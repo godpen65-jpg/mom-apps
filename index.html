@@ -15,10 +15,9 @@
     min-height: 100vh;
     color: #4a3f55;
     padding: 32px 18px 60px;
-    display: flex;
-    justify-content: center;
+    overflow-x: hidden;
   }
-  .wrap { width: 100%; max-width: 480px; }
+  .wrap { width: 100%; max-width: 480px; margin: 0 auto; }
 
   header { text-align: center; margin-bottom: 28px; }
   .emoji-top { font-size: 46px; }
@@ -80,6 +79,43 @@
     padding: 2px 10px;
     border-radius: 999px;
     margin-bottom: 8px;
+  }
+
+  .social { margin-top: 34px; text-align: center; }
+  .social-title {
+    font-family: 'Jua', sans-serif;
+    font-size: 18px;
+    color: #e8698f;
+    margin-bottom: 14px;
+  }
+  .social-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .sbtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    background: #ffffff;
+    border: 2px solid #ffe1ec;
+    border-radius: 999px;
+    padding: 10px 16px;
+    box-shadow: 0 4px 12px rgba(232,105,143,0.10);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .sbtn:hover, .sbtn:active {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(232,105,143,0.20);
+  }
+  .sicon { font-size: 18px; line-height: 1; }
+  .slabel {
+    font-family: 'Jua', sans-serif;
+    font-size: 14px;
+    color: #6b6078;
+    white-space: nowrap;
   }
 
   footer {
@@ -160,6 +196,21 @@
         <div class="arrow">›</div>
       </div>
     </a>
+
+    <div class="social">
+      <div class="social-title">소통해요 💌</div>
+      <div class="social-row">
+        <a class="sbtn" href="https://www.instagram.com/baaabi_doll/" target="_blank" rel="noopener">
+          <span class="sicon">📷</span><span class="slabel">인스타그램</span>
+        </a>
+        <a class="sbtn" href="https://www.threads.com/@baaabi_doll" target="_blank" rel="noopener">
+          <span class="sicon">🧵</span><span class="slabel">스레드</span>
+        </a>
+        <a class="sbtn" href="https://blog.naver.com/godpen1126" target="_blank" rel="noopener">
+          <span class="sicon">📝</span><span class="slabel">블로그</span>
+        </a>
+      </div>
+    </div>
 
     <footer>
       초1 딸 키우는 엄마가 만들어요 <span class="heart">♥</span><br>
