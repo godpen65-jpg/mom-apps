@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>💗 내 사이트 방문자 현황판</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Jua','Apple SD Gothic Neo',sans-serif;
+    background:linear-gradient(160deg,#fff0f6 0%,#fdeffb 50%,#eef4ff 100%);
+    color:#5b4b66;min-height:100vh;padding:24px 14px 60px;
+  }
+  .wrap{max-width:560px;margin:0 auto;}
+  h1{font-size:26px;text-align:center;color:#ff7eb3;margin-bottom:4px;}
+  .sub{text-align:center;font-family:'Gaegu',sans-serif;font-size:15px;color:#a99;margin-bottom:6px;}
+  .total{
+    text-align:center;background:#fff;border-radius:22px;padding:16px;margin:16px 0 22px;
+    box-shadow:0 6px 18px rgba(255,150,190,.18);border:2px dashed #ffc7de;
+  }
+  .total .n{font-size:38px;color:#ff5fa2;}
+  .total .lbl{font-family:'Gaegu',sans-serif;font-size:15px;color:#b0a}
+  .sec{font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;color:#c58;margin:18px 6px 8px;}
+  .card{
+    display:flex;align-items:center;gap:12px;background:#fff;border-radius:18px;
+    padding:14px 16px;margin-bottom:11px;box-shadow:0 4px 12px rgba(200,160,200,.14);
+    text-decoration:none;color:inherit;transition:transform .12s;
+  }
+  .card:active{transform:scale(.98);}
+  .emo{font-size:26px;width:34px;text-align:center;flex:0 0 auto;}
+  .info{flex:1 1 auto;min-width:0;}
+  .nm{font-size:17px;color:#6a5}
+  .nm{color:#7a6b86;}
+  .url{font-family:'Gaegu',sans-serif;font-size:12px;color:#bbb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cnt{font-size:24px;color:#ff6faa;flex:0 0 auto;min-width:58px;text-align:right;}
+  .cnt small{font-size:12px;color:#cbb;}
+  .foot{text-align:center;font-family:'Gaegu',sans-serif;font-size:13px;color:#bbb;margin-top:22px;line-height:1.7;}
+  .refresh{
+    display:block;margin:20px auto 0;background:#ffb3d1;color:#fff;border:none;
+    font-family:'Jua',sans-serif;font-size:16px;padding:11px 26px;border-radius:30px;
+    cursor:pointer;box-shadow:0 5px 14px rgba(255,150,190,.35);
+  }
+  .refresh:active{transform:scale(.96);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>💗 내 사이트 방문자 현황판</h1>
+  <div class="sub">엄마가 만든 사이트들, 얼마나 왔나 보기</div>
+
+  <div class="total">
+    <div class="n" id="total">…</div>
+    <div class="lbl">전체 방문 합계</div>
+  </div>
+
+  <div class="sec">🌸 공유용 앱</div>
+  <div id="grp-share"></div>
+
+  <div class="sec">🔒 개인용 (공유 안 함)</div>
+  <div id="grp-private"></div>
+
+  <div class="sec">🏠 모아보기 허브</div>
+  <div id="grp-hub"></div>
+
+  <button class="refresh" onclick="loadAll()">🔄 새로고침</button>
+  <div class="foot">
+    숫자는 이 현황판을 열어도 올라가지 않아요(읽기 전용).<br>
+    현황판 자체는 검색에 안 뜨는 나만 보는 페이지예요.<br>
+    <span id="updated"></span>
+  </div>
+</div>
+
+<script>
+var NS="godpen65-sites";
+var SITES=[
+  {g:"share",  e:"📚", nm:"워드업400",     key:"wordup400",   url:"https://godpen65-jpg.github.io/wordup400/"},
+  {g:"share",  e:"✏️", nm:"받아쓰기",       key:"dictation",   url:"https://godpen65-jpg.github.io/dictation-practice/"},
+  {g:"share",  e:"🔤", nm:"파닉스 로드맵",  key:"phonics",     url:"https://godpen65-jpg.github.io/phonics-roadmap/"},
+  {g:"share",  e:"📖", nm:"다국어 동화",    key:"donghwa",     url:"https://godpen65-jpg.github.io/donghwa-multilang/"},
+  {g:"share",  e:"🗓️", nm:"방학 일정표",    key:"vacation",    url:"https://godpen65-jpg.github.io/vacation-schedule-maker/"},
+  {g:"private",e:"🧸", nm:"리틀헬로",       key:"littlehello", url:"https://godpen65-jpg.github.io/littlehello-lessons/"},
+  {g:"private",e:"🤖", nm:"마미AI",         key:"mommyai",     url:"https://godpen65-jpg.github.io/mommyai-lessons/"},
+  {g:"hub",    e:"🏠", nm:"엄마표앱 모음",  key:"momapps",     url:"https://godpen65-jpg.github.io/mom-apps/"}
+];
+
+function cardHTML(s){
+  return '<a class="card" href="'+s.url+'" target="_blank" rel="noopener">'+
+    '<div class="emo">'+s.e+'</div>'+
+    '<div class="info"><div class="nm">'+s.nm+'</div><div class="url">'+s.url.replace("https://","")+'</div></div>'+
+    '<div class="cnt" id="c-'+s.key+'">…</div></a>';
+}
+
+function render(){
+  ["share","private","hub"].forEach(function(g){
+    var box=document.getElementById("grp-"+(g==="share"?"share":g==="private"?"private":"hub"));
+    box.innerHTML=SITES.filter(function(s){return s.g===g;}).map(cardHTML).join("");
+  });
+}
+
+function loadAll(){
+  render();
+  var total=0, done=0;
+  SITES.forEach(function(s){
+    fetch("https://abacus.jasoncameron.dev/get/"+NS+"/"+s.key)
+      .then(function(r){return r.json();})
+      .then(function(d){
+        var v=(d&&typeof d.value!=="undefined")?Number(d.value):0;
+        var el=document.getElementById("c-"+s.key);
+        if(el) el.innerHTML=v.toLocaleString()+' <small>회</small>';
+        total+=v;
+      })
+      .catch(function(){
+        var el=document.getElementById("c-"+s.key);
+        if(el) el.innerHTML='<small>-</small>';
+      })
+      .finally(function(){
+        done++;
+        if(done===SITES.length){
+          document.getElementById("total").textContent=total.toLocaleString();
+          var now=new Date();
+          document.getElementById("updated").textContent="업데이트: "+now.toLocaleString('ko-KR');
+        }
+      });
+  });
+}
+loadAll();
+</script>
+</body>
+</html>
