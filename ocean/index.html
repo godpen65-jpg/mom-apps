@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#fdf7ea; --ink:#43382c; --muted:#a2937a;
+    --paper:#fdf7ea; --ink:#43382c; --muted:#6f6047;
     --tile-top:#ffc064; --tile-bot:#f79c1a; --tile-edge:#d17c10;
     --blue:#1560ad; --green:#2e9e5b; --red:#e0533f;
   }
@@ -77,6 +77,7 @@
   .art svg{position:absolute;inset:0;width:100%;height:100%;}
   .art span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
             font-size:68px;line-height:1;filter:drop-shadow(0 5px 6px rgba(0,0,0,.18));}
+  .art span.n2{font-size:44px;} .art span.n3{font-size:32px;}
   .label{background:#fff;color:var(--blue);border-radius:99px;padding:6px 16px;font-size:16px;
          box-shadow:0 2px 6px rgba(0,0,0,.14);}
   .pagenum{color:var(--muted);font-size:14px;}
@@ -146,6 +147,7 @@
   .help{text-align:left;}
   .help h2{text-align:center;}
   .help ul{padding-left:20px;margin:8px 0;}
+  .help .hl{background:#ffe94f;border-radius:4px;padding:0 3px;}
   .help li{font-size:16px;line-height:1.75;color:#5d5040;margin-bottom:4px;}
   .help .note{font-size:14px;color:#a2937a;margin-top:14px;}
 
@@ -162,7 +164,7 @@
 
   /* ── 문제 ── */
   .ask{margin:0 0 4px;font-size:20px;color:var(--ink);line-height:1.5;}
-  .qhint{margin:0 0 12px;font-size:15px;color:var(--muted);line-height:1.6;}
+  .qhint{margin:0 0 12px;font-size:16px;color:var(--muted);line-height:1.6;}
   .qsent{
     margin:0 0 12px;font-size:20px;line-height:1.9;
     font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;
@@ -203,6 +205,7 @@
     .main{border-radius:0 0 16px 16px;padding:14px 12px 16px;}
     .art{width:96px;height:96px;}
     .art span{font-size:44px;}
+    .art span.n2{font-size:30px;} .art span.n3{font-size:22px;}
     .ln p{font-size:19px;line-height:1.85;}
     .ask{font-size:18px;} .qsent{font-size:18px;} .choice{font-size:17px;}
     .tab{font-size:15px;padding:8px 16px;}
@@ -286,7 +289,6 @@
     <div class="art" id="art"></div>
     <div class="who">
       <div class="label" id="label"></div>
-      <div class="pagenum" id="pagenum"></div>
     </div>
     <div class="tiles" id="tilesWide"></div>
   </div>
@@ -345,13 +347,15 @@
     <li>글을 읽다가 <b>빈칸</b>이 나오면, 아래 단어 중 <b>알맞은 것을 눌러요</b>.</li>
     <li>지금 채울 빈칸은 <b>파란 줄</b>로 깜빡여요.</li>
     <li>틀리면 단어가 흔들려요. 세 번 틀리면 <b>정답 단어</b>가 반짝여요.</li>
-    <li>문장 옆 <b>🔊</b> 를 누르면 <b>그 문장만</b> 들려줘요.</li>
-    <li>아래 <b>전체 듣기</b>를 누르면 그 쪽을 처음부터 들려줘요.</li>
+    <li>채울 차례가 된 문장은 <b>저절로 한 번</b> 읽어줘요.</li>
+    <li>문장 옆 <b>🔊</b> 를 누르면 <b>그 문장만</b> 다시 들려줘요.</li>
+    <li>아래 <b>전체 듣기</b> 는 누를 때만 그 쪽을 쭉 읽어줘요.</li>
     <li>다 채우면 <b>한국어 뜻</b>이 아래에 나와요.</li>
+    <li><b class="hl">노란 단어</b>는 책에 형광펜으로 칠해져 있는 중요한 단어예요.</li>
   </ul>
   <p class="note">
     책 『At Home in the Ocean』 (Rozanne Lanczak Williams) 16~28쪽이에요.<br>
-    음원 파일을 넣으면 사람 목소리로 들려주고, 없으면 브라우저 읽어주기로 들려줘요.
+    문장마다 녹음된 소리가 들어 있어요.
   </p>
   <button class="btn" id="btnHelpClose" type="button">닫기</button>
 </div></div>
@@ -366,11 +370,10 @@ window.onerror = function(msg, src, line){
 };
 
 /* ══════════════════════════════════════════════════════════
-   1. 음원 설정 ── 여기에 오디오북 음원을 넣으세요
-      src 를 비워두면 브라우저 읽어주기로 대신합니다.
-      각 쪽의 t:[시작초, 끝초] 구간만 재생됩니다.
+   1. 음원 ── 문장마다 audio 폴더에 파일이 하나씩 있습니다.
+      아래 본문 각 줄의 a 가 그 문장의 소리 파일입니다.
+      a 를 지우거나 파일이 없으면 브라우저 읽어주기로 대신합니다.
    ══════════════════════════════════════════════════════════ */
-const AUDIO = { src: "" };
 
 /* ══════════════════════════════════════════════════════════
    2. 본문 ── 다른 책으로 바꾸려면 여기만 고치면 됩니다.
@@ -378,54 +381,44 @@ const AUDIO = { src: "" };
       key : 책에 형광펜으로 칠해져 있던 단어
    ══════════════════════════════════════════════════════════ */
 const PAGES = [
-  { page:16, art:"🐬", label:"dolphins", key:["blue","far"], lines:[
-    { en:"The ocean is {big}!", ko:"바다는 커요!" },
-    { en:"It is big and {blue} as {far} as you can see.", ko:"눈에 보이는 데까지 크고 파래요." }
+  { page:"16~18", art:"🐬🦈🐋", label:"the ocean", key:["blue","far","home","little"], lines:[
+    { a:"audio/s01.mp3", en:"The ocean is {big}!", ko:"바다는 커요!" },
+    { a:"audio/s02.mp3", en:"It is big and {blue} as {far} as you can see.", ko:"눈에 보이는 데까지 크고 파래요." },
+    { a:"audio/s03.mp3", en:"It is {home} to many plants and {animals}.", ko:"바다는 많은 식물과 동물의 집이에요." },
+    { a:"audio/s04.mp3", en:"The {biggest} animals in the ocean are blue whales.", ko:"바다에서 가장 큰 동물은 흰긴수염고래예요." },
+    { a:"audio/s05.mp3", en:"They eat {little} animals called {krill}.", ko:"크릴이라는 작은 동물을 먹어요." }
   ]},
-  { page:17, art:"🦈", label:"reef shark", key:["home"], lines:[
-    { en:"It is {home} to many plants and {animals}.", ko:"바다는 많은 식물과 동물의 집이에요." }
+  { page:"20~21", art:"🐚🐧", label:"cold water", key:["live","cold","their"], lines:[
+    { a:"audio/s06.mp3", en:"Many animals {live} in {cold} water.", ko:"많은 동물이 차가운 물에 살아요." },
+    { a:"audio/s07.mp3", en:"Brrr!", ko:"으으, 추워!" },
+    { a:"audio/s08.mp3", en:"Penguins swim {fast}!", ko:"펭귄은 빠르게 헤엄쳐요!" },
+    { a:"audio/s09.mp3", en:"They flap {their} wings to zip, zip, zip in the {water}.", ko:"날개를 파닥이며 물속을 쌩쌩 지나가요." }
   ]},
-  { page:18, art:"🐋", label:"blue whale", key:["little"], lines:[
-    { en:"The {biggest} animals in the ocean are blue whales.", ko:"바다에서 가장 큰 동물은 흰긴수염고래예요." },
-    { en:"They eat {little} animals called {krill}.", ko:"크릴이라는 작은 동물을 먹어요." }
+  { page:"22~23", art:"🦭", label:"manatees", key:["where","warm","lots"], lines:[
+    { a:"audio/s10.mp3", en:"Manatees live {where} the water is {warm}.", ko:"매너티는 물이 따뜻한 곳에 살아요." },
+    { a:"audio/s11.mp3", en:"They do not swim {fast}.", ko:"빠르게 헤엄치지 않아요." },
+    { a:"audio/s12.mp3", en:"Manatees eat {lots} and lots of {plants}.", ko:"매너티는 식물을 아주 많이 먹어요." },
+    { a:"audio/s13.mp3", en:"Then they {rest}.", ko:"그러고 나서 쉬어요." }
   ]},
-  { page:20, art:"🐚", label:"sea urchins", key:["live","cold"], lines:[
-    { en:"Many animals {live} in {cold} water.", ko:"많은 동물이 차가운 물에 살아요." },
-    { en:"Brrr!", ko:"으으, 추워!" }
+  { page:"24", art:"🐢", label:"turtle", key:["lays"], lines:[
+    { a:"audio/s14.mp3", en:"This turtle swims {far}!", ko:"이 거북은 멀리까지 헤엄쳐요!" },
+    { a:"audio/s15.mp3", en:"It digs in the {sand} and {lays} its eggs.", ko:"모래를 파고 알을 낳아요." },
+    { a:"audio/s16.mp3", en:"Then it swims back to its ocean {home}.", ko:"그러고 나서 바다 집으로 돌아가요." }
   ]},
-  { page:21, art:"🐧", label:"penguins", key:["their"], lines:[
-    { en:"Penguins swim {fast}!", ko:"펭귄은 빠르게 헤엄쳐요!" },
-    { en:"They flap {their} wings to zip, zip, zip in the {water}.", ko:"날개를 파닥이며 물속을 쌩쌩 지나가요." }
+  { page:"26~27", art:"🌿🦦", label:"kelp & sea otters", key:["grow","lots"], lines:[
+    { a:"audio/s17.mp3", en:"Kelp is the {biggest} plant in the ocean.", ko:"켈프는 바다에서 가장 큰 식물이에요." },
+    { a:"audio/s18.mp3", en:"It can {grow} fast.", ko:"빠르게 자랄 수 있어요." },
+    { a:"audio/s19.mp3", en:"Kelp can grow two {feet} in a day!", ko:"켈프는 하루에 60센티미터나 자랄 수 있어요!" },
+    { a:"audio/s20.mp3", en:"Sea otters can get {lots} of {food} here.", ko:"해달은 여기서 먹이를 많이 얻어요." }
   ]},
-  { page:22, art:"🦭", label:"manatee", key:["where","warm"], lines:[
-    { en:"Manatees live {where} the water is {warm}.", ko:"매너티는 물이 따뜻한 곳에 살아요." },
-    { en:"They do not swim {fast}.", ko:"빠르게 헤엄치지 않아요." }
-  ]},
-  { page:23, art:"🦭", label:"manatees", key:["lots"], lines:[
-    { en:"Manatees eat {lots} and lots of {plants}.", ko:"매너티는 식물을 아주 많이 먹어요." },
-    { en:"Then they {rest}.", ko:"그러고 나서 쉬어요." }
-  ]},
-  { page:24, art:"🐢", label:"turtle", key:["lays"], lines:[
-    { en:"This turtle swims {far}!", ko:"이 거북은 멀리까지 헤엄쳐요!" },
-    { en:"It digs in the {sand} and {lays} its eggs.", ko:"모래를 파고 알을 낳아요." },
-    { en:"Then it swims back to its ocean {home}.", ko:"그러고 나서 바다 집으로 돌아가요." }
-  ]},
-  { page:26, art:"🌿", label:"kelp", key:["grow"], lines:[
-    { en:"Kelp is the {biggest} plant in the ocean.", ko:"켈프는 바다에서 가장 큰 식물이에요." },
-    { en:"It can {grow} fast.", ko:"빠르게 자랄 수 있어요." }
-  ]},
-  { page:27, art:"🦦", label:"sea otter", key:["lots"], lines:[
-    { en:"Kelp can grow two {feet} in a day!", ko:"켈프는 하루에 60센티미터나 자랄 수 있어요!" },
-    { en:"Sea otters can get {lots} of {food} here.", ko:"해달은 여기서 먹이를 많이 얻어요." }
-  ]},
-  { page:28, art:"🐠", label:"coral reef", key:["little","their"], lines:[
-    { en:"Lots of plants and animals, big and {little}, live in the ocean.", ko:"크고 작은 많은 식물과 동물이 바다에 살아요." },
-    { en:"The ocean is {their} {home}.", ko:"바다가 그들의 집이에요." }
+  { page:"28", art:"🐠", label:"coral reef", key:["little","their"], lines:[
+    { a:"audio/s21.mp3", en:"Lots of plants and animals, big and {little}, live in the ocean.", ko:"크고 작은 많은 식물과 동물이 바다에 살아요." },
+    { a:"audio/s22.mp3", en:"The ocean is {their} {home}.", ko:"바다가 그들의 집이에요." }
   ]}
 ];
 
 const $ = function(id){ return document.getElementById(id); };
-const artEl=$('art'), labelEl=$('label'), pageEl=$('pagenum'), txtEl=$('txt');
+const artEl=$('art'), labelEl=$('label'), txtEl=$('txt');
 const tilesWide=$('tilesWide'), tilesNarrow=$('tilesNarrow');
 const btnNext=$('btnNext'), barFill=$('barFill'), countEl=$('count');
 
@@ -455,7 +448,7 @@ function drawArt(emoji, el){
     '<svg viewBox="'+(-r-6)+' '+(-r-6)+' '+(w+2*r+12)+' '+(h+2*r+12)+'">' +
       '<path d="'+scallop(w,h,r)+'" fill="#dff1fd" stroke="#bfe4fb" stroke-width="7"/>' +
       '<path d="'+scallop(w,h,r)+'" fill="none" stroke="#fff" stroke-width="3"/>' +
-    '</svg><span>'+emoji+'</span>';
+    '</svg><span class="n'+Array.from(emoji).length+'">'+emoji+'</span>';
 }
 
 (function makeBubbles(){
@@ -473,23 +466,15 @@ function drawArt(emoji, el){
 
 /* 소리 */
 const audioEl = new Audio();
-let stopAt = null;
-if(AUDIO.src) audioEl.src = AUDIO.src;
-audioEl.addEventListener('timeupdate', function(){
-  if(stopAt !== null && audioEl.currentTime >= stopAt){ audioEl.pause(); stopAt = null; }
+let queue = [];
+audioEl.addEventListener('ended', function(){
+  if(queue.length){ audioEl.src = queue.shift(); audioEl.play(); }
 });
 function pageText(){
   return PAGES[idx].lines.map(function(l){ return l.en.replace(/[{}]/g,''); }).join(' ');
 }
-function speak(text, t){
-  if(AUDIO.src && t){
-    try{
-      stopAt = t[1];
-      audioEl.currentTime = t[0];
-      audioEl.play();
-      return;
-    }catch(e){ /* 음원을 못 읽으면 읽어주기로 */ }
-  }
+/* 음원 파일이 없을 때만 쓰는 브라우저 읽어주기 */
+function say(text){
   if(!('speechSynthesis' in window)) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
@@ -497,21 +482,72 @@ function speak(text, t){
   speechSynthesis.speak(u);
 }
 
+/* 파일 여러 개를 차례대로 재생합니다.
+   재생 도중 다른 소리가 시작되면 앞의 재생은 조용히 버립니다.
+   (여기서 예비용 읽어주기를 부르면 목소리가 두 개로 겹칩니다) */
+let playSeq = 0;
+function play(files, fallbackText){
+  const my = ++playSeq;
+  queue = [];
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  audioEl.pause();
+  if(!files.length){ say(fallbackText); return; }
+  queue = files.slice(1);
+  audioEl.src = files[0];
+  const go = audioEl.play();
+  if(go && go.catch) go.catch(function(e){
+    if(my !== playSeq) return;                        /* 더 새 소리가 시작됨 */
+    if(e && e.name === 'AbortError') return;          /* 다른 소리로 교체된 것뿐 */
+    queue = []; say(fallbackText);
+  });
+}
+
+function speak(text, file){ play(file ? [file] : [], text); }
+
+/* 맞혔을 때 나는 짧은 소리 (파일 없이 브라우저가 냅니다) */
+let actx = null;
+function ding(){
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    actx = actx || new AC();
+    if(actx.state === 'suspended') actx.resume();
+    const t0 = actx.currentTime;
+    [523.25, 659.25, 783.99].forEach(function(f, i){
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      const at = t0 + i * 0.08;
+      g.gain.setValueAtTime(0.0001, at);
+      g.gain.exponentialRampToValueAtTime(0.22, at + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + 0.26);
+      o.connect(g); g.connect(actx.destination);
+      o.start(at); o.stop(at + 0.3);
+    });
+  }catch(e){ /* 소리를 못 내면 그냥 넘어갑니다 */ }
+}
+
+let readTimer = null;
+function scheduleRead(ms){
+  clearTimeout(readTimer);
+  readTimer = setTimeout(focusRow, ms);
+}
+
+/* 지금 채울 차례인 문장을 읽어줍니다 (아직 안 읽은 문장까지 차례대로) */
+let curRow = -1;
+function focusRow(){
+  const lines = PAGES[idx].lines;
+  const b = txtEl.querySelector('.blank[data-n="' + cursor + '"]');
+  const to = b ? Number(b.dataset.li) : lines.length - 1;
+  if(to <= curRow) return;
+  const files = [];
+  for(let i = curRow + 1; i <= to; i++) if(lines[i].a) files.push(lines[i].a);
+  curRow = to;
+  if(files.length) play(files, lines[to].en.replace(/[{}]/g, ''));
+}
+
 function playPage(){
   const p = PAGES[idx];
-  if(AUDIO.src){
-    try{
-      stopAt = p.t ? p.t[1] : null;
-      audioEl.currentTime = p.t ? p.t[0] : 0;
-      audioEl.play();
-      return;
-    }catch(e){ /* 음원을 못 읽으면 읽어주기로 */ }
-  }
-  if(!('speechSynthesis' in window)) return;
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(pageText());
-  u.lang='en-US'; u.rate=0.82;
-  speechSynthesis.speak(u);
+  play(p.lines.map(function(l){ return l.a; }).filter(Boolean), pageText());
 }
 
 function norm(w){ return w.replace(/[^A-Za-z']/g,'').toLowerCase(); }
@@ -522,11 +558,10 @@ function shuffle(a){
 
 function renderPage(){
   const p = PAGES[idx];
-  cursor = 0; misses = 0; answers = [];
+  cursor = 0; misses = 0; answers = []; curRow = -1; clearTimeout(readTimer);
 
   drawArt(p.art);
-  labelEl.textContent = p.label;
-  pageEl.textContent = p.page + '쪽';
+  labelEl.textContent = p.label + ' · ' + p.page + '쪽';
   btnNext.hidden = true;
 
   txtEl.innerHTML = '';
@@ -538,7 +573,7 @@ function renderPage(){
     spk.type = 'button'; spk.className = 'spk'; spk.textContent = '🔊';
     spk.title = '이 문장 듣기';
     spk.dataset.text = line.en.replace(/[{}]/g, '');
-    if(line.t) spk.dataset.t = line.t.join(',');
+    if(line.a) spk.dataset.a = line.a;
     row.appendChild(spk);
 
     const body = document.createElement('div');
@@ -553,6 +588,7 @@ function renderPage(){
         b.className = 'blank';
         b.dataset.answer = part;
         b.dataset.n = answers.length;
+        b.dataset.li = li;
         b.textContent = part;      /* 글자는 투명, 칸 너비만 잡아줘요 */
         para.appendChild(b);
         answers.push(part);
@@ -625,8 +661,10 @@ function onTile(e){
     const hints = document.querySelectorAll('.tile.hint');
     for(let i=0;i<hints.length;i++) hints[i].classList.remove('hint');
 
+    ding();
     if(cursor >= answers.length){ markNow(); finishPage(); }
     else markNow();
+    if(touched) scheduleRead(620);
   } else {
     t.classList.add('bad');
     setTimeout(function(){ t.classList.remove('bad'); }, 450);
@@ -651,15 +689,22 @@ txtEl.addEventListener('click', function(e){
   for(let i=0;i<marks.length;i++) marks[i].classList.remove('on');
   s.classList.add('on');
   setTimeout(function(){ s.classList.remove('on'); }, 1400);
-  speak(s.dataset.text, s.dataset.t ? s.dataset.t.split(',').map(Number) : null);
+  speak(s.dataset.text, s.dataset.a || null);
 });
 
 $('btnListen').addEventListener('click', function(){ touched = true; playPage(); });
 
+/* 브라우저는 화면을 한 번 건드리기 전에는 소리를 못 냅니다.
+   그래서 첫 터치 때 지금 문장을 읽어줍니다. */
+document.addEventListener('pointerdown', function first(){
+  touched = true;
+  scheduleRead(120);
+}, { once: true });
+
 btnNext.addEventListener('click', function(){
   if(idx === PAGES.length-1){ clearIdx(); $('ovEnd').classList.add('on'); return; }
   idx++; renderPage();
-  if(touched) setTimeout(playPage, 350);
+  if(touched) scheduleRead(350);
   window.scrollTo(0,0);
 });
 
