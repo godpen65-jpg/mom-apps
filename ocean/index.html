@@ -149,6 +149,49 @@
   .help li{font-size:16px;line-height:1.75;color:#5d5040;margin-bottom:4px;}
   .help .note{font-size:14px;color:#a2937a;margin-top:14px;}
 
+
+  /* ── 읽기 / 문제 고르는 줄 ── */
+  .tabs{max-width:980px;margin:0 auto 10px;display:flex;gap:8px;justify-content:center;}
+  .tab{
+    background:rgba(255,255,255,.55);border:none;border-radius:99px;
+    padding:9px 22px;font-size:16px;font-family:inherit;color:#1f6491;cursor:pointer;
+    box-shadow:0 3px 0 rgba(0,0,0,.12);
+  }
+  .tab.on{background:#fff;box-shadow:0 3px 0 rgba(0,0,0,.2);}
+  .tab:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.12);}
+
+  /* ── 문제 ── */
+  .ask{margin:0 0 4px;font-size:20px;color:var(--ink);line-height:1.5;}
+  .qhint{margin:0 0 12px;font-size:15px;color:var(--muted);line-height:1.6;}
+  .qsent{
+    margin:0 0 12px;font-size:20px;line-height:1.9;
+    font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;
+  }
+  .qsent u{text-decoration-color:var(--red);text-underline-offset:4px;}
+  .choices{display:flex;flex-direction:column;gap:9px;}
+  .choice{
+    display:flex;gap:10px;align-items:center;width:100%;text-align:left;
+    background:#fff;border:2px solid #eee0c4;border-radius:14px;padding:12px 14px;
+    font-size:19px;font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;
+    color:var(--ink);cursor:pointer;line-height:1.5;
+  }
+  .choice .mark{
+    width:28px;height:28px;border-radius:50%;background:#e9f4fc;color:#1f6491;flex:none;
+    display:flex;align-items:center;justify-content:center;font-size:15px;
+    font-family:'Jua',system-ui,sans-serif;
+  }
+  .choice.ok{border-color:var(--green);background:#f3fbf6;}
+  .choice.ok .mark{background:var(--green);color:#fff;}
+  .choice.no{border-color:var(--red);background:#fdf3f1;animation:shake .4s;}
+  .choice.no .mark{background:var(--red);color:#fff;}
+  .why{
+    display:none;margin:12px 0 0;font-size:16px;line-height:1.7;color:#3f7d57;
+    background:#f3fbf6;border:2px solid #cfe9da;border-radius:12px;padding:11px 13px;
+  }
+  .why.show{display:block;}
+  .part{background:#fff;color:var(--blue);border-radius:99px;padding:6px 16px;font-size:16px;
+        box-shadow:0 2px 6px rgba(0,0,0,.14);text-align:center;}
+
   @media (max-width:820px){
     body{padding:8px;}
     .book{flex-direction:column;padding:8px;}
@@ -161,6 +204,8 @@
     .art{width:96px;height:96px;}
     .art span{font-size:44px;}
     .ln p{font-size:19px;line-height:1.85;}
+    .ask{font-size:18px;} .qsent{font-size:18px;} .choice{font-size:17px;}
+    .tab{font-size:15px;padding:8px 16px;}
     .main .tiles{display:flex;}
     .tile{font-size:19px;padding:10px 16px;}
   }
@@ -230,6 +275,12 @@
   <button class="icon-btn" id="btnHelp" type="button" title="사용법">?</button>
 </div>
 
+<div class="tabs">
+  <button class="tab on" id="tabRead" type="button">📖 읽기</button>
+  <button class="tab" id="tabQuiz" type="button">✏️ 문제</button>
+</div>
+
+<div id="readView">
 <div class="book">
   <div class="side">
     <div class="art" id="art"></div>
@@ -249,7 +300,38 @@
   </div>
 </div>
 
-<div class="stamp">v4 · 빈칸 채우기 + 문장별 듣기</div>
+</div>
+
+<div id="quizView" hidden>
+<div class="book">
+  <div class="side">
+    <div class="art" id="qArt"></div>
+    <div class="who">
+      <div class="part" id="qPart"></div>
+      <div class="pagenum" id="qSrc"></div>
+    </div>
+  </div>
+  <div class="main">
+    <p class="ask" id="qAsk"></p>
+    <p class="qhint" id="qHint"></p>
+    <p class="qsent" id="qSent"></p>
+    <div class="choices" id="qChoices"></div>
+    <div class="tiles" id="qTiles"></div>
+    <p class="why" id="qWhy"></p>
+    <div class="actions">
+      <button class="btn go" id="qNext" type="button" hidden>다음 ▶</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="stamp">v5 · 빈칸 채우기 + 워크북 문제 15개</div>
+
+<div class="ov" id="ovQuizEnd"><div class="ov-box">
+  <h2 id="winTitle">✏️ 문제 다 풀었어요!</h2>
+  <p id="winText"></p>
+  <button class="btn go" id="btnQuizAgain" type="button">문제 다시 풀기</button>
+</div></div>
 
 <div class="ov" id="ovEnd"><div class="ov-box">
   <h2>🎉 다 읽었어요!</h2>
@@ -367,9 +449,9 @@ function scallop(w,h,r){
   for(let i=0;i<ny;i++) d += ' a'+(sy/2)+','+(sy/2)+' 0 0,1 0,'+(-sy);
   return d + ' Z';
 }
-function drawArt(emoji){
+function drawArt(emoji, el){
   const w=124,h=124,r=13;
-  artEl.innerHTML =
+  (el || artEl).innerHTML =
     '<svg viewBox="'+(-r-6)+' '+(-r-6)+' '+(w+2*r+12)+' '+(h+2*r+12)+'">' +
       '<path d="'+scallop(w,h,r)+'" fill="#dff1fd" stroke="#bfe4fb" stroke-width="7"/>' +
       '<path d="'+scallop(w,h,r)+'" fill="none" stroke="#fff" stroke-width="3"/>' +
@@ -590,6 +672,234 @@ $('ovHelp').addEventListener('click', function(e){ if(e.target === this) this.cl
 const saved = parseInt(loadIdx() || '0', 10) || 0;
 if(saved > 0 && saved < PAGES.length) idx = saved;
 renderPage();
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   워크북 문제 (Making Connections 2 · Test Yourself 2 · 39쪽 C)
+   answerIf 가 있으면 앞에서 고른 물(cold/warm)에 따라 정답이 달라집니다.
+   ══════════════════════════════════════════════════════════ */
+var QUIZ = [
+  { part:"그림에 맞는 문장", src:"39쪽 C · 1", art:"🐢",
+    ask:"그림에 맞는 문장을 고르세요.",
+    hint:"거북이 넓은 바다를 헤엄쳐 가고 있어요. (24~25쪽)",
+    choices:["This turtle swims far.","This turtle rests.","This turtle doesn't swim far."],
+    answer:0, why:"24쪽 — This turtle swims far! 멀리까지 헤엄쳐요." },
+
+  { part:"그림에 맞는 문장", src:"39쪽 C · 2", art:"🥚",
+    ask:"그림에 맞는 문장을 고르세요.",
+    hint:"거북이 모래 속에 하얀 알을 낳아 두었어요. (24~25쪽)",
+    choices:["The turtle flaps its wings.","The turtle lays its eggs.","The turtle gets lots of food."],
+    answer:1, why:"24쪽 — It digs in the sand and lays its eggs. 알을 낳아요." },
+
+  { part:"그림에 맞는 문장", src:"39쪽 C · 3", art:"🌿",
+    ask:"그림에 맞는 문장을 고르세요.",
+    hint:"바닷속에 켈프 숲이 길게 자라 있어요. (26쪽)",
+    choices:["Kelp can grow slow.","Kelp can grow fast.","Kelp doesn't grow."],
+    answer:1, why:"26쪽 — It can grow fast. 빠르게 자라요." },
+
+  { part:"그림에 맞는 문장", src:"39쪽 C · 4", art:"🐠",
+    ask:"그림에 맞는 문장을 고르세요.",
+    hint:"산호초에 물고기와 거북이 가득해요. (28쪽)",
+    choices:["Lots of plants and animals live in the ocean.",
+             "Lots of plants and animals live in the desert.",
+             "Lots of plants and animals live in the forest."],
+    answer:0, why:"28쪽 — Lots of plants and animals live in the ocean. 사막도 숲도 아니에요." },
+
+  { part:"틀린 말 고치기", src:"38쪽 A · 1", art:"🐢",
+    ask:"밑줄 친 말을 알맞게 고치세요.",
+    sent:"The turtle <u>eats</u> in the sand.",
+    choices:["digs","rests","swims"],
+    answer:0, why:"24쪽 — It digs in the sand. 모래를 파요.\n고친 문장: The turtle digs in the sand." },
+
+  { part:"틀린 말 고치기", src:"38쪽 A · 2", art:"🦦",
+    ask:"밑줄 친 말을 알맞게 고치세요.",
+    sent:"<u>Sea otters</u> can grow two feet in a day!",
+    choices:["Kelp","Penguins","Turtles"],
+    answer:0, why:"27쪽 — Kelp can grow two feet in a day! 하루에 자라는 건 켈프예요.\n고친 문장: Kelp can grow two feet in a day!" },
+
+  { part:"낱말 상자로 채우기", src:"38쪽 B · 1", art:"🌿", fill:true, cap:true,
+    ask:"What is the biggest plant in the ocean?",
+    sent:"{kelp} is the biggest plant in the ocean.",
+    why:"26쪽 — Kelp is the biggest plant in the ocean." },
+
+  { part:"낱말 상자로 채우기", src:"38쪽 B · 2", art:"🌿", fill:true,
+    ask:"How can kelp grow?",
+    sent:"Kelp can {grow} fast.",
+    why:"26쪽 — It can grow fast." },
+
+  { part:"낱말 상자로 채우기", src:"38쪽 B · 3", art:"🌿", fill:true,
+    ask:"How much can kelp grow in a day?",
+    sent:"Kelp can grow two {feet} in a day.",
+    why:"27쪽 — Kelp can grow two feet in a day!" },
+
+  { part:"낱말 상자로 채우기", src:"38쪽 B · 4", art:"🦦", fill:true, cap:true,
+    ask:"What animals can get lots of food from kelp?",
+    sent:"{sea otters} can get lots of food from kelp.",
+    why:"27쪽 — Sea otters can get lots of food here." },
+
+  { part:"차가운 물? 따뜻한 물?", src:"37쪽 A · 1", art:"🌊", branch:true,
+    ask:"차가운 물과 따뜻한 물 중 하나를 고르세요.",
+    hint:"어느 쪽을 골라도 맞아요. 대신 끝까지 고른 쪽에 맞춰 답해야 해요.",
+    choices:["cold water  (차가운 물)","warm water  (따뜻한 물)"],
+    keys:["cold","warm"],
+    why:{ cold:"Many animals live in really cold water. 이제 차가운 물에 사는 동물로 이어가요.",
+          warm:"Many animals live in really warm water. 이제 따뜻한 물에 사는 동물로 이어가요." } },
+
+  { part:"차가운 물? 따뜻한 물?", src:"37쪽 A · 2", artIf:{cold:"🐧",warm:"🦭"},
+    ask:"One of these animals is the ______.",
+    choices:["penguin","manatee"], answerIf:{cold:0,warm:1},
+    why:{ cold:"20~21쪽 — 차가운 물에 사는 동물은 펭귄이에요.",
+          warm:"22쪽 — Manatees live where the water is warm." } },
+
+  { part:"차가운 물? 따뜻한 물?", src:"37쪽 A · 3", artIf:{cold:"🐧",warm:"🦭"},
+    ask:"물속에서 어떻게 헤엄칠까요?",
+    choices:["fast  (빠르게)","slow  (느리게)"], answerIf:{cold:0,warm:1},
+    why:{ cold:"21쪽 — Penguins swim fast!",
+          warm:"22쪽 — They do not swim fast. 빠르지 않아요." } },
+
+  { part:"차가운 물? 따뜻한 물?", src:"37쪽 A · 4", artIf:{cold:"🐧",warm:"🦭"},
+    ask:"They eat lots and lots of ______.",
+    choices:["fish","plants"], answerIf:{cold:0,warm:1},
+    why:{ cold:"펭귄은 물고기를 먹어요.",
+          warm:"23쪽 — Manatees eat lots and lots of plants." } },
+
+  { part:"차가운 물? 따뜻한 물?", src:"37쪽 A · 5", artIf:{cold:"🐧",warm:"🦭"},
+    ask:"They ______.",
+    choices:["zip in the water  (쌩쌩 지나가요)","eat and then rest  (먹고 나서 쉬어요)"],
+    answerIf:{cold:0,warm:1},
+    why:{ cold:"21쪽 — zip, zip, zip in the water",
+          warm:"23쪽 — Manatees eat lots and lots of plants. Then they rest." } }
+];
+
+var BANK = ["sea otters","grow","feet","kelp"];
+
+var qIdx = 0, qBranch = null, qRight = 0, qTried = false, qLocked = false;
+var qArt=$('qArt'), qPart=$('qPart'), qSrc=$('qSrc'), qAsk=$('qAsk'), qHint=$('qHint'),
+    qSent=$('qSent'), qChoices=$('qChoices'), qTiles=$('qTiles'), qWhy=$('qWhy'), qNext=$('qNext');
+
+function qWhyText(q){ return (q.why && typeof q.why === 'object') ? (q.why[qBranch] || '') : (q.why || ''); }
+function qAnswer(q){ return q.answerIf ? q.answerIf[qBranch] : q.answer; }
+function cap1(w){ return w.charAt(0).toUpperCase() + w.slice(1); }
+
+function renderQ(){
+  var q = QUIZ[qIdx];
+  qTried = false; qLocked = false;
+
+  drawArt(q.artIf ? (q.artIf[qBranch] || '🌊') : q.art, qArt);
+  qPart.textContent = q.part;
+  qSrc.textContent  = q.src;
+  qAsk.textContent  = q.ask;
+  qHint.textContent = q.hint || '';
+  qHint.style.display = q.hint ? 'block' : 'none';
+  qWhy.classList.remove('show');
+  qNext.hidden = true;
+  qChoices.innerHTML = '';
+  qTiles.innerHTML = '';
+  qSent.innerHTML = '';
+  qSent.style.display = 'none';
+
+  if(q.fill){
+    qSent.style.display = 'block';
+    var parts = q.sent.split(/\{([^}]+)\}/);
+    for(var i=0;i<parts.length;i++){
+      if(i % 2 === 0){ qSent.appendChild(document.createTextNode(parts[i])); }
+      else {
+        var b = document.createElement('span');
+        b.className = 'blank now'; b.id = 'qBlank';
+        b.dataset.answer = parts[i];
+        b.textContent = q.cap ? cap1(parts[i]) : parts[i];
+        qSent.appendChild(b);
+      }
+    }
+    for(var k=0;k<BANK.length;k++){
+      var t = document.createElement('button');
+      t.type='button'; t.className='tile'; t.dataset.w = BANK[k]; t.textContent = BANK[k];
+      qTiles.appendChild(t);
+    }
+  } else {
+    if(q.sent){ qSent.style.display='block'; qSent.innerHTML = q.sent; }
+    var letters = ['ⓐ','ⓑ','ⓒ','ⓓ'];
+    for(var j=0;j<q.choices.length;j++){
+      var c = document.createElement('button');
+      c.type='button'; c.className='choice'; c.dataset.i = j;
+      c.innerHTML = '<span class="mark">' + letters[j] + '</span><span>' + q.choices[j] + '</span>';
+      qChoices.appendChild(c);
+    }
+  }
+
+  countEl.textContent = (qIdx+1) + ' / ' + QUIZ.length;
+  barFill.style.width = (qIdx / QUIZ.length * 100) + '%';
+}
+
+function qSolved(){
+  var q = QUIZ[qIdx];
+  qLocked = true;
+  if(!qTried) qRight++;
+  qWhy.textContent = qWhyText(q);
+  qWhy.classList.add('show');
+  qNext.hidden = false;
+  qNext.textContent = (qIdx === QUIZ.length-1) ? '끝내기 🎉' : '다음 ▶';
+  barFill.style.width = ((qIdx+1) / QUIZ.length * 100) + '%';
+}
+
+qChoices.addEventListener('click', function(e){
+  var c = e.target.closest ? e.target.closest('.choice') : null;
+  if(!c || qLocked) return;
+  var q = QUIZ[qIdx], i = parseInt(c.dataset.i, 10);
+
+  if(q.branch){ qBranch = q.keys[i]; c.classList.add('ok'); qSolved(); return; }
+
+  if(i === qAnswer(q)){ c.classList.add('ok'); qSolved(); }
+  else {
+    c.classList.add('no'); qTried = true;
+    setTimeout(function(){ c.classList.remove('no'); }, 700);
+  }
+});
+
+qTiles.addEventListener('click', function(e){
+  var t = e.target.closest ? e.target.closest('.tile') : null;
+  if(!t || qLocked) return;
+  var q = QUIZ[qIdx], b = document.getElementById('qBlank');
+  if(t.dataset.w === b.dataset.answer){
+    b.classList.remove('now'); b.classList.add('done');
+    t.classList.add('used');
+    qSolved();
+  } else {
+    t.classList.add('bad'); qTried = true;
+    setTimeout(function(){ t.classList.remove('bad'); }, 450);
+  }
+});
+
+qNext.addEventListener('click', function(){
+  if(qIdx === QUIZ.length-1){
+    $('winTitle').textContent = '✏️ 문제 다 풀었어요!';
+    $('winText').textContent = '문제 ' + QUIZ.length + '개 중 한 번에 맞힌 것 ' + qRight + '개예요.';
+    $('ovQuizEnd').classList.add('on');
+    return;
+  }
+  qIdx++; renderQ(); window.scrollTo(0,0);
+});
+
+/* ── 읽기 / 문제 바꾸기 ── */
+function setMode(m){
+  var quiz = (m === 'quiz');
+  $('readView').hidden = quiz;
+  $('quizView').hidden = !quiz;
+  $('tabRead').classList.toggle('on', !quiz);
+  $('tabQuiz').classList.toggle('on', quiz);
+  if(quiz) renderQ();
+  else { countEl.textContent = (idx+1) + ' / ' + PAGES.length;
+         barFill.style.width = (idx / PAGES.length * 100) + '%'; }
+  window.scrollTo(0,0);
+}
+$('tabRead').addEventListener('click', function(){ setMode('read'); });
+$('tabQuiz').addEventListener('click', function(){ setMode('quiz'); });
+
+$('btnQuizAgain').addEventListener('click', function(){
+  $('ovQuizEnd').classList.remove('on');
+  qIdx = 0; qBranch = null; qRight = 0; renderQ();
+});
 </script>
 </body>
 </html>
