@@ -650,7 +650,7 @@ function renderPage(){
 
   markNow();
   countEl.textContent = (idx+1) + ' / ' + PAGES.length;
-  barFill.style.width = (idx / PAGES.length * 100) + '%';
+  barFill.style.width = ((idx+1) / PAGES.length * 100) + '%';
   saveIdx(idx);
 }
 
@@ -960,7 +960,7 @@ function renderQ(){
   }
 
   countEl.textContent = (qIdx+1) + ' / ' + QUIZ.length;
-  barFill.style.width = (qIdx / QUIZ.length * 100) + '%';
+  barFill.style.width = ((qIdx+1) / QUIZ.length * 100) + '%';
 }
 
 function qSolved(){
@@ -1021,7 +1021,7 @@ function setMode(m){
   $('tabQuiz').classList.toggle('on', quiz);
   if(quiz) renderQ();
   else { countEl.textContent = (idx+1) + ' / ' + PAGES.length;
-         barFill.style.width = (idx / PAGES.length * 100) + '%'; }
+         barFill.style.width = ((idx+1) / PAGES.length * 100) + '%'; }
   window.scrollTo(0,0);
 }
 $('tabRead').addEventListener('click', function(){ setMode('read'); });
