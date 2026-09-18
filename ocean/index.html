@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>바다 빈칸 채우기 · At Home in the Ocean</title>
+<title>11단원 바다 빈칸 채우기 · At Home in the Ocean</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
@@ -122,6 +122,7 @@
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
   .blank.done{color:var(--blue);border-bottom-color:var(--green);}
   .blank.done.key{background:#ffe94f;border-radius:4px;}
+  .blank.done.voca{border-bottom-color:#2e9e5b;border-bottom-width:4px;}
   .blank.bad{animation:shake .4s;border-bottom-color:var(--red);}
 
   /* 버튼 줄 */
@@ -133,6 +134,17 @@
   .btn.go:active{box-shadow:0 2px 0 var(--tile-edge);}
   .btn[hidden]{display:none;}
 
+    .unit{max-width:980px;margin:0 auto 9px;text-align:center;font-size:15px;
+        color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.35);}
+  .unit b{background:rgba(255,255,255,.92);border-radius:99px;padding:3px 11px;margin-right:6px;}
+  .unit .ten{font-family:'Trebuchet MS','Segoe UI',sans-serif;font-size:17px;font-weight:700;}
+  .unit .krt{display:none;}
+  body.kr .unit .krt{display:inline;}
+  .krbtn{
+    background:rgba(255,255,255,.88);border:none;border-radius:99px;
+    font-family:inherit;font-size:12px;padding:4px 11px;margin-left:8px;cursor:pointer;
+    vertical-align:2px;
+  }
   .stamp{max-width:980px;margin:10px auto 4px;text-align:center;font-size:13px;
          color:#fff;opacity:.85;text-shadow:0 1px 3px rgba(0,0,0,.35);}
 
@@ -189,6 +201,7 @@
   .why{
     display:none;margin:12px 0 0;font-size:16px;line-height:1.7;color:#3f7d57;
     background:#f3fbf6;border:2px solid #cfe9da;border-radius:12px;padding:11px 13px;
+    white-space:pre-line;
   }
   .why.show{display:block;}
   .part{background:#fff;color:var(--blue);border-radius:99px;padding:6px 16px;font-size:16px;
@@ -271,12 +284,14 @@
 <div class="bubbles" id="bubbles"></div>
 
 <div class="topbar">
-  <a class="icon-btn" href="../secret.html" title="비밀 앱 모음으로">←</a>
+  <a class="icon-btn" href="../langcon/" title="랭콘 목록으로">←</a>
   <div class="bar"><i id="barFill"></i></div>
   <div class="count" id="count">–</div>
   <button class="icon-btn" id="btnRestart" type="button" title="처음부터">↻</button>
   <button class="icon-btn" id="btnHelp" type="button" title="사용법">?</button>
 </div>
+
+<div class="unit"><b style="color:#1f6491">11단원</b><span class="ten">At Home in the Ocean</span><span class="krt"> · 바다가 우리 집</span><button class="krbtn" id="krBtn" type="button" style="color:#1f6491">한글 제목 보이기</button></div>
 
 <div class="tabs">
   <button class="tab on" id="tabRead" type="button">📖 읽기</button>
@@ -297,6 +312,7 @@
     <div class="tiles" id="tilesNarrow"></div>
     <div class="actions">
       <button class="btn" id="btnListen" type="button">🔊 전체 듣기</button>
+      <button class="btn" id="btnSkip" type="button">⏭ 다음 쪽</button>
       <button class="btn go" id="btnNext" type="button" hidden>다음 ▶</button>
     </div>
   </div>
@@ -327,7 +343,7 @@
 </div>
 </div>
 
-<div class="stamp">v5 · 빈칸 채우기 + 워크북 문제 15개</div>
+<div class="stamp">v6 · 빈칸 34개 + 문제 23개 · 11단원</div>
 
 <div class="ov" id="ovQuizEnd"><div class="ov-box">
   <h2 id="winTitle">✏️ 문제 다 풀었어요!</h2>
@@ -351,7 +367,8 @@
     <li>문장 옆 <b>🔊</b> 를 누르면 <b>그 문장만</b> 다시 들려줘요.</li>
     <li>아래 <b>전체 듣기</b> 는 누를 때만 그 쪽을 쭉 읽어줘요.</li>
     <li>다 채우면 <b>한국어 뜻</b>이 아래에 나와요.</li>
-    <li><b class="hl">노란 단어</b>는 책에 형광펜으로 칠해져 있는 중요한 단어예요.</li>
+    <li><b class="hl">노란 단어</b>는 책에 형광펜으로 칠해져 있는 단어예요.</li>
+    <li>칸 아래 <b>초록 굵은 줄</b>이 그어지면 <b>11단원 낱말</b>이에요. (표에 있는 스무 개)</li>
   </ul>
   <p class="note">
     책 『At Home in the Ocean』 (Rozanne Lanczak Williams) 16~28쪽이에요.<br>
@@ -380,6 +397,12 @@ window.onerror = function(msg, src, line){
       {단어} 가 빈칸이 됩니다. 한 문장에 한 칸이면 알맞아요.
       key : 책에 형광펜으로 칠해져 있던 단어
    ══════════════════════════════════════════════════════════ */
+const VOCA = ["cloud","cold","dig","far","feet","flap","flow","form","freeze","grow",
+              "have in common","krill","lay","liquid","live","rest","sand","solid",
+              "the North Pole","zip"];
+/* 책에 나오는 모양이 낱말표와 다른 것 */
+const SAME = { "digs":"dig", "lays":"lay", "flap":"flap" };
+
 const PAGES = [
   { page:"16~18", art:"🐬🦈🐋", label:"the ocean", key:["blue","far","home","little"], lines:[
     { a:"audio/s01.mp3", en:"The ocean is {big}!", ko:"바다는 커요!" },
@@ -392,7 +415,7 @@ const PAGES = [
     { a:"audio/s06.mp3", en:"Many animals {live} in {cold} water.", ko:"많은 동물이 차가운 물에 살아요." },
     { a:"audio/s07.mp3", en:"Brrr!", ko:"으으, 추워!" },
     { a:"audio/s08.mp3", en:"Penguins swim {fast}!", ko:"펭귄은 빠르게 헤엄쳐요!" },
-    { a:"audio/s09.mp3", en:"They flap {their} wings to zip, zip, zip in the {water}.", ko:"날개를 파닥이며 물속을 쌩쌩 지나가요." }
+    { a:"audio/s09.mp3", en:"They {flap} {their} wings to {zip}, zip, zip in the {water}.", ko:"날개를 파닥이며 물속을 쌩쌩 지나가요." }
   ]},
   { page:"22~23", art:"🦭", label:"manatees", key:["where","warm","lots"], lines:[
     { a:"audio/s10.mp3", en:"Manatees live {where} the water is {warm}.", ko:"매너티는 물이 따뜻한 곳에 살아요." },
@@ -402,7 +425,7 @@ const PAGES = [
   ]},
   { page:"24", art:"🐢", label:"turtle", key:["lays"], lines:[
     { a:"audio/s14.mp3", en:"This turtle swims {far}!", ko:"이 거북은 멀리까지 헤엄쳐요!" },
-    { a:"audio/s15.mp3", en:"It digs in the {sand} and {lays} its eggs.", ko:"모래를 파고 알을 낳아요." },
+    { a:"audio/s15.mp3", en:"It {digs} in the {sand} and {lays} its eggs.", ko:"모래를 파고 알을 낳아요." },
     { a:"audio/s16.mp3", en:"Then it swims back to its ocean {home}.", ko:"그러고 나서 바다 집으로 돌아가요." }
   ]},
   { page:"26~27", art:"🌿🦦", label:"kelp & sea otters", key:["grow","lots"], lines:[
@@ -550,7 +573,17 @@ function playPage(){
   play(p.lines.map(function(l){ return l.a; }).filter(Boolean), pageText());
 }
 
-function norm(w){ return w.replace(/[^A-Za-z']/g,'').toLowerCase(); }
+function norm(w){ return w.replace(/[^A-Za-z' ]/g,'').trim().toLowerCase(); }
+/* 낱말이 11단원 낱말인지 (digs → dig 처럼 모양이 바뀐 것도 찾습니다) */
+function isVoca(w){
+  const n = norm(w);
+  if(SAME[n]) return true;
+  return VOCA.some(function(v){
+    const b = norm(v);
+    return n === b || n === b+'s' || n === b+'ed' || n === b+'d' || n === b+'ing';
+  });
+}
+
 function shuffle(a){
   for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; }
   return a;
@@ -635,7 +668,9 @@ function finishPage(){
   const key = p.key || [];
   const done = txtEl.querySelectorAll('.blank.done');
   for(let i=0;i<done.length;i++){
-    if(key.some(function(k){ return norm(k) === norm(done[i].dataset.answer); })) done[i].classList.add('key');
+    const w = done[i].dataset.answer;
+    if(key.some(function(k){ return norm(k) === norm(w); })) done[i].classList.add('key');
+    if(isVoca(w)) done[i].classList.add('voca');
   }
   const kos = txtEl.querySelectorAll('.kohint');
   for(let i=0;i<kos.length;i++) kos[i].classList.add('show');
@@ -693,6 +728,9 @@ txtEl.addEventListener('click', function(e){
 });
 
 $('btnListen').addEventListener('click', function(){ touched = true; playPage(); });
+/* 다 채우지 않아도 다음 쪽으로 넘어갑니다 */
+$('btnSkip').addEventListener('click', function(){ btnNext.click(); });
+
 
 /* 브라우저는 화면을 한 번 건드리기 전에는 소리를 못 냅니다.
    그래서 첫 터치 때 지금 문장을 읽어줍니다. */
@@ -725,6 +763,54 @@ renderPage();
    answerIf 가 있으면 앞에서 고른 물(cold/warm)에 따라 정답이 달라집니다.
    ══════════════════════════════════════════════════════════ */
 var QUIZ = [
+  { part:"단어 뜻", src:"11단원 낱말 · 1", art:"☁️",
+    ask:"cloud 는 무슨 뜻일까요?",
+    hint:"하늘에 떠 있고, 여기서 비가 내려요.",
+    choices:["구름","바람","무지개"],
+    answer:0, why:"cloud = 구름.\n하늘에 떠 있는 희거나 회색인 것이고, 여기서 비가 내려요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+
+  { part:"단어 뜻", src:"11단원 낱말 · 2", art:"🌊",
+    ask:"flow 는 무슨 뜻일까요?",
+    hint:"물이 한쪽으로 계속 가는 모습이에요.",
+    choices:["흐르다","멈추다","얼다"],
+    answer:0, why:"flow = 흐르다.\n한 방향으로 쉬지 않고 움직이는 거예요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+
+  { part:"단어 뜻", src:"11단원 낱말 · 3", art:"🧊",
+    ask:"freeze 는 무슨 뜻일까요?",
+    hint:"물이 아주 추우면 이렇게 돼요.",
+    choices:["얼다","끓다","녹다"],
+    answer:0, why:"freeze = 얼다.\n추워서 얼음으로 바뀌는 거예요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+
+  { part:"단어 뜻", src:"11단원 낱말 · 4", art:"💧",
+    ask:"liquid 는 무슨 뜻일까요?",
+    hint:"물처럼 컵에 따를 수 있는 것이에요.",
+    choices:["액체","고체","기체"],
+    answer:0, why:"liquid = 액체.\n물처럼 쉽게 따를 수 있는 것이에요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+
+  { part:"단어 뜻", src:"11단원 낱말 · 5", art:"🧱",
+    ask:"solid 는 무슨 뜻일까요?",
+    hint:"얼음이나 돌처럼 단단한 것이에요.",
+    choices:["고체","액체","연기"],
+    answer:0, why:"solid = 고체.\n알갱이가 꽉 붙어 있어서 모양이 잘 안 변해요.\n물이 얼면 액체(liquid)에서 고체(solid)가 돼요." },
+
+  { part:"단어 뜻", src:"11단원 낱말 · 6", art:"🔷",
+    ask:"form 은 무슨 뜻일까요?",
+    hint:"물은 액체, 얼음은 고체 — 이렇게 여러 가지 ___ 가 있어요.",
+    choices:["형태","무게","소리"],
+    answer:0, why:"form = 형태, 모양.\n물은 액체·고체·기체 세 가지 형태가 있어요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+
+  { part:"단어 뜻", src:"11단원 낱말 · 7", art:"🧭",
+    ask:"the North Pole 은 무슨 뜻일까요?",
+    hint:"지구에서 가장 북쪽이에요. 아주 춥고 얼음이 많아요.",
+    choices:["북극","남극","적도"],
+    answer:0, why:"the North Pole = 북극.\n지구에서 가장 북쪽에 있는 곳이에요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+
+  { part:"단어 뜻", src:"11단원 낱말 · 8", art:"🤝",
+    ask:"have in common 은 무슨 뜻일까요?",
+    hint:"펭귄과 매너티는 둘 다 바다에 살아요. 이런 걸 뭐라고 할까요?",
+    choices:["공통점이 있다","서로 다르다","따로 살다"],
+    answer:0, why:"have in common = 공통점이 있다.\n둘이 같은 점을 가지고 있다는 뜻이에요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+
   { part:"그림에 맞는 문장", src:"39쪽 C · 1", art:"🐢",
     ask:"그림에 맞는 문장을 고르세요.",
     hint:"거북이 넓은 바다를 헤엄쳐 가고 있어요. (24~25쪽)",
@@ -945,6 +1031,23 @@ $('btnQuizAgain').addEventListener('click', function(){
   $('ovQuizEnd').classList.remove('on');
   qIdx = 0; qBranch = null; qRight = 0; renderQ();
 });
+</script>
+
+<script>
+/* 한글 제목 보이기 / 숨기기 — 세 페이지가 같은 설정을 씁니다 */
+(function(){
+  var KEY = 'langcon-show-kr', b = document.getElementById('krBtn');
+  try{ if(localStorage.getItem(KEY) === '1') document.body.classList.add('kr'); }catch(e){}
+  function label(){
+    b.textContent = document.body.classList.contains('kr') ? '한글 제목 숨기기' : '한글 제목 보이기';
+  }
+  label();
+  b.addEventListener('click', function(){
+    document.body.classList.toggle('kr');
+    try{ localStorage.setItem(KEY, document.body.classList.contains('kr') ? '1' : '0'); }catch(e){}
+    label();
+  });
+})();
 </script>
 </body>
 </html>
