@@ -63,6 +63,69 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 .say b{font-family:"Jua",sans-serif;font-weight:400;color:var(--main)}
 .eng{font-family:"Jua",sans-serif;font-size:20px;color:var(--deep);margin-top:6px}
 
+
+/* ---------- 장면 만화(2편) ---------- */
+.art.scene{aspect-ratio:16/9;padding:0;border-radius:12px}
+.art.scene img{width:100%;height:100%;object-fit:cover;
+  animation:drift 16s ease-in-out infinite}
+.art{animation:cutIn .34s cubic-bezier(.22,.7,.3,1) both}
+
+/* 말풍선 */
+.bubble{position:absolute;max-width:58%;z-index:2;background:#fff;color:var(--ink);
+  border:3px solid var(--ink);border-radius:16px;padding:9px 12px;
+  font-size:15px;line-height:1.45;box-shadow:3px 3px 0 rgba(43,36,32,.16);
+  opacity:0;animation:pop .42s cubic-bezier(.2,.9,.3,1) .5s forwards}
+.bubble b{display:block;font-family:"Jua",sans-serif;font-weight:400;
+  color:var(--main);font-size:13px;margin-bottom:1px}
+.bubble::before,.bubble::after{content:"";position:absolute;
+  border:12px solid transparent;border-top-color:var(--ink)}
+.bubble::after{border-top-color:#fff}
+.bubble.b-tl{left:20px;top:16px}
+.bubble.b-tr{right:20px;top:16px}
+.bubble.b-tl::before{left:22px;bottom:-24px}
+.bubble.b-tl::after{left:22px;bottom:-19px}
+.bubble.b-tr::before{right:22px;bottom:-24px}
+.bubble.b-tr::after{right:22px;bottom:-19px}
+
+/* 시간 띠 */
+.tl{display:flex;align-items:center;gap:10px;margin:0 2px 12px;
+  font-family:"Jua",sans-serif;font-size:14px;color:var(--dim)}
+.tl i{flex:1;height:2px;background:var(--line);font-style:normal}
+.tl span{display:inline-flex;align-items:center;gap:6px}
+.tl span::before{content:"";width:9px;height:9px;border-radius:50%;
+  border:2px solid var(--line);background:var(--bg)}
+.tl span.on{color:var(--main)}
+.tl span.on::before{background:var(--main);border-color:var(--main)}
+
+/* 동사 변신기 */
+.morph{display:flex;align-items:baseline;justify-content:center;gap:0;
+  flex-wrap:wrap;margin:16px 0 2px;padding:14px 0;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  font-family:"Jua",sans-serif;font-size:26px;line-height:1.2}
+.morph .m-a{color:var(--ink)}
+.morph .m-b{color:var(--main);opacity:0;
+  animation:flyIn .5s cubic-bezier(.2,.9,.3,1) .8s forwards}
+.morph .m-eq,.morph .m-ar{color:var(--dim);font-size:20px;margin:0 12px;opacity:0;
+  animation:fadeIn .3s ease-out 1.25s forwards}
+.morph .m-ar{animation-delay:.8s}
+.morph .m-r{color:var(--deep);opacity:0;
+  animation:pop .4s cubic-bezier(.2,.9,.3,1) 1.4s forwards}
+.morph .m-ar+.m-r{animation-delay:1.05s}
+.morph .m-r.same{color:var(--dim)}
+
+@keyframes cutIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes drift{0%{transform:scale(1.01)}50%{transform:scale(1.05) translate(-.8%,-.8%)}100%{transform:scale(1.01)}}
+@keyframes pop{0%{opacity:0;transform:scale(.72)}62%{opacity:1;transform:scale(1.07)}100%{opacity:1;transform:scale(1)}}
+@keyframes flyIn{0%{opacity:0;transform:translateX(46px) rotate(14deg)}70%{opacity:1;transform:translateX(-5px) rotate(-4deg)}100%{opacity:1;transform:none}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes okPop{40%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes noShake{20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}100%{transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;
+    animation-iteration-count:1!important}
+}
+
 /* ---------- 퀴즈 ---------- */
 .ko{color:var(--dim);font-size:15px;margin-bottom:10px}
 .sent{font-family:"Jua",sans-serif;font-size:27px;line-height:1.5;margin:0 0 26px}
@@ -70,8 +133,8 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 .opts{display:grid;gap:12px}
 .opt{background:#fff;border:2px solid var(--line);border-radius:12px;padding:16px;
   font-family:"Jua",sans-serif;font-size:23px;transition:border-color .15s ease,background .15s ease}
-.opt.ok{border-color:var(--deep);background:#EAF3EF;color:var(--deep)}
-.opt.no{border-color:var(--main);background:#FBE9E4;color:var(--main)}
+.opt.ok{border-color:var(--deep);background:#EAF3EF;color:var(--deep);animation:okPop .36s ease-out}
+.opt.no{border-color:var(--main);background:#FBE9E4;color:var(--main);animation:noShake .38s ease-out}
 .opt:disabled{cursor:default}
 .why{margin-top:18px;padding:14px 16px;border-left:3px solid var(--deep);
   background:#F5EEDF;font-size:15px;border-radius:0 8px 8px 0}
@@ -126,12 +189,26 @@ const CH = [
   ]
 },
 {
-  id:2, title:"어제로 가는 문", sub:"과거형 · 어제 한 일",
+  id:2, title:"어제로 가는 문", sub:"과거형 · 어제 한 일", scene:true,
   cuts:[
-    {ph:"🚪", ko:"사전 뒤에 문이 하나 있었어요. 문 위에 <b>어제</b>라고 적혀 있어요."},
-    {ph:"🌀", props:["ed"], ko:"그 문을 지나가면 동사 뒤에 <b>ed 꼬리</b>가 달라붙어요.", en:"Yesterday I painted the wall."},
-    {ph:"💥", ko:"그런데 몇몇 동사는 꼬리가 안 붙고 <b>아예 변신</b>해 버려요.", en:"wear → wore,  swim → swam"},
-    {ph:"😐", ko:"hit만 꿈쩍도 안 했어요. “나는 안 변해.” 얄미운 hit이에요.", en:"hit → hit"}
+    {ph:"🚪", at:"tl", who:"서현", say:"어? 이런 문이 있었나?",
+     ko:"책 더미 뒤에 못 보던 문이 하나 있었어요. 문 위에는 <b>어제</b>라고 적혀 있었어요."},
+    {ph:"🌀", at:"tr", who:"이디", say:"내가 붙으면 어제 일이 돼!",
+     ko:"문을 지나자 빨간 꼬리 <b>이디</b>가 날아와 동사 뒤에 착 달라붙었어요.",
+     morph:{a:"paint", b:"ed", r:"painted"},
+     en:"Yesterday I painted the fence."},
+    {ph:"🍰", at:"tr", who:"이디", say:"어? e가 있네. 그럼 난 반만!",
+     ko:"동사 끝에 이미 <b>e</b>가 있으면 이디는 몸을 반으로 줄여 <b>d</b>만 붙어요.",
+     morph:{a:"bake", b:"d", r:"baked"},
+     en:"Yesterday I baked a cake."},
+    {ph:"💥", at:"tl", who:"서현", say:"어? 이디가 튕겨 나갔어!",
+     ko:"어떤 동사는 꼬리를 아예 안 받아요. 대신 <b>모습이 통째로 바뀌어요.</b>",
+     morph:{a:"swim", r:"swam", kind:"change"},
+     en:"Yesterday I swam in the pool."},
+    {ph:"😐", at:"tr", who:"이디", say:"치사해… 넌 왜 안 변해!",
+     ko:"hit은 꿈쩍도 안 했어요. 어제도 오늘도 그냥 <b>hit</b>이에요.",
+     morph:{a:"hit", r:"hit", kind:"same"},
+     en:"Yesterday I hit the ball."}
   ],
   quiz:[
     {ko:"어제 나는 벽을 칠했어요.", s:["Yesterday I "," the wall."], o:["painted","paint"], a:0, w:"어제 일이니까 ed 꼬리를 붙여요."},
@@ -142,6 +219,10 @@ const CH = [
     {ko:"어제 그는 버스를 기다렸어요.", s:["Yesterday he "," for the bus."], o:["wait","waited"], a:1, w:"어제 일이니까 waited예요."},
     {ko:"어제 우리는 바다에 갔어요.", s:["Yesterday we "," the sea."], o:["visited","visit"], a:0, w:"어제 일이니까 visited예요."},
     {ko:"어제 그녀는 가방을 쌌어요.", s:["Yesterday she "," her bag."], o:["pack","packed"], a:1, w:"어제 일이니까 packed예요."},
+    {ko:"어제 나는 케이크를 구웠어요.", s:["Yesterday I "," a cake."], o:["baked","bakeed"], a:0, w:"bake에는 이미 e가 있어서 d만 붙여 baked예요."},
+    {ko:"어제 그녀는 친구에게 손을 흔들었어요.", s:["Yesterday she "," to her friend."], o:["waveed","waved"], a:1, w:"wave도 e가 있어서 d만 붙여 waved예요."},
+    {ko:"어제 그는 문을 닫았어요.", s:["Yesterday he "," the door."], o:["closed","closeed"], a:0, w:"close도 e가 있어서 d만 붙여 closed예요."},
+    {ko:"어제 우리는 숲을 탐험했어요.", s:["Yesterday we "," the forest."], o:["exploreed","explored"], a:1, w:"explore도 e가 있어서 d만 붙여 explored예요."},
     {ko:"어제 나는 빨간 모자를 썼어요.", s:["Yesterday I "," a red cap."], o:["wore","weared"], a:0, w:"wear는 꼬리 대신 wore로 변신해요."},
     {ko:"어제 그는 수영을 했어요.", s:["Yesterday he "," in the pool."], o:["swimmed","swam"], a:1, w:"swim은 swam으로 변신해요."},
     {ko:"어제 우리는 게임에서 이겼어요.", s:["Yesterday we "," the game."], o:["won","winned"], a:0, w:"win은 won으로 변신해요."},
@@ -274,6 +355,22 @@ function 읽기(keys, btn){
 }
 
 /* ===================== 만화 ===================== */
+/* 시간 띠. 지금 어느 시간을 배우는지 눈으로 보여 준다 */
+function 시간띠(){
+  return `<div class="tl"><span class="on">어제</span><i></i><span>오늘</span></div>`;
+}
+
+/* 동사 변신기. 꼬리가 날아와 붙고 결과가 톡 나타난다 */
+function 변신기(m){
+  if(m.kind) return `<div class="morph"><span class="m-a">${esc(m.a)}</span>`
+    + `<span class="m-ar">→</span>`
+    + `<span class="m-r${m.kind==="same"?" same":""}">${esc(m.r)}</span></div>`;
+  return `<div class="morph"><span class="m-a">${esc(m.a)}</span>`
+    + `<span class="m-b">${esc(m.b)}</span>`
+    + `<span class="m-eq">=</span>`
+    + `<span class="m-r">${esc(m.r)}</span></div>`;
+}
+
 function comic(id, i){
   const c = CH.find(x=>x.id===id), cut = c.cuts[i];
   app.innerHTML = `
@@ -282,10 +379,13 @@ function comic(id, i){
     <span class="name">${c.title}</span>
     <span class="step">${i+1} / ${c.cuts.length}</span>
   </div>
-  <div class="art" style="--tint:${TINT[id]}">
+  ${c.scene ? 시간띠() : ""}
+  <div class="art${c.scene ? " scene" : ""}" style="--tint:${TINT[id]}">
     <img src="컷/${id}-${i+1}.png" alt=""><span class="ph hide">${cut.ph}</span>
     ${소품(cut.props)}
+    ${cut.say ? `<div class="bubble b-${cut.at || "tl"}"><b>${esc(cut.who)}</b>${esc(cut.say)}</div>` : ""}
   </div>
+  ${cut.morph ? 변신기(cut.morph) : ""}
   <p class="say">${cut.ko}</p>
   ${cut.en ? `<p class="eng">${esc(cut.en)}</p>` : ""}
   <button class="read">🔊 읽어주기</button>
@@ -365,7 +465,7 @@ home();
 /* ===== 자체 점검: 문제 데이터가 깨지지 않았는지 ===== */
 (function check(){
   CH.forEach(c=>{
-    console.assert(c.cuts.length === 4, c.id + "편 컷 수가 4가 아님");
+    console.assert(c.cuts.length >= 4, c.id + "편 컷이 4개보다 적음");
     c.quiz.forEach((q,i)=>{
       console.assert(q.o.length === 2, c.id+"-"+i+" 보기 2개 아님");
       console.assert(q.a === 0 || q.a === 1, c.id+"-"+i+" 정답 번호 이상");
