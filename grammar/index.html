@@ -98,10 +98,16 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 .tl span.on::before{background:var(--main);border-color:var(--main)}
 
 /* 동사 변신기 */
-.morph{display:flex;align-items:baseline;justify-content:center;gap:0;
-  flex-wrap:wrap;margin:16px 0 2px;padding:14px 0;
+.morph{display:flex;flex-direction:column;align-items:center;gap:0;
+  margin:16px 0 2px;padding:13px 0 15px;
   border-top:1px solid var(--line);border-bottom:1px solid var(--line);
   font-family:"Jua",sans-serif;font-size:26px;line-height:1.2}
+.morph .m-row{display:flex;align-items:baseline;justify-content:center;
+  gap:0;flex-wrap:wrap}
+.morph .m-tag{font-family:"Gowun Dodum",sans-serif;font-size:14px;
+  color:var(--main);margin-bottom:7px;opacity:0;
+  animation:fadeIn .3s ease-out .35s forwards}
+.morph .m-tag.same{color:var(--dim)}
 .morph .m-a{color:var(--ink)}
 .morph .m-b{color:var(--main);opacity:0;
   animation:flyIn .5s cubic-bezier(.2,.9,.3,1) .8s forwards}
@@ -193,19 +199,19 @@ const CH = [
   cuts:[
     {ph:"🚪", at:"tl", who:"서현", say:"어? 이런 문이 있었나?",
      ko:"책 더미 뒤에 못 보던 문이 하나 있었어요. 문 위에는 <b>어제</b>라고 적혀 있었어요."},
-    {ph:"🌀", at:"tr", who:"이디", say:"내가 붙으면 어제 일이 돼!",
-     ko:"문을 지나자 빨간 꼬리 <b>이디</b>가 날아와 동사 뒤에 착 달라붙었어요.",
+    {ph:"🌀", at:"tr", who:"ed", say:"안녕! 나는 ed야. 내가 붙으면 어제 일이 돼!",
+     ko:"문을 지나자 빨간 꼬리 <b>ed</b>가 날아와 동사 뒤에 착 달라붙었어요.",
      morph:{a:"paint", b:"ed", r:"painted"},
      en:"Yesterday I painted the fence."},
-    {ph:"🍰", at:"tr", who:"이디", say:"어? e가 있네. 그럼 난 반만!",
-     ko:"동사 끝에 이미 <b>e</b>가 있으면 이디는 몸을 반으로 줄여 <b>d</b>만 붙어요.",
+    {ph:"🍰", at:"tr", who:"ed", say:"어? e가 있네. 그럼 난 반만!",
+     ko:"동사 끝에 이미 <b>e</b>가 있으면 <b>ed</b>는 몸을 반으로 줄여 <b>d</b>만 붙여요.",
      morph:{a:"bake", b:"d", r:"baked"},
      en:"Yesterday I baked a cake."},
-    {ph:"💥", at:"tl", who:"서현", say:"어? 이디가 튕겨 나갔어!",
+    {ph:"💥", at:"tl", who:"서현", say:"어? ed가 튕겨 나갔어!",
      ko:"어떤 동사는 꼬리를 아예 안 받아요. 대신 <b>모습이 통째로 바뀌어요.</b>",
      morph:{a:"swim", r:"swam", kind:"change"},
      en:"Yesterday I swam in the pool."},
-    {ph:"😐", at:"tr", who:"이디", say:"치사해… 넌 왜 안 변해!",
+    {ph:"😐", at:"tr", who:"ed", say:"치사해… 넌 왜 안 변해!",
      ko:"hit은 꿈쩍도 안 했어요. 어제도 오늘도 그냥 <b>hit</b>이에요.",
      morph:{a:"hit", r:"hit", kind:"same"},
      en:"Yesterday I hit the ball."}
@@ -362,13 +368,17 @@ function 시간띠(){
 
 /* 동사 변신기. 꼬리가 날아와 붙고 결과가 톡 나타난다 */
 function 변신기(m){
-  if(m.kind) return `<div class="morph"><span class="m-a">${esc(m.a)}</span>`
-    + `<span class="m-ar">→</span>`
-    + `<span class="m-r${m.kind==="same"?" same":""}">${esc(m.r)}</span></div>`;
-  return `<div class="morph"><span class="m-a">${esc(m.a)}</span>`
-    + `<span class="m-b">${esc(m.b)}</span>`
-    + `<span class="m-eq">=</span>`
-    + `<span class="m-r">${esc(m.r)}</span></div>`;
+  const 딱지 = m.kind
+    ? (m.kind === "same" ? "꿈쩍도 안 해요" : "아예 변신해요")
+    : (m.b === "ed" ? "ed 꼬리를 붙여요" : "e가 있으니 d 하나만");
+  const 줄 = m.kind
+    ? `<span class="m-a">${esc(m.a)}</span><span class="m-ar">→</span>`
+      + `<span class="m-r${m.kind==="same"?" same":""}">${esc(m.r)}</span>`
+    : `<span class="m-a">${esc(m.a)}</span><span class="m-b">${esc(m.b)}</span>`
+      + `<span class="m-eq">=</span><span class="m-r">${esc(m.r)}</span>`;
+  return `<div class="morph">`
+    + `<span class="m-tag${m.kind==="same"?" same":""}">${딱지}</span>`
+    + `<span class="m-row">${줄}</span></div>`;
 }
 
 function comic(id, i){
