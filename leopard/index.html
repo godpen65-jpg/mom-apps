@@ -17,7 +17,8 @@
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;}
   body{
-    margin:0;padding:10px;min-height:100%;background:#f0a92f;
+    margin:0;padding:10px;height:100vh;height:100dvh;background:#f0a92f;
+    display:flex;flex-direction:column;overflow:hidden;
     font-family:'Jua','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
     color:var(--ink);overflow-x:hidden;
   }
@@ -49,7 +50,7 @@
   }
 
   /* ── 상단 바 ── */
-  .topbar{max-width:980px;margin:0 auto 10px;display:flex;align-items:center;gap:8px;}
+  .topbar{max-width:980px;width:100%;margin:0 auto 10px;display:flex;align-items:center;gap:8px;flex:none;}
   .icon-btn{
     background:rgba(255,255,255,.94);border:none;border-radius:14px;
     width:42px;height:42px;font-size:19px;cursor:pointer;color:var(--deep);
@@ -63,6 +64,49 @@
   .count{color:#fff;font-size:15px;min-width:52px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.32);}
 
   /* ── 책 ── */
+
+  /* ── 화면에 딱 맞추기 ──
+     책 상자를 화면 높이에 맞춰 고정해서, 쪽을 넘겨도 크기가 안 바뀌고
+     태블릿 가로로 놓아도 화면 전체를 스크롤할 일이 없게 합니다. */
+  #readView,#quizView{flex:1;min-height:0;display:flex;flex-direction:column;}
+  #readView[hidden],#quizView[hidden]{display:none;}
+  #quizView .main{overflow-y:auto;}
+  .book{width:100%;flex:1;min-height:0;}
+  .side{overflow-y:auto;}
+  .main{min-width:0;min-height:0;}
+  .txt{min-height:0;overflow-y:auto;}
+  .actions{flex:none;}
+  /* 낮은 화면(태블릿 가로 등)에서는 글씨와 여백을 조금 줄입니다 */
+  @media (max-height:780px){
+    .art{width:118px;height:118px;}
+    .art span{font-size:54px;} .art span.n2{font-size:35px;} .art span.n3{font-size:26px;}
+    .txt{--fs:18px;}
+    .tile{font-size:19px;padding:9px 16px;}
+    .btn{font-size:17px;padding:10px 18px;}
+    .unit{font-size:14px;margin-bottom:6px;}
+    .tab{padding:7px 18px;}
+    .stamp{margin:6px auto 2px;}
+  }
+  @media (max-height:660px){
+    body{padding:6px;}
+    .topbar{margin-bottom:6px;} .tabs{margin-bottom:6px;} .unit{margin-bottom:5px;font-size:13px;}
+    .side{width:27%;padding:10px 8px;gap:7px;}
+    .main{padding:12px 12px;}
+    .art{width:86px;height:86px;}
+    .art span{font-size:40px;} .art span.n2{font-size:27px;} .art span.n3{font-size:20px;}
+    .label{font-size:13px;padding:4px 11px;}
+    .txt{--fs:16px;}
+    .ln .kohint{font-size:12.5px;}
+    .spk{width:29px;height:29px;font-size:13px;margin-top:2px;}
+    .tile{font-size:17px;padding:8px 13px;border-radius:11px;}
+    .tiles{gap:7px;}
+    .btn{font-size:16px;padding:8px 15px;}
+    .actions{margin-top:7px;}
+    .stamp{display:none;}
+    .ask{font-size:17px;} .qhint{font-size:14px;margin-bottom:8px;}
+    .qsent{font-size:17px;margin-bottom:8px;} .choice{font-size:16px;padding:9px 12px;}
+    .why{font-size:14px;padding:9px 11px;}
+  }
   .book{
     max-width:980px;margin:0 auto;display:flex;
     background:#c94f33;border-radius:24px;padding:11px;
@@ -101,11 +145,12 @@
 
   /* 본문 */
   .txt{flex:1;}
-  .ln{padding:9px 2px;border-bottom:1px dashed #ecdfc5;
+  .ln{padding:calc(var(--fs) * .28) 2px;border-bottom:1px dashed #ecdfc5;
       display:flex;gap:9px;align-items:flex-start;}
   .ln:last-child{border-bottom:none;}
   .ln .body{flex:1;min-width:0;}
-  .ln p{margin:0;font-size:20px;line-height:1.85;
+  .txt{--fs:20px;}
+  .ln p{margin:0;font-size:var(--fs);line-height:1.55;
         font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;}
   .spk{
     background:#eaf5e6;border:none;border-radius:50%;width:36px;height:36px;
@@ -115,7 +160,7 @@
   .spk:active{transform:translateY(2px);box-shadow:0 1px 0 #c8e2bf;}
   .spk.on{background:#fff0c9;box-shadow:0 3px 0 var(--tile-bot);}
   .ln.now p{color:var(--blue);}
-  .ln .kohint{display:none;margin:3px 0 0;font-size:14px;color:var(--muted);}
+  .ln .kohint{display:none;margin:calc(var(--fs) * .08) 0 0;font-size:calc(var(--fs) * .72);color:var(--muted);}
   .ln .kohint.show{display:block;}
   .blank{
     display:inline-block;min-width:56px;text-align:center;padding:0 5px;margin:0 3px;
@@ -137,7 +182,7 @@
   .btn.go:active{box-shadow:0 2px 0 var(--tile-edge);}
   .btn[hidden]{display:none;}
 
-    .unit{max-width:980px;margin:0 auto 9px;text-align:center;font-size:15px;
+    .unit{max-width:980px;width:100%;margin:0 auto 9px;flex:none;text-align:center;font-size:15px;
         color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.35);}
   .unit b{background:rgba(255,255,255,.92);border-radius:99px;padding:3px 11px;margin-right:6px;}
   .unit .ten{font-family:'Trebuchet MS','Segoe UI',sans-serif;font-size:17px;font-weight:700;}
@@ -148,7 +193,7 @@
     font-family:inherit;font-size:12px;padding:4px 11px;margin-left:8px;cursor:pointer;
     vertical-align:2px;
   }
-  .stamp{max-width:980px;margin:10px auto 4px;text-align:center;font-size:13px;
+  .stamp{max-width:980px;width:100%;margin:10px auto 4px;flex:none;text-align:center;font-size:13px;
          color:#fff;opacity:.9;text-shadow:0 1px 3px rgba(0,0,0,.35);}
 
   /* 덮개 */
@@ -168,7 +213,7 @@
   .help .note{font-size:14px;color:#a2937a;margin-top:14px;}
 
   /* ── 읽기 / 문제 고르는 줄 ── */
-  .tabs{max-width:980px;margin:0 auto 10px;display:flex;gap:8px;justify-content:center;}
+  .tabs{max-width:980px;width:100%;margin:0 auto 10px;display:flex;gap:8px;justify-content:center;flex:none;}
   .tab{
     background:rgba(255,255,255,.58);border:none;border-radius:99px;
     padding:9px 22px;font-size:16px;font-family:inherit;color:var(--deep);cursor:pointer;
@@ -222,7 +267,7 @@
     .art{width:96px;height:96px;}
     .art span{font-size:44px;}
     .art span.n2{font-size:30px;} .art span.n3{font-size:22px;}
-    .ln p{font-size:19px;line-height:1.85;}
+    .txt{--fs:19px;}
     .ask{font-size:18px;} .qsent{font-size:18px;} .choice{font-size:17px;}
     .tab{font-size:15px;padding:8px 16px;}
     .main .tiles{display:flex;}
@@ -688,10 +733,24 @@ function renderPage(){
   });
 
   markNow();
+  fitText();
   countEl.textContent = (idx+1) + ' / ' + PAGES.length;
   barFill.style.width = ((idx+1) / PAGES.length * 100) + '%';
   saveIdx(idx);
 }
+
+
+/* 글이 칸보다 길면 스크롤 대신 글자를 조금씩 줄여 한 화면에 담습니다 */
+function fitText(){
+  txtEl.style.removeProperty('--fs');
+  const base = parseFloat(getComputedStyle(txtEl).getPropertyValue('--fs')) || 20;
+  let s = base;
+  while(txtEl.scrollHeight > txtEl.clientHeight + 1 && s > 12){
+    s -= 0.5;
+    txtEl.style.setProperty('--fs', s + 'px');
+  }
+}
+window.addEventListener('resize', function(){ if(!$('readView').hidden) fitText(); });
 
 function markNow(){
   const all = txtEl.querySelectorAll('.blank');
@@ -713,6 +772,7 @@ function finishPage(){
   }
   const kos = txtEl.querySelectorAll('.kohint');
   for(let i=0;i<kos.length;i++) kos[i].classList.add('show');
+  fitText();
   btnNext.hidden = false;
   btnNext.textContent = (idx === PAGES.length-1) ? '끝내기 🎉' : '다음 ▶';
   barFill.style.width = ((idx+1) / PAGES.length * 100) + '%';
