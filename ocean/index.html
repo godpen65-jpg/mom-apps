@@ -249,6 +249,17 @@
     white-space:pre-line;
   }
   .why.show{display:block;}
+
+  /* 문제 화면 — '다음' 을 상자 안 오른쪽 위에 둬서 스크롤 없이 누를 수 있게 */
+  #quizView .main{position:relative;}
+  #quizView .ask{padding-right:104px;}
+  #quizView #qNext{position:absolute;top:14px;right:16px;margin:0;z-index:5;
+                   padding:9px 17px;font-size:17px;}
+  #quizView .actions{margin-top:0;}
+  @media (max-width:820px){
+    #quizView .ask{padding-right:88px;}
+    #quizView #qNext{top:10px;right:10px;padding:8px 13px;font-size:15px;}
+  }
   .part{background:#fff;color:var(--blue);border-radius:99px;padding:6px 16px;font-size:16px;
         box-shadow:0 2px 6px rgba(0,0,0,.14);text-align:center;}
 
@@ -270,7 +281,7 @@
     .main .tiles{display:flex;}
     .tile{font-size:19px;padding:10px 16px;}
   }
-  @media (min-width:821px){ .main .tiles{display:none;} }
+  @media (min-width:821px){ #readView .main .tiles{display:none;} }
 </style>
 </head>
 <body>
@@ -827,25 +838,25 @@ var QUIZ = [
     ask:"cloud 는 무슨 뜻일까요?",
     hint:"하늘에 떠 있고, 여기서 비가 내려요.",
     choices:["구름","바람","무지개"],
-    answer:0, why:"cloud = 구름.\n하늘에 떠 있는 희거나 회색인 것이고, 여기서 비가 내려요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+    answer:0, why:"cloud = 구름.\n하늘에 떠 있는 희거나 회색인 것이고, 여기서 비가 내려요." },
 
   { part:"단어 뜻", src:"11단원 낱말 · 2", art:"🌊",
     ask:"flow 는 무슨 뜻일까요?",
     hint:"물이 한쪽으로 계속 가는 모습이에요.",
     choices:["흐르다","멈추다","얼다"],
-    answer:0, why:"flow = 흐르다.\n한 방향으로 쉬지 않고 움직이는 거예요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+    answer:0, why:"flow = 흐르다.\n한 방향으로 쉬지 않고 움직이는 거예요." },
 
   { part:"단어 뜻", src:"11단원 낱말 · 3", art:"🧊",
     ask:"freeze 는 무슨 뜻일까요?",
     hint:"물이 아주 추우면 이렇게 돼요.",
     choices:["얼다","끓다","녹다"],
-    answer:0, why:"freeze = 얼다.\n추워서 얼음으로 바뀌는 거예요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+    answer:0, why:"freeze = 얼다.\n추워서 얼음으로 바뀌는 거예요." },
 
   { part:"단어 뜻", src:"11단원 낱말 · 4", art:"💧",
     ask:"liquid 는 무슨 뜻일까요?",
     hint:"물처럼 컵에 따를 수 있는 것이에요.",
     choices:["액체","고체","기체"],
-    answer:0, why:"liquid = 액체.\n물처럼 쉽게 따를 수 있는 것이에요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+    answer:0, why:"liquid = 액체.\n물처럼 쉽게 따를 수 있는 것이에요." },
 
   { part:"단어 뜻", src:"11단원 낱말 · 5", art:"🧱",
     ask:"solid 는 무슨 뜻일까요?",
@@ -857,19 +868,19 @@ var QUIZ = [
     ask:"form 은 무슨 뜻일까요?",
     hint:"물은 액체, 얼음은 고체 — 이렇게 여러 가지 ___ 가 있어요.",
     choices:["형태","무게","소리"],
-    answer:0, why:"form = 형태, 모양.\n물은 액체·고체·기체 세 가지 형태가 있어요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+    answer:0, why:"form = 형태, 모양.\n물은 액체·고체·기체 세 가지 형태가 있어요." },
 
   { part:"단어 뜻", src:"11단원 낱말 · 7", art:"🧭",
     ask:"the North Pole 은 무슨 뜻일까요?",
     hint:"지구에서 가장 북쪽이에요. 아주 춥고 얼음이 많아요.",
     choices:["북극","남극","적도"],
-    answer:0, why:"the North Pole = 북극.\n지구에서 가장 북쪽에 있는 곳이에요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+    answer:0, why:"the North Pole = 북극.\n지구에서 가장 북쪽에 있는 곳이에요." },
 
   { part:"단어 뜻", src:"11단원 낱말 · 8", art:"🤝",
     ask:"have in common 은 무슨 뜻일까요?",
     hint:"펭귄과 매너티는 둘 다 바다에 살아요. 이런 걸 뭐라고 할까요?",
     choices:["공통점이 있다","서로 다르다","따로 살다"],
-    answer:0, why:"have in common = 공통점이 있다.\n둘이 같은 점을 가지고 있다는 뜻이에요.\n이 낱말은 바다 이야기에는 안 나오고 11단원 낱말에만 있어요." },
+    answer:0, why:"have in common = 공통점이 있다.\n둘이 같은 점을 가지고 있다는 뜻이에요." },
 
   { part:"그림에 맞는 문장", src:"39쪽 C · 1", art:"🐢",
     ask:"그림에 맞는 문장을 고르세요.",
