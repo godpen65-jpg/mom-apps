@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>서현이와 에스 - 영어 동사 만화</title>
+<title>로미와 에스 - 영어 동사 만화</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
@@ -87,6 +87,11 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 .bubble::before,.bubble::after{content:"";position:absolute;
   border:12px solid transparent;border-top-color:var(--ink)}
 .bubble::after{border-top-color:#fff}
+.bubble.b-bl{left:20px;bottom:16px}
+.bubble.b-bl::before{left:22px;top:-24px;
+  border-top-color:transparent;border-bottom-color:var(--ink)}
+.bubble.b-bl::after{left:22px;top:-19px;
+  border-top-color:transparent;border-bottom-color:#fff}
 .bubble.b-tl{left:20px;top:16px}
 .bubble.b-tr{right:20px;top:16px}
 .bubble.b-tl::before{left:22px;bottom:-24px}
@@ -116,6 +121,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
   animation:fadeIn .3s ease-out .35s forwards}
 .morph .m-tag.same{color:var(--dim)}
 .morph .m-a{color:var(--ink)}
+.morph .m-row.pre .m-b{margin-right:.22em}
 .morph .m-b{color:var(--main);opacity:0;
   animation:flyIn .5s cubic-bezier(.2,.9,.3,1) .8s forwards}
 .morph .m-eq,.morph .m-ar{color:var(--dim);font-size:20px;margin:0 12px;opacity:0;
@@ -177,8 +183,8 @@ const CH = [
 {
   id:1, title:"에스가 나타났다", sub:"현재형 · 지금 하는 일",
   cuts:[
-    {ph:"📖", props:["s"], ko:"서현이가 낡은 사전을 펼치자, 파란 <b>에스</b>가 툭 튀어나왔어요. 에스는 s 붙이는 걸 제일 좋아해요."},
-    {ph:"🍕", props:["s","pizza gone"], ko:"에스가 서현이 문장에도 몰래 s를 붙였어요. 그러자 피자가 스르륵 사라졌어요.", en:"I likes pizza."},
+    {ph:"📖", props:["s"], ko:"로미가 낡은 사전을 펼치자, 파란 <b>에스</b>가 툭 튀어나왔어요. 에스는 s 붙이는 걸 제일 좋아해요."},
+    {ph:"🍕", props:["s","pizza gone"], ko:"에스가 로미 문장에도 몰래 s를 붙였어요. 그러자 피자가 스르륵 사라졌어요.", en:"I likes pizza."},
     {ph:"✋", props:["pizza"], ko:"“<b>나, 너, 우리, 그들</b>한테는 붙이면 안 돼!” 에스가 s를 떼자 피자가 돌아왔어요.", en:"I like pizza."},
     {ph:"⭕", props:["pizza"], ko:"“대신 <b>그, 그녀, 한 명</b>한테는 꼭 붙여야 해.” y로 끝나는 말은 carries처럼 모양이 살짝 바뀌어요.", en:"She likes pizza."}
   ],
@@ -193,7 +199,7 @@ const CH = [
     {ko:"너는 공을 던져요.", s:["You "," the ball."], o:["throw","throws"], a:0, w:"You 뒤에는 s가 없어요."},
     {ko:"그녀는 피자를 원해요.", s:["She "," pizza."], o:["wants","want"], a:0, w:"She(그녀)는 한 명이라 s를 붙여요."},
     {ko:"그는 공을 차요.", s:["He "," the ball."], o:["kick","kicks"], a:1, w:"He(그)는 한 명이라 s를 붙여요."},
-    {ko:"서현이는 그림을 그려요.", s:["Seohyun "," a picture."], o:["draws","draw"], a:0, w:"이름 하나도 한 명이라 s를 붙여요."},
+    {ko:"로미는 그림을 그려요.", s:["Romi "," a picture."], o:["draws","draw"], a:0, w:"이름 하나도 한 명이라 s를 붙여요."},
     {ko:"그는 수영을 해요.", s:["He "," in the pool."], o:["swim","swims"], a:1, w:"He 뒤에는 s를 붙여요."},
     {ko:"그녀는 큰 가방을 들고 다녀요.", s:["She "," a big bag."], o:["carry","carries"], a:1, w:"carry는 y를 빼고 ies를 붙여 carries가 돼요."},
     {ko:"그는 영어를 공부해요.", s:["He "," English."], o:["studies","study"], a:0, w:"study도 y를 빼고 ies를 붙여 studies가 돼요."},
@@ -203,9 +209,10 @@ const CH = [
 },
 {
   id:2, title:"어제로 가는 문", sub:"과거형 · 어제 한 일 · 영상 1분 33초", scene:true,
+  tl:["어제","오늘"], on:0,
   video:"영상/2편_동사과거형.mp4", poster:"영상/2편_표지.jpg",
   cuts:[
-    {ph:"🚪", at:"tl", who:"서현", say:"어? 이런 문이 있었나?",
+    {ph:"🚪", at:"tl", who:"로미", say:"어? 이런 문이 있었나?",
      ko:"책 더미 뒤에 못 보던 문이 하나 있었어요. 문 위에는 <b>어제</b>라고 적혀 있었어요."},
     {ph:"🌀", at:"tr", who:"ed", say:"안녕! 나는 ed야. 내가 붙으면 어제 일이 돼!",
      ko:"문을 지나자 빨간 꼬리 <b>ed</b>가 날아와 동사 뒤에 착 달라붙었어요.",
@@ -215,7 +222,7 @@ const CH = [
      ko:"동사 끝에 이미 <b>e</b>가 있으면 <b>ed</b>는 몸을 반으로 줄여 <b>d</b>만 붙여요.",
      morph:{a:"bake", b:"d", r:"baked"},
      en:"Yesterday I baked a cake."},
-    {ph:"💥", at:"tl", who:"서현", say:"어? ed가 튕겨 나갔어!",
+    {ph:"💥", at:"tl", who:"로미", say:"어? ed가 튕겨 나갔어!",
      ko:"어떤 동사는 꼬리를 아예 안 받아요. 대신 <b>모습이 통째로 바뀌어요.</b>",
      morph:{a:"swim", r:"swam", kind:"change"},
      en:"Yesterday I swam in the pool."},
@@ -246,13 +253,59 @@ const CH = [
     {ko:"어제 그녀는 큰 가방을 들고 다녔어요.", s:["Yesterday she "," a big bag."], o:["carried","carryed"], a:0, w:"carry는 y를 빼고 ied를 붙여 carried가 돼요."},
     {ko:"어제 나는 새 게임을 해 봤어요.", s:["Yesterday I "," a new game."], o:["tryed","tried"], a:1, w:"try도 y를 빼고 ied를 붙여 tried가 돼요."}
   ]
+},
+{
+  id:3, title:"내일로 가는 문", sub:"미래형 · 앞으로 할 일 · 영상 1분 33초", scene:true,
+  video:"영상/3편_동사미래형.mp4", poster:"영상/3편_표지.jpg",
+  tl:["오늘","내일"], on:1,
+  cuts:[
+    {ph:"🚪", at:"bl", who:"로미", say:"어? 문이 하나 더 생겼어!",
+     ko:"어제 문 옆에 <b>내일</b> 문이 하나 더 생겼어요. ed는 저 문엔 안 간다고 삐죽했어요."},
+    {ph:"🏮", at:"tl", who:"will", say:"나는 뒤에 안 붙어. 앞에 설 거야!",
+     ko:"문이 열리자 노란 등불 <b>will</b>이 나왔어요. will은 동사 <b>앞</b>에 서요.",
+     morph:{b:"will", a:"play", r:"will play", pre:true},
+     en:"I will play soccer."},
+    {ph:"🍽", at:"tl", who:"will", say:"나는 너를 안 바꿔!",
+     ko:"ed는 동사 모양을 바꿨지만 will은 <b>동사를 그대로 둬요.</b> eat은 그냥 eat이에요.",
+     morph:{b:"will", a:"eat", r:"will eat", pre:true, tag:"동사는 안 변해요"},
+     en:"I will eat lunch."},
+    {ph:"☔", at:"tl", who:"will", say:"내일은 비가 올 거야. 우산 챙겨!",
+     ko:"아직 오지 않은 일도 will로 말해요. 내일, 다음 주, 오늘 밤 모두요.",
+     morph:{b:"will", a:"rain", r:"will rain", pre:true},
+     en:"It will rain tomorrow."},
+    {ph:"🗓", ko:"왼쪽 문에는 <b>ed</b>, 오른쪽 문에는 <b>will</b>. 가운데 로미는 <b>오늘</b>이에요.",
+     morph:{three:true, a:"play", b:"played", r:"will play"},
+     en:"I play. I played. I will play."}
+  ],
+  quiz:[
+    {ko:"나는 축구를 할 거예요.", s:["I "," soccer."], o:["will play","play"], a:0, w:"앞으로 할 일이니까 동사 앞에 will을 붙여요."},
+    {ko:"그는 점심을 먹을 거예요.", s:["He "," lunch."], o:["eats","will eat"], a:1, w:"앞으로 할 일이니까 will eat이에요."},
+    {ko:"그녀는 자전거를 탈 거예요.", s:["She "," her bike."], o:["will ride","rode"], a:0, w:"rode는 어제 일이에요. 앞으로 할 일은 will ride."},
+    {ko:"내일 비가 올 거예요.", s:["It "," tomorrow."], o:["rained","will rain"], a:1, w:"내일 일이니까 will rain이에요."},
+    {ko:"나는 오늘 밤 영화를 보러 갈 거예요.", s:["I "," to the movie tonight."], o:["will go","went"], a:0, w:"오늘 밤은 아직 안 온 시간이라 will go예요."},
+    {ko:"고양이가 곧 쥐를 잡을 거예요.", s:["The cat "," the mouse soon."], o:["catches","will catch"], a:1, w:"곧 할 일이니까 will catch예요."},
+    {ko:"세라는 다음 주 시험 공부를 할 거예요.", s:["Sarah "," for her test."], o:["will study","studied"], a:0, w:"다음 주 일이니까 will study예요."},
+    {ko:"그들은 저녁을 요리할 거예요.", s:["They "," dinner."], o:["cooked","will cook"], a:1, w:"앞으로 할 일이니까 will cook이에요."},
+    {ko:"그는 벽을 색칠할 거예요.", s:["He will "," walls."], o:["paint","painted"], a:0, w:"will 뒤에는 동사를 그대로 써요. painted가 아니에요."},
+    {ko:"우리는 책을 읽을 거예요.", s:["We will "," a book."], o:["reads","read"], a:1, w:"will 뒤에는 s도 붙이지 않아요."},
+    {ko:"그녀는 춤을 출 거예요.", s:["She will ","."], o:["dance","dances"], a:0, w:"will 뒤에는 동사를 그대로. dances가 아니에요."},
+    {ko:"나는 피아노를 연주할 거예요.", s:["I will "," the piano."], o:["played","play"], a:1, w:"will 뒤에는 동사를 그대로 써요."},
+    {ko:"어제 나는 축구를 했어요.", s:["Yesterday I "," soccer."], o:["played","will play"], a:0, w:"어제 일은 ed, 내일 일은 will이에요."},
+    {ko:"내일 나는 축구를 할 거예요.", s:["Tomorrow I "," soccer."], o:["played","will play"], a:1, w:"내일 일이니까 will play예요."},
+    {ko:"어제 그는 케이크를 구웠어요.", s:["Yesterday he "," a cake."], o:["baked","will bake"], a:0, w:"어제 일이니까 baked예요."},
+    {ko:"내일 그는 케이크를 구울 거예요.", s:["Tomorrow he "," a cake."], o:["baked","will bake"], a:1, w:"내일 일이니까 will bake예요."},
+    {ko:"그녀는 문을 닫을 거예요.", s:["She "," the door."], o:["will close","close will"], a:0, w:"will은 동사 앞에 서요. 뒤에 쓰지 않아요."},
+    {ko:"우리는 바다에 갈 거예요.", s:["We "," to the sea."], o:["go will","will go"], a:1, w:"will을 동사 앞에 써요."},
+    {ko:"그는 공을 던질 거예요.", s:["He "," the ball."], o:["will throw","throw will"], a:0, w:"will은 언제나 동사 앞이에요."},
+    {ko:"그들은 집을 지을 거예요.", s:["They "," a house."], o:["build will","will build"], a:1, w:"will을 동사 앞에 써요."}
+  ]
 }];
 
-const TINT = {1:"#F8E9D5", 2:"#E2E9EF"};
+const TINT = {1:"#F8E9D5", 2:"#E2E9EF", 3:"#F6EFD8"};
 
 /* 소품 그림. 이모티콘과 같은 굵은 외곽선 · 납작한 색으로 직접 그림 */
 const PROPS = {
-  /* 서현이가 제일 좋아하는 피자 */
+  /* 로미가 제일 좋아하는 피자 */
   pizza: `<svg viewBox="0 0 200 200" fill="none"
     stroke="#2B2420" stroke-width="8" stroke-linejoin="round" stroke-linecap="round">
     <path d="M28 46 L172 46 L100 182 Z" fill="#F5C84C"/>
@@ -270,7 +323,7 @@ const PROPS = {
     <circle cx="76" cy="57" r="7.5" fill="#2B2420"/>
   </svg>`,
 
-  /* 서현이를 쫓아다니는 ed 꼬리 */
+  /* 로미를 쫓아다니는 ed 꼬리 */
   ed: `<svg viewBox="0 0 200 120">
     <g stroke="#2B2420" stroke-width="7" stroke-linecap="round" opacity=".55">
       <line x1="8" y1="36" x2="56" y2="36"/>
@@ -290,8 +343,13 @@ function 소품(list){
 }
 
 /* ===================== 저장 ===================== */
-const KEY = "seohyun-grammar-v1";
-function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; } }
+const KEY = "romi-grammar-v1";
+const 예전KEY = "seohyun-grammar-v1";          /* 이름 바꾸기 전 점수도 살린다 */
+function load(){
+  try{
+    return JSON.parse(localStorage.getItem(KEY) || localStorage.getItem(예전KEY)) || {};
+  }catch(e){ return {}; }
+}
 function save(d){ try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){} }
 
 const app = document.getElementById("app");
@@ -302,7 +360,7 @@ function home(){
   const d = load();
   app.innerHTML = `
   <div class="top">
-    <h1>서현이와 에스</h1>
+    <h1>로미와 에스</h1>
     <p>만화 보고 문제 풀면서 영어 동사 익히기</p>
   </div>
   <div class="chapters">
@@ -395,23 +453,36 @@ function 영상보기(id){
 
 /* ===================== 만화 ===================== */
 /* 시간 띠. 지금 어느 시간을 배우는지 눈으로 보여 준다 */
-function 시간띠(){
-  return `<div class="tl"><span class="on">어제</span><i></i><span>오늘</span></div>`;
+function 시간띠(c){
+  const [l, r] = c.tl || ["어제", "오늘"];
+  const on = c.on || 0;
+  return `<div class="tl"><span class="${on===0?"on":""}">${l}</span><i></i>`
+    + `<span class="${on===1?"on":""}">${r}</span></div>`;
 }
 
 /* 동사 변신기. 꼬리가 날아와 붙고 결과가 톡 나타난다 */
 function 변신기(m){
+  if(m.three){                       /* 세 시제를 나란히 (3편 마지막 컷) */
+    return `<div class="morph"><span class="m-tag">오늘 · 어제 · 내일</span>`
+      + `<span class="m-row"><span class="m-a">${esc(m.a)}</span>`
+      + `<span class="m-eq">·</span><span class="m-b">${esc(m.b)}</span>`
+      + `<span class="m-eq">·</span><span class="m-r">${esc(m.r)}</span></span></div>`;
+  }
   const 딱지 = m.kind
     ? (m.kind === "same" ? "꿈쩍도 안 해요" : "아예 변신해요")
+    : m.pre ? (m.tag || "동사 앞에 will")
     : (m.b === "ed" ? "ed 꼬리를 붙여요" : "e가 있으니 d 하나만");
   const 줄 = m.kind
     ? `<span class="m-a">${esc(m.a)}</span><span class="m-ar">→</span>`
       + `<span class="m-r${m.kind==="same"?" same":""}">${esc(m.r)}</span>`
-    : `<span class="m-a">${esc(m.a)}</span><span class="m-b">${esc(m.b)}</span>`
-      + `<span class="m-eq">=</span><span class="m-r">${esc(m.r)}</span>`;
+    : m.pre                          /* will 은 동사 앞에 선다 */
+      ? `<span class="m-b">${esc(m.b)}</span><span class="m-a">${esc(m.a)}</span>`
+        + `<span class="m-eq">=</span><span class="m-r">${esc(m.r)}</span>`
+      : `<span class="m-a">${esc(m.a)}</span><span class="m-b">${esc(m.b)}</span>`
+        + `<span class="m-eq">=</span><span class="m-r">${esc(m.r)}</span>`;
   return `<div class="morph">`
     + `<span class="m-tag${m.kind==="same"?" same":""}">${딱지}</span>`
-    + `<span class="m-row">${줄}</span></div>`;
+    + `<span class="m-row${m.pre?" pre":""}">${줄}</span></div>`;
 }
 
 function comic(id, i){
@@ -423,7 +494,7 @@ function comic(id, i){
     ${c.video ? `<button class="tovid">🎬 영상</button>` : ""}
     <span class="step">${i+1} / ${c.cuts.length}</span>
   </div>
-  ${c.scene ? 시간띠() : ""}
+  ${c.scene ? 시간띠(c) : ""}
   <div class="art${c.scene ? " scene" : ""}" style="--tint:${TINT[id]}">
     <img src="컷/${id}-${i+1}.png" alt=""><span class="ph hide">${cut.ph}</span>
     ${소품(cut.props)}
