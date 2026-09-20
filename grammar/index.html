@@ -51,11 +51,6 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 /* ---------- 만화 ---------- */
 .art{position:relative;width:100%;aspect-ratio:4/3;border-radius:10px;overflow:hidden;padding:14px;
   background:var(--tint,#F3E7D2);display:grid;place-items:center}
-.prop{position:absolute}
-.prop.pizza{right:7%;bottom:9%;width:30%;max-width:132px}
-.prop.s{left:5%;top:8%;width:19%;max-width:78px}
-.prop.ed{left:4%;bottom:11%;width:35%;max-width:152px}
-.prop.gone{opacity:.22}
 .art img{max-width:100%;height:100%;width:auto;object-fit:contain;display:block}
 .art .ph{font-size:56px}
 .hide{display:none}
@@ -173,7 +168,6 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 <body>
 <div class="wrap" id="app"></div>
 
-<script src="소리.js"></script>
 <script>
 /* =========================================================
    만화 2편 + 문제 32개
@@ -181,12 +175,27 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
    ========================================================= */
 const CH = [
 {
-  id:1, title:"에스가 나타났다", sub:"현재형 · 지금 하는 일",
+  id:1, title:"에스가 나타났다", sub:"현재형 · 지금 하는 일 · 영상 1분 40초", scene:true,
+  video:"영상/1편_동사현재형.mp4", poster:"영상/1편_표지.jpg", vlen:"1분 40초",
   cuts:[
-    {ph:"📖", props:["s"], ko:"로미가 낡은 사전을 펼치자, 파란 <b>에스</b>가 툭 튀어나왔어요. 에스는 s 붙이는 걸 제일 좋아해요."},
-    {ph:"🍕", props:["s","pizza gone"], ko:"에스가 로미 문장에도 몰래 s를 붙였어요. 그러자 피자가 스르륵 사라졌어요.", en:"I likes pizza."},
-    {ph:"✋", props:["pizza"], ko:"“<b>나, 너, 우리, 그들</b>한테는 붙이면 안 돼!” 에스가 s를 떼자 피자가 돌아왔어요.", en:"I like pizza."},
-    {ph:"⭕", props:["pizza"], ko:"“대신 <b>그, 그녀, 한 명</b>한테는 꼭 붙여야 해.” y로 끝나는 말은 carries처럼 모양이 살짝 바뀌어요.", en:"She likes pizza."}
+    {ph:"📖", at:"tl", who:"로미", say:"어? 사전에서 뭐가 나왔어!",
+     ko:"로미가 낡은 사전을 펼치자 파란 <b>s</b>가 툭 튀어나왔어요."},
+    {ph:"🍕", at:"tl", who:"s", say:"으악! 나 튕겨 나갔어!",
+     ko:"s가 로미에게 붙으려다 튕겨 나갔어요. <b>나·너·우리·그들</b>에게는 안 붙어요.",
+     morph:{a:"like", r:"like", kind:"same", tag:"나·너·우리·그들엔 안 붙어요"},
+     en:"I like pizza."},
+    {ph:"🐶", at:"tl", who:"s", say:"한 명한테는 꼭 붙을 거야!",
+     ko:"강아지 한 마리에게는 s가 착 붙었어요. <b>그·그녀·하나</b>에게는 꼭 붙여요.",
+     morph:{a:"like", b:"s", r:"likes", tag:"그·그녀·하나엔 붙여요"},
+     en:"It likes pizza."},
+    {ph:"📺", at:"tl", who:"s", say:"혼자 안 들어가. 친구 e 데려왔어!",
+     ko:"동사가 <b>ch·sh·x·s</b>로 끝나면 s는 친구 <b>e</b>를 데려와 <b>es</b>가 돼요.",
+     morph:{a:"watch", b:"es", r:"watches", tag:"ch로 끝나면 es"},
+     en:"It watches TV."},
+    {ph:"🦴", at:"tl", who:"s", say:"y는 내가 밀어낼게!",
+     ko:"동사가 <b>y</b>로 끝나면 y를 밀어내고 <b>ies</b>가 돼요.",
+     morph:{a:"carr", b:"ies", r:"carries", tag:"y를 빼고 ies"},
+     en:"It carries a big bone."}
   ],
   quiz:[
     {ko:"나는 피자를 원해요.", s:["I "," pizza."], o:["want","wants"], a:0, w:"I(나) 뒤에는 s를 붙이지 않아요."},
@@ -201,16 +210,20 @@ const CH = [
     {ko:"그는 공을 차요.", s:["He "," the ball."], o:["kick","kicks"], a:1, w:"He(그)는 한 명이라 s를 붙여요."},
     {ko:"로미는 그림을 그려요.", s:["Romi "," a picture."], o:["draws","draw"], a:0, w:"이름 하나도 한 명이라 s를 붙여요."},
     {ko:"그는 수영을 해요.", s:["He "," in the pool."], o:["swim","swims"], a:1, w:"He 뒤에는 s를 붙여요."},
-    {ko:"그녀는 큰 가방을 들고 다녀요.", s:["She "," a big bag."], o:["carry","carries"], a:1, w:"carry는 y를 빼고 ies를 붙여 carries가 돼요."},
-    {ko:"그는 영어를 공부해요.", s:["He "," English."], o:["studies","study"], a:0, w:"study도 y를 빼고 ies를 붙여 studies가 돼요."},
+    {ko:"그는 강아지를 키워요.", s:["He "," a dog."], o:["have","has"], a:1, w:"have는 has로 모양이 바뀌어요."},
+    {ko:"그녀는 학교에 가요.", s:["She "," to school."], o:["goes","go"], a:0, w:"go는 o로 끝나서 es를 붙여 goes가 돼요."},
     {ko:"그녀는 영화를 봐요.", s:["She "," a movie."], o:["watch","watches"], a:1, w:"watch는 ch로 끝나서 es를 붙여요."},
-    {ko:"아빠는 문을 고쳐요.", s:["My dad "," the door."], o:["fixes","fix"], a:0, w:"fix는 x로 끝나서 es를 붙여요."}
+    {ko:"아빠는 문을 고쳐요.", s:["My dad "," the door."], o:["fixes","fix"], a:0, w:"fix는 x로 끝나서 es를 붙여요."},
+    {ko:"그는 이를 닦아요.", s:["He "," his teeth."], o:["brush","brushes"], a:1, w:"brush는 sh로 끝나서 es를 붙여요."},
+    {ko:"그녀는 공을 건네줘요.", s:["She "," the ball."], o:["passes","pass"], a:0, w:"pass는 s로 끝나서 es를 붙여요."},
+    {ko:"그녀는 큰 가방을 들고 다녀요.", s:["She "," a big bag."], o:["carry","carries"], a:1, w:"carry는 y를 빼고 ies를 붙여 carries가 돼요."},
+    {ko:"그는 영어를 공부해요.", s:["He "," English."], o:["studies","study"], a:0, w:"study도 y를 빼고 ies를 붙여 studies가 돼요."}
   ]
 },
 {
   id:2, title:"어제로 가는 문", sub:"과거형 · 어제 한 일 · 영상 1분 33초", scene:true,
   tl:["어제","오늘"], on:0,
-  video:"영상/2편_동사과거형.mp4", poster:"영상/2편_표지.jpg",
+  video:"영상/2편_동사과거형.mp4", poster:"영상/2편_표지.jpg", vlen:"1분 33초",
   cuts:[
     {ph:"🚪", at:"tl", who:"로미", say:"어? 이런 문이 있었나?",
      ko:"책 더미 뒤에 못 보던 문이 하나 있었어요. 문 위에는 <b>어제</b>라고 적혀 있었어요."},
@@ -256,7 +269,7 @@ const CH = [
 },
 {
   id:3, title:"내일로 가는 문", sub:"미래형 · 앞으로 할 일 · 영상 1분 33초", scene:true,
-  video:"영상/3편_동사미래형.mp4", poster:"영상/3편_표지.jpg",
+  video:"영상/3편_동사미래형.mp4", poster:"영상/3편_표지.jpg", vlen:"1분 33초",
   tl:["오늘","내일"], on:1,
   cuts:[
     {ph:"🚪", at:"bl", who:"로미", say:"어? 문이 하나 더 생겼어!",
@@ -303,45 +316,6 @@ const CH = [
 
 const TINT = {1:"#F8E9D5", 2:"#E2E9EF", 3:"#F6EFD8"};
 
-/* 소품 그림. 이모티콘과 같은 굵은 외곽선 · 납작한 색으로 직접 그림 */
-const PROPS = {
-  /* 로미가 제일 좋아하는 피자 */
-  pizza: `<svg viewBox="0 0 200 200" fill="none"
-    stroke="#2B2420" stroke-width="8" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M28 46 L172 46 L100 182 Z" fill="#F5C84C"/>
-    <path d="M26 48 C26 12 174 12 174 48 Z" fill="#E0A55C"/>
-    <circle cx="74" cy="84" r="14" fill="#C8452B"/>
-    <circle cx="126" cy="92" r="13" fill="#C8452B"/>
-    <circle cx="99" cy="130" r="12" fill="#C8452B"/>
-  </svg>`,
-
-  /* 파란 요정 에스 */
-  s: `<svg viewBox="0 0 120 140">
-    <text x="60" y="114" font-family="Jua, sans-serif" font-size="132" text-anchor="middle"
-      fill="#4A8FD4" stroke="#2B2420" stroke-width="11" paint-order="stroke">s</text>
-    <circle cx="44" cy="62" r="7.5" fill="#2B2420"/>
-    <circle cx="76" cy="57" r="7.5" fill="#2B2420"/>
-  </svg>`,
-
-  /* 로미를 쫓아다니는 ed 꼬리 */
-  ed: `<svg viewBox="0 0 200 120">
-    <g stroke="#2B2420" stroke-width="7" stroke-linecap="round" opacity=".55">
-      <line x1="8" y1="36" x2="56" y2="36"/>
-      <line x1="0" y1="66" x2="44" y2="66"/>
-      <line x1="12" y1="96" x2="54" y2="96"/>
-    </g>
-    <text x="128" y="96" font-family="Jua, sans-serif" font-size="104" text-anchor="middle"
-      fill="#C8452B" stroke="#2B2420" stroke-width="10" paint-order="stroke">ed</text>
-  </svg>`
-};
-
-function 소품(list){
-  return (list || []).map(k=>{
-    const [key, ...cls] = k.split(" ");
-    return PROPS[key].replace("<svg", `<svg class="prop ${key} ${cls.join(" ")}"`);
-  }).join("");
-}
-
 /* ===================== 저장 ===================== */
 const KEY = "romi-grammar-v1";
 const 예전KEY = "seohyun-grammar-v1";          /* 이름 바꾸기 전 점수도 살린다 */
@@ -384,7 +358,21 @@ function home(){
    미리 구워 둔 mp3(소리.js)를 재생한다. 아이폰·아이패드·갤럭시탭 모두 같은 소리가 나야 해서
    브라우저 기본 음성(speechSynthesis) 대신 파일 재생을 쓴다.
    오디오 태그는 하나만 만들어 재사용한다. 아이폰은 사용자가 처음 누른 그 태그만 계속 열어 준다. */
-const 소리표 = (typeof SOUND !== "undefined") ? SOUND : {};
+let 소리표 = {}, 소리받는중 = null;
+
+/* 소리 파일은 1MB가 넘어서, 화면을 먼저 보여 준 다음 배경에서 받아 온다.
+   그래야 폰에서 앱이 바로 열린다. 아래에서 첫 화면을 그린 뒤 바로 부른다. */
+function 소리받기(){
+  if(소리받는중) return 소리받는중;
+  소리받는중 = new Promise((ok, no)=>{
+    const t = document.createElement("script");
+    t.src = "소리.js";
+    t.onload = ()=>{ 소리표 = (typeof SOUND !== "undefined") ? SOUND : {}; ok(); };
+    t.onerror = ()=>{ 소리받는중 = null; no(); };
+    document.head.appendChild(t);
+  });
+  return 소리받는중;
+}
 const 오디오 = new Audio();
 const 주소캐시 = {};
 let 큐 = [], 현재버튼 = null;
@@ -422,12 +410,17 @@ function 읽기(keys, btn){
   const 다시누름 = (현재버튼 === btn);
   멈춤();
   if(다시누름) return;
-  큐 = keys.filter(k => 소리주소(k));
-  if(!큐.length) return;
   현재버튼 = btn;
   btn.classList.add("on");
   btn.textContent = "읽는 중…";
-  다음클립();
+  const 틀기 = ()=>{
+    if(현재버튼 !== btn) return;          /* 그새 다른 걸 눌렀으면 그만 */
+    큐 = keys.filter(k => 소리주소(k));
+    if(!큐.length){ 멈춤(); return; }
+    다음클립();
+  };
+  if(소리받는중) 소리받기().then(틀기).catch(()=> 멈춤());
+  else { btn.textContent = "소리 받는 중…"; 소리받기().then(틀기).catch(()=> 멈춤()); }
 }
 
 /* ===================== 영상 =====================
@@ -442,7 +435,7 @@ function 영상보기(id){
   </div>
   <video class="vid" controls playsinline webkit-playsinline preload="metadata"
     poster="${c.poster}"><source src="${c.video}" type="video/mp4"></video>
-  <p class="say">만화를 <b>1분 33초</b> 영상으로 이어서 볼 수 있어요. 소리를 켜고 보세요.</p>
+  <p class="say">만화를 <b>${c.vlen}</b> 영상으로 이어서 볼 수 있어요. 소리를 켜고 보세요.</p>
   <button class="read">만화 컷으로 천천히 보기 →</button>
   <button class="next">문제 풀러 가기 →</button>`;
 
@@ -468,10 +461,12 @@ function 변신기(m){
       + `<span class="m-eq">·</span><span class="m-a">${esc(m.now)}</span>`
       + `<span class="m-eq">·</span><span class="m-r">${esc(m.future)}</span></span></div>`;
   }
-  const 딱지 = m.kind
-    ? (m.kind === "same" ? "꿈쩍도 안 해요" : "아예 변신해요")
-    : m.pre ? (m.tag || "동사 앞에 will")
-    : (m.b === "ed" ? "ed 꼬리를 붙여요" : "e가 있으니 d 하나만");
+  const 딱지 = m.tag
+    ? m.tag
+    : m.kind
+      ? (m.kind === "same" ? "꿈쩍도 안 해요" : "아예 변신해요")
+      : m.pre ? "동사 앞에 will"
+      : (m.b === "ed" ? "ed 꼬리를 붙여요" : "e가 있으니 d 하나만");
   const 줄 = m.kind
     ? `<span class="m-a">${esc(m.a)}</span><span class="m-ar">→</span>`
       + `<span class="m-r${m.kind==="same"?" same":""}">${esc(m.r)}</span>`
@@ -494,10 +489,9 @@ function comic(id, i){
     ${c.video ? `<button class="tovid">🎬 영상</button>` : ""}
     <span class="step">${i+1} / ${c.cuts.length}</span>
   </div>
-  ${c.scene ? 시간띠(c) : ""}
+  ${c.tl ? 시간띠(c) : ""}
   <div class="art${c.scene ? " scene" : ""}" style="--tint:${TINT[id]}">
     <img src="컷/${id}-${i+1}.png" alt=""><span class="ph hide">${cut.ph}</span>
-    ${소품(cut.props)}
     ${cut.say ? `<div class="bubble b-${cut.at || "tl"}"><b>${esc(cut.who)}</b>${esc(cut.say)}</div>` : ""}
   </div>
   ${cut.morph ? 변신기(cut.morph) : ""}
@@ -511,8 +505,7 @@ function comic(id, i){
 
   const 키 = id + "-" + (i+1);
   const rb = app.querySelector(".read");
-  if(소리주소("ko:"+키)) rb.onclick = ()=> 읽기(["ko:"+키, "en:"+키], rb);
-  else rb.remove();
+  rb.onclick = ()=> 읽기(["ko:"+키, "en:"+키], rb);
 
   app.querySelector(".back").onclick = ()=>{ 멈춤(); home(); };
   const vb = app.querySelector(".tovid");
@@ -578,6 +571,7 @@ function done(id, right){
 }
 
 home();
+setTimeout(소리받기, 400);   /* 화면 먼저, 소리는 뒤따라 */
 
 /* ===== 자체 점검: 문제 데이터가 깨지지 않았는지 ===== */
 (function check(){
