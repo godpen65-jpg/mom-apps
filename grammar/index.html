@@ -64,6 +64,13 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 .eng{font-family:"Jua",sans-serif;font-size:20px;color:var(--deep);margin-top:6px}
 
 
+/* ---------- 영상 ---------- */
+.tovid{margin-left:auto;background:none;border:0;padding:6px 0;
+  font-size:14px;color:var(--deep)}
+.bar .tovid+.step{margin-left:14px}
+.vid{width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;
+  display:block;animation:cutIn .34s cubic-bezier(.22,.7,.3,1) both}
+
 /* ---------- 장면 만화(2편) ---------- */
 .art.scene{aspect-ratio:16/9;padding:0;border-radius:12px}
 .art.scene img{width:100%;height:100%;object-fit:cover;
@@ -195,7 +202,8 @@ const CH = [
   ]
 },
 {
-  id:2, title:"어제로 가는 문", sub:"과거형 · 어제 한 일", scene:true,
+  id:2, title:"어제로 가는 문", sub:"과거형 · 어제 한 일 · 영상 1분 33초", scene:true,
+  video:"영상/2편_동사과거형.mp4", poster:"영상/2편_표지.jpg",
   cuts:[
     {ph:"🚪", at:"tl", who:"서현", say:"어? 이런 문이 있었나?",
      ko:"책 더미 뒤에 못 보던 문이 하나 있었어요. 문 위에는 <b>어제</b>라고 적혀 있었어요."},
@@ -307,7 +315,11 @@ function home(){
       </button>`;
     }).join("")}
   </div>`;
-  app.querySelectorAll(".ch").forEach(b=> b.onclick = ()=> comic(+b.dataset.id, 0));
+  app.querySelectorAll(".ch").forEach(b=> b.onclick = ()=>{
+    const id = +b.dataset.id;
+    const c = CH.find(x=>x.id===id);
+    c.video ? 영상보기(id) : comic(id, 0);
+  });
 }
 
 /* ===================== 소리로 읽어주기 =====================
@@ -360,6 +372,27 @@ function 읽기(keys, btn){
   다음클립();
 }
 
+/* ===================== 영상 =====================
+   만든 만화를 소리와 함께 이어 보는 화면. 컷을 하나씩 넘기는 화면은 그대로 남겨 둔다. */
+function 영상보기(id){
+  const c = CH.find(x=>x.id===id);
+  app.innerHTML = `
+  <div class="bar">
+    <button class="back">← 목록</button>
+    <span class="name">${c.title}</span>
+    <span class="step">영상</span>
+  </div>
+  <video class="vid" controls playsinline webkit-playsinline preload="metadata"
+    poster="${c.poster}"><source src="${c.video}" type="video/mp4"></video>
+  <p class="say">만화를 <b>1분 33초</b> 영상으로 이어서 볼 수 있어요. 소리를 켜고 보세요.</p>
+  <button class="read">만화 컷으로 천천히 보기 →</button>
+  <button class="next">문제 풀러 가기 →</button>`;
+
+  app.querySelector(".back").onclick = ()=>{ 멈춤(); home(); };
+  app.querySelector(".read").onclick = ()=>{ 멈춤(); comic(id, 0); };
+  app.querySelector(".next").onclick = ()=>{ 멈춤(); quiz(id, 0, 0); };
+}
+
 /* ===================== 만화 ===================== */
 /* 시간 띠. 지금 어느 시간을 배우는지 눈으로 보여 준다 */
 function 시간띠(){
@@ -387,6 +420,7 @@ function comic(id, i){
   <div class="bar">
     <button class="back">← 목록</button>
     <span class="name">${c.title}</span>
+    ${c.video ? `<button class="tovid">🎬 영상</button>` : ""}
     <span class="step">${i+1} / ${c.cuts.length}</span>
   </div>
   ${c.scene ? 시간띠() : ""}
@@ -410,6 +444,8 @@ function comic(id, i){
   else rb.remove();
 
   app.querySelector(".back").onclick = ()=>{ 멈춤(); home(); };
+  const vb = app.querySelector(".tovid");
+  if(vb) vb.onclick = ()=>{ 멈춤(); 영상보기(id); };
   app.querySelector(".next").onclick = ()=>{
     멈춤();
     (i+1 < c.cuts.length) ? comic(id, i+1) : quiz(id, 0, 0);
