@@ -274,8 +274,8 @@ const CH = [
      morph:{b:"will", a:"rain", r:"will rain", pre:true},
      en:"It will rain tomorrow."},
     {ph:"🗓", ko:"왼쪽 문에는 <b>ed</b>, 오른쪽 문에는 <b>will</b>. 가운데 로미는 <b>오늘</b>이에요.",
-     morph:{three:true, a:"play", b:"played", r:"will play"},
-     en:"I play. I played. I will play."}
+     morph:{three:true, past:"played", now:"play", future:"will play"},
+     en:"I played. I play. I will play."}
   ],
   quiz:[
     {ko:"나는 축구를 할 거예요.", s:["I "," soccer."], o:["will play","play"], a:0, w:"앞으로 할 일이니까 동사 앞에 will을 붙여요."},
@@ -462,11 +462,11 @@ function 시간띠(c){
 
 /* 동사 변신기. 꼬리가 날아와 붙고 결과가 톡 나타난다 */
 function 변신기(m){
-  if(m.three){                       /* 세 시제를 나란히 (3편 마지막 컷) */
-    return `<div class="morph"><span class="m-tag">오늘 · 어제 · 내일</span>`
-      + `<span class="m-row"><span class="m-a">${esc(m.a)}</span>`
-      + `<span class="m-eq">·</span><span class="m-b">${esc(m.b)}</span>`
-      + `<span class="m-eq">·</span><span class="m-r">${esc(m.r)}</span></span></div>`;
+  if(m.three){      /* 세 시제를 그림 순서대로. 왼쪽 문 어제, 가운데 오늘, 오른쪽 문 내일 */
+    return `<div class="morph"><span class="m-tag">어제 · 오늘 · 내일</span>`
+      + `<span class="m-row"><span class="m-b">${esc(m.past)}</span>`
+      + `<span class="m-eq">·</span><span class="m-a">${esc(m.now)}</span>`
+      + `<span class="m-eq">·</span><span class="m-r">${esc(m.future)}</span></span></div>`;
   }
   const 딱지 = m.kind
     ? (m.kind === "same" ? "꿈쩍도 안 해요" : "아예 변신해요")
