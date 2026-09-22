@@ -139,6 +139,29 @@
   .result .msg{font-family:'Gaegu',sans-serif;font-weight:700;font-size:18px;color:var(--muted);margin-top:8px;}
   .wrong-list .card .py{font-size:19px;}
 
+
+  /* 오늘 공부 큰 단추 · 도장판 */
+  .go{display:block;width:100%;border:none;border-radius:24px;background:var(--red);color:#fff;padding:18px 16px;margin-top:8px;
+      box-shadow:0 6px 0 #b83d2b;text-align:center;}
+  .go:active{transform:translateY(4px);box-shadow:0 2px 0 #b83d2b;}
+  .go .r{font-family:'Gaegu',sans-serif;font-weight:700;font-size:16px;opacity:.9;}
+  .go .t{font-size:26px;margin:2px 0;}
+  .go .d{font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;opacity:.9;}
+  .pace{text-align:center;font-family:'Gaegu',sans-serif;font-weight:700;font-size:16px;color:#7a5a45;margin:14px 0 6px;}
+  .stampbox{background:#fff;border-radius:20px;padding:12px 10px;box-shadow:0 3px 10px rgba(180,120,80,.10);}
+  .srow{display:flex;align-items:center;gap:6px;margin:4px 0;}
+  .slab{font-family:'Gaegu',sans-serif;font-weight:700;font-size:13px;color:var(--muted);width:34px;flex:none;}
+  .sgrid{flex:1;display:grid;grid-template-columns:repeat(10,1fr);gap:4px;}
+  .st{aspect-ratio:1;border:none;border-radius:8px;background:#f6ece1;color:#c9b6a4;font-size:11px;padding:0;font-family:'Jua',sans-serif;}
+  .st.mk{background:#fbe3dc;}
+  .st.done{background:#fff1c9;font-size:15px;}
+  .st.now{background:var(--gold);color:#fff;font-size:13px;box-shadow:0 0 0 2px #fff,0 0 0 4px var(--gold);}
+  .card.veil .ko,body.kr .card.veil .kr{display:none;}
+  .card.veil .body::after{content:'👆 눌러서 뜻 보기';display:block;font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;color:#d0a57a;margin-top:4px;}
+  .stamp{margin:14px auto 0;width:120px;height:120px;border-radius:50%;border:5px solid var(--red);color:var(--red);display:flex;flex-direction:column;
+         align-items:center;justify-content:center;font-size:44px;transform:rotate(-12deg);animation:stampin .45s ease-out;}
+  .stamp span{font-size:18px;}
+  @keyframes stampin{0%{transform:scale(2) rotate(-12deg);opacity:0}100%{transform:scale(1) rotate(-12deg);opacity:1}}
   @keyframes pop{50%{transform:scale(1.05)}}
   @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
@@ -410,7 +433,7 @@ const STORE='chinese-cert-v1';
 let mem={};
 function load(){ try{ return JSON.parse(localStorage.getItem(STORE))||{}; }catch(e){ return mem; } }
 function save(d){ mem=d; try{ localStorage.setItem(STORE,JSON.stringify(d)); }catch(e){} }
-let DB=load(); DB.done=DB.done||{}; DB.wrong=DB.wrong||{}; DB.best=DB.best||null;
+let DB=load(); DB.wrong=DB.wrong||{}; DB.best=DB.best||null;
 
 /* ================================================================
    소리 — 음원 파일이 있으면 그걸, 없으면 폰의 중국어 목소리로
@@ -471,56 +494,13 @@ function daysLeft(){
 }
 function gradeOf(s){ return s>=90?'특급':s>=70?'1급':s>=50?'2급':'다시 도전'; }
 
-/* 첫 화면 */
-function home(v){
-  const dl=daysLeft(); const done=Object.keys(DB.done).length;
-  const wrongN=Object.keys(DB.wrong).length;
-  v.innerHTML=
-    '<div class="hero"><div class="flag">🐼</div><h1>중국어 인증제</h1>'+
-    '<div class="sub">특급 도전! 발음1 · 스토리1 교재</div></div>'+
-    '<div class="dday"><div><b>'+(dl>0?'D-'+dl:dl===0?'D-DAY':'끝!')+'</b><span>12월 14일 시험</span></div>'+
-    '<div><b>'+done+' / '+UNITS.length+'</b><span>공부한 단원</span></div>'+
-    '<div><b>'+(DB.best==null?'–':DB.best)+'</b><span>모의고사 최고</span></div></div>'+
-    '<div class="grade">객관식 40문제 · 특급 90점 · 1급 70점 · 2급 50점</div>'+
-    menu('today','📖','#fdebd9','오늘 공부','12주 순서대로 한 단원씩')+
-    menu('must','⭐','#fff1c9','꼭 외울 것','시험에 계속 나오는 것만 모았어요')+
-    menu('prac','✏️','#e3f1e6','연습 문제','단원을 골라 10문제')+
-    menu('mock','📝','#e4eefa','모의고사','진짜처럼 40문제, 점수와 급수까지')+
-    menu('wrong','🔁','#fde4e4','틀린 문제 다시',wrongN?wrongN+'개 남았어요':'아직 없어요')+
-    '<div class="foot">누르면 중국어로 읽어 줘요 🔊<br>「한글 발음」은 막힐 때만 잠깐 켜 보세요</div>';
-  v.querySelectorAll('.menu').forEach(function(b){
-    b.onclick=function(){
-      const k=b.dataset.k;
-      if(k==='today') go(unitList,'오늘 공부');
-      if(k==='must') go(mustView,'꼭 외울 것');
-      if(k==='prac') go(pracList,'연습 문제');
-      if(k==='mock') go(function(el){ quiz(el,buildMock(),'mock'); },'모의고사');
-      if(k==='wrong') go(function(el){ wrongStart(el); },'틀린 문제 다시');
-    };
-  });
-}
 function menu(k,ic,bg,t,d){
   return '<button class="menu" data-k="'+k+'"><div class="ic" style="background:'+bg+'">'+ic+'</div>'+
     '<div><div class="t">'+t+'</div><div class="d">'+d+'</div></div><div class="ar">›</div></button>';
 }
-
-/* 단원 목록 */
-function unitList(v){
-  let h='',wk='';
-  UNITS.forEach(function(u){
-    if(u.wk!==wk){ wk=u.wk; h+='<div class="week">'+wk+'</div>'; }
-    h+='<button class="unit'+(DB.done[u.id]?' done':'')+'" data-id="'+u.id+'"><div class="n">'+(DB.done[u.id]?'✓':u.emo)+'</div>'+
-       '<div><div class="t">'+u.t+'</div><div class="d py" style="font-family:\'Noto Sans\',sans-serif;font-weight:500">'+esc(u.d)+'</div></div></button>';
-  });
-  h+='<div class="week">12주</div><div class="tip">모의고사를 여러 번 풀고, 틀린 문제만 다시 봐요.</div>';
-  v.innerHTML=h;
-  v.querySelectorAll('.unit').forEach(function(b){
-    b.onclick=function(){ const u=UNITS.find(function(x){ return x.id===b.dataset.id; }); go(function(el){ unitView(el,u); },u.t); };
-  });
-}
-
-function cardHTML(it,i){
-  return '<div class="card"><div class="body">'+
+/* veil: 2바퀴에서는 뜻을 가려 두고, 카드를 누르면 보여요 */
+function cardHTML(it,i,veil){
+  return '<div class="card'+(veil?' veil':'')+'"><div class="body">'+
     '<div class="py">'+(it.star?'<span class="star">★</span>':'')+esc(it.py)+'</div>'+
     '<div class="hz">'+esc(it.hz)+'</div>'+
     '<div class="ko">'+esc(it.ko)+'</div>'+
@@ -528,7 +508,21 @@ function cardHTML(it,i){
     '</div><button class="say" data-i="'+i+'" aria-label="듣기">🔊</button></div>';
 }
 function bindSay(el,list){
-  el.querySelectorAll('[data-i]').forEach(function(b){ b.onclick=function(){ play(list[+b.dataset.i]); }; });
+  el.querySelectorAll('[data-i]').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); play(list[+b.dataset.i]); }; });
+  el.querySelectorAll('.card.veil').forEach(function(c){ c.onclick=function(){ c.classList.remove('veil'); }; });
+}
+/* 이야기 전체 이어 듣기 */
+function playAll(list){
+  audioEl.pause(); if('speechSynthesis' in window) speechSynthesis.cancel();
+  let k=0;
+  function next(){
+    if(k>=list.length) return; const it=list[k++];
+    if(it.a){ audioEl.src='audio/'+it.a; audioEl.onended=next; audioEl.play().catch(next); return; }
+    if(!('speechSynthesis' in window)) return;
+    const u=new SpeechSynthesisUtterance(it.hz); u.lang='zh-CN'; u.rate=0.75; if(zhVoice) u.voice=zhVoice;
+    u.onend=function(){ setTimeout(next,500); }; speechSynthesis.speak(u);
+  }
+  next();
 }
 function toneSvg(t){
   const p={1:'M8 10 L62 10',2:'M8 36 L62 8',3:'M8 18 L35 38 L62 12',4:'M8 8 L62 38'}[t];
@@ -575,15 +569,6 @@ function unitView(v,u){
     v.innerHTML=h;
   }
   bindSay(v,list);
-  const f=document.createElement('div');
-  f.innerHTML='<button class="big">이 단원 문제 풀기 ✏️</button>'+
-    '<button class="big sub">'+(DB.done[u.id]?'공부 끝 ✓ (다시 누르면 취소)':'다 봤어요! 공부 끝 표시')+'</button>';
-  v.appendChild(f);
-  f.children[0].onclick=function(){ go(function(el){ quiz(el,buildUnitQuiz(u,10),u.id); },u.t+' 문제'); };
-  f.children[1].onclick=function(){
-    if(DB.done[u.id]) delete DB.done[u.id]; else DB.done[u.id]=1;
-    save(DB); back();
-  };
 }
 
 /* 꼭 외울 것 */
@@ -616,18 +601,6 @@ function mustView(v){
   bindSay(v,sents);
 }
 function uniqBy(a){ const seen={}; return a.filter(function(x){ if(seen[x.py]) return false; seen[x.py]=1; return true; }); }
-
-/* 연습 문제 — 단원 고르기 */
-function pracList(v){
-  let h='<div class="tip">단원을 고르면 10문제가 나와요.</div>';
-  UNITS.forEach(function(u){
-    h+='<button class="unit" data-id="'+u.id+'"><div class="n">'+u.emo+'</div><div><div class="t">'+u.t+'</div><div class="d">'+u.wk+'</div></div></button>';
-  });
-  v.innerHTML=h;
-  v.querySelectorAll('.unit').forEach(function(b){
-    b.onclick=function(){ const u=UNITS.find(function(x){ return x.id===b.dataset.id; }); go(function(el){ quiz(el,buildUnitQuiz(u,10),u.id); },u.t+' 문제'); };
-  });
-}
 
 /* ================================================================
    문제 만들기 — 전부 객관식
@@ -721,54 +694,278 @@ const Q = {
 /* 문제 하나 만들기 — 어떤 종류였는지 적어 둡니다 (틀린 문제 다시 풀 때 씀) */
 function makeQ(type,item){ const q=Q[type](item); if(q) q.type=type; return q; }
 
-/* 단원별 문제 */
-function buildUnitQuiz(u,n){
-  const list=unitItems(u); const out=[];
-  let types;
-  if(u.id==='u1') return shuffle(TONES.concat(TONES,TONES)).slice(0,n).map(function(t){ return makeQ('tone4',t); });
-  if(u.id==='u2') return shuffle(VOWELS.concat(VOWELS)).slice(0,n).map(function(x){ return makeQ('vowel',x); });
-  const words=list.filter(function(x){ return x.kind==='w'; }), sents=list.filter(function(x){ return x.kind==='s' && x.src!=null; });
-  if(u.ini) types=[['tone',words],['initial',words],['starts',words],['hear',words],['wmean',words]];
-  else if(u.id==='u9') types=[['smean',sents],['ksent',sents],['tsent',sents]];
-  else types=[['tone',words],['wmean',words],['kword',words],['smean',sents],['ksent',sents],['blank',sents],['order',sents],['tsent',sents]];
-  let guard=0;
-  while(out.length<n && guard++<200){
-    const t=pick(types); if(!t[1].length) continue;
-    const q=makeQ(t[0],pick(t[1]));
-    if(q && !out.some(function(o){ return o.kind===q.kind && o.item===q.item; })) out.push(q);
-  }
-  return out;
+/* ================================================================
+   하루 계획 — 20일에 한 바퀴, 3바퀴
+   매일: 이야기 카드 5~6개 + 발음 카드 4~5개 + 문제
+   ================================================================ */
+const START_DAY = '2026-09-23';   /* 이날부터 매일 하면 11월 21일에 3바퀴가 끝나요 */
+const ROUNDS = 3, DAYS_PER = 20;
+const STORY_NAME = {S1:'이야기 ① 보물은 어디에?', S2:'이야기 ② 여기 늑대가 있어요', S3:'이야기 ③ 기다려 주세요'};
+const STORY_LIST = {S1:{w:S1W,s:S1S}, S2:{w:S2W,s:S2S}, S3:{w:S3W,s:S3S}};
+
+/* [이야기, 새 단어, 문장] — 이야기 순서대로. 'ALL' 은 처음부터 끝까지 이어 듣는 날 */
+const STORY_PLAN = [
+  ['S1',['hěn','nín'],['Nǐ hǎo!','Nín hǎo!','Nǐ hǎo ma?','Wǒ hěn hǎo.']],
+  ['S1',['bǎowù','yǒu'],['Nǐ yǒu bǎowù ma?','Wǒ yǒu bǎowù.','Zhè shì wǒ de bǎowù.']],
+  ['S1',['fēng','pǎo','búshì'],['Fēng hěn dà.','Kuài pǎo!','Zhè búshì nǐ de.']],
+  ['S1',['nǐmen','wǒmen','bù'],['Nǐmen hǎo ma?','Wǒmen bù hǎo.']],
+  ['S1',['méiyǒu','běnzi'],['Wǒmen méiyǒu bǎowù.','Nǐmen kànkan!','Zhè shì wǒ de běnzi.','Tā hěn hǎo.']],
+  ['S1','ALL'],
+  ['S2',['zhèr','láng'],['Zhèr yǒu láng ma?','Zhèr méiyǒu láng.','Zhèr yǒu láng.']],
+  ['S2',['nàr','dàjiā','lái','bāng'],['Nín qù nàr kànkan.','Dàjiā lái bāng wǒ.']],
+  ['S2',['nǎr','duìbuqǐ','kuài'],['Láng zài nǎr?','Duìbuqǐ.','Dàjiā kuài lái bāng wǒ.']],
+  ['S2',['shénme','tā','dà'],['Nà shì shénme?','Tā shì láng.','Láng hěn dà.']],
+  ['S2',['niúnǎi','ěrduo'],['Zhèr yǒu niúnǎi.','Ěrduo hěn dà.']],
+  ['S2','ALL'],
+  ['S3',['piàoliang','ài'],['Nǐ kàn!','Tā hěn piàoliang!','Wǒ ài tā.']],
+  ['S3',['qián','kěshì','děngdeng'],['Kěshì, wǒ méiyǒu qián.','Nǐ yǒu qián ma?','Nǐ děngdeng.']],
+  ['S3',['xièxie','búkèqi','gěi'],['Xièxie!','Búkèqi.','Kuài gěi wǒ qián.']],
+  ['S3',['tīngting','shuōshuo','gēge'],['Nín děngdeng.','Nǐ tīngting.','Hǎo, nín shuōshuo.']],
+  ['S3',['gōngpíng','píngguǒ','bōluó'],['Nà bù gōngpíng.','Gěi wǒ qián.','Bù xíng.','Gěi wǒ píngguǒ.']],
+  ['S3','ALL'],
+];
+
+/* 발음: 1일 성조, 2일 모음, 3~16일 발음책 단어(첫소리 순서), 17~18일 인사말 */
+const PRON_PLAN = (function(){
+  const plan=[TONES.slice(), VOWELS.slice()];
+  const sizes=[5,5,5,5,5,5,5,5,4,4,4,4,4,4];   /* 64개를 14일에 나눔 */
+  let p=0; sizes.forEach(function(n){ plan.push(PWORDS.slice(p,p+n)); p+=n; });
+  plan.push(PSENT.slice(0,4)); plan.push(PSENT.slice(4));
+  return plan;
+})();
+
+function findIn(list,py){ const x=list.find(function(i){ return i.py===py; }); if(!x) console.warn('없음',py); return x; }
+const DAYS = STORY_PLAN.map(function(sp,i){
+  const L=STORY_LIST[sp[0]]; const d={no:i+1, story:sp[0], listen:sp[1]==='ALL', pron:PRON_PLAN[i]};
+  d.cards = d.listen ? L.s.slice() : sp[1].map(function(p){ return findIn(L.w,p); }).concat(sp[2].map(function(p){ return findIn(L.s,p); }));
+  return d;
+});
+DAYS.push({no:19, review:true});
+DAYS.push({no:20, mock:true});
+
+function pronLabel(list){
+  if(list===PRON_PLAN[0]) return '성조 4개';
+  if(list===PRON_PLAN[1]) return '모음 6개';
+  if(list[0].kind==='s') return '인사말';
+  return '첫소리 '+uniq(list.map(function(w){ return initialOf(w.py); }).filter(Boolean)).join(' · ');
+}
+function dayTitle(d){
+  if(d.review) return '★ 꼭 외울 것 총복습';
+  if(d.mock) return '모의고사 40문제';
+  return STORY_NAME[d.story].replace('이야기 ','')+(d.listen?' · 이어 듣기':'');
 }
 
-/* 모의고사 40문제: 발음 16 + 회화 24 */
-function buildMock(){
-  const out=[]; let guard=0;
-  function add(type,pool,k){
-    let c=0;
-    while(c<k && guard++<800){
-      const q=makeQ(type,pick(pool));
-      if(q && !out.some(function(o){ return o.kind===q.kind && o.item===q.item; })){ out.push(q); c++; }
+/* 진도 */
+DB.pos=DB.pos||{r:1,d:1}; DB.stamps=DB.stamps||{};
+function posIdx(r,d){ return (r-1)*DAYS_PER+d; }
+function curIdx(){ return DB.pos.r>ROUNDS?ROUNDS*DAYS_PER+1:posIdx(DB.pos.r,DB.pos.d); }
+function paceMsg(){
+  const now=new Date(); now.setHours(0,0,0,0);
+  const since=Math.round((now-new Date(START_DAY+'T00:00:00'))/86400000);
+  if(since<0) return '9월 23일부터 매일 하면 11월 21일에 3바퀴 끝!';
+  const want=Math.min(since+1,ROUNDS*DAYS_PER), have=curIdx()-1;
+  if(have>=ROUNDS*DAYS_PER) return '3바퀴 완주! 이제 모의고사로 마무리해요 🏆';
+  const diff=have-(want-1);
+  if(diff>0) return '계획보다 '+diff+'일 앞서 있어요 👍';
+  if(diff===0) return '계획대로 딱 맞게 가고 있어요 😊';
+  return '계획보다 '+(-diff)+'일 늦어요. 주말에 하루 더 해 볼까요?';
+}
+const ROUND_NAME={1:'익히기',2:'떠올리기',3:'실전'};
+const ROUND_HOW={
+  1:'카드를 눌러 듣고 따라 읽어요. 그다음 문제 10개!',
+  2:'뜻이 가려져 있어요. 먼저 말해 보고 카드를 눌러 확인해요.',
+  3:'카드 없이 바로 문제 15개! 틀린 것만 카드로 다시 봐요.'};
+
+/* 첫 화면 */
+function home(v){
+  const dl=daysLeft(); const r=DB.pos.r, d=DB.pos.d; const fin=r>ROUNDS;
+  const wrongN=Object.keys(DB.wrong).length;
+  let h='<div class="hero"><div class="flag">🐼</div><h1>중국어 인증제</h1>'+
+    '<div class="sub">특급 도전! 발음1 · 스토리1 교재</div></div>'+
+    '<div class="dday"><div><b>'+(dl>0?'D-'+dl:dl===0?'D-DAY':'끝!')+'</b><span>12월 14일 시험</span></div>'+
+    '<div><b>'+Math.min(curIdx()-1,60)+' / 60</b><span>도장</span></div>'+
+    '<div><b>'+(DB.best==null?'–':DB.best)+'</b><span>모의고사 최고</span></div></div>';
+  if(fin){
+    h+='<button class="go" id="go"><div class="r">3바퀴 완주 🏆</div><div class="t">모의고사 40문제</div><div class="d">시험 전까지 여러 번 풀어 봐요</div></button>';
+  } else {
+    const D=DAYS[d-1];
+    h+='<button class="go" id="go"><div class="r">'+r+'바퀴 · '+ROUND_NAME[r]+'</div>'+
+       '<div class="t">'+d+'일차 공부 시작 ▶</div><div class="d">'+esc(dayTitle(D))+(D.pron?' + '+pronLabel(D.pron):'')+'</div></button>';
+  }
+  h+='<div class="pace">'+paceMsg()+'</div>';
+  h+='<div class="stampbox">';
+  for(let rr=1;rr<=ROUNDS;rr++){
+    h+='<div class="srow"><div class="slab">'+rr+'바퀴</div><div class="sgrid">';
+    for(let dd=1;dd<=DAYS_PER;dd++){
+      const k=rr+'-'+dd, done=!!DB.stamps[k], now=!fin&&rr===r&&dd===d;
+      const open=done||now;
+      h+='<button class="st'+(done?' done':'')+(now?' now':'')+(dd===20?' mk':'')+'" '+(open?'data-r="'+rr+'" data-d="'+dd+'"':'disabled')+'>'+(done?'🐼':dd)+'</button>';
     }
+    h+='</div></div>';
   }
-  const storyW=S1W.concat(S2W,S3W), storyS=S1S.concat(S2S,S3S);
-  add('tone4',TONES,2); add('vowel',VOWELS,2);
-  add('tone',PWORDS,4); add('initial',PWORDS,4); add('starts',PWORDS,2); add('hear',PWORDS,2);
-  add('tone',storyW,3); add('wmean',storyW,3); add('kword',storyW,2);
-  add('smean',storyS,4); add('ksent',storyS.concat(PSENT),4); add('blank',storyS,4); add('order',storyS,2); add('tsent',storyS,2);
-  return out;
+  h+='</div>';
+  h+=menu('must','⭐','#fff1c9','꼭 외울 것','시험에 계속 나오는 것만')+
+     menu('book','📚','#fdebd9','교재 전체 보기','단원별로 찾아보기')+
+     menu('wrong','🔁','#fde4e4','틀린 문제 다시',wrongN?wrongN+'개 남았어요':'아직 없어요')+
+     '<div class="foot">누르면 중국어로 읽어 줘요 🔊<br>「한글 발음」은 막힐 때만 잠깐 켜 보세요</div>';
+  v.innerHTML=h;
+  $('go').onclick=function(){ if(fin) go(function(el){ quiz(el,buildMock(3),{mock:true}); },'모의고사'); else openDay(r,d); };
+  v.querySelectorAll('.st[data-r]').forEach(function(b){ b.onclick=function(){ openDay(+b.dataset.r,+b.dataset.d); }; });
+  v.querySelectorAll('.menu').forEach(function(b){
+    b.onclick=function(){
+      const k=b.dataset.k;
+      if(k==='must') go(mustView,'꼭 외울 것');
+      if(k==='book') go(unitList,'교재 전체 보기');
+      if(k==='wrong') go(wrongStart,'틀린 문제 다시');
+    };
+  });
 }
 
+function openDay(r,d){
+  const D=DAYS[d-1];
+  if(D.mock){ go(function(el){ quiz(el,buildMock(r),{r:r,d:d,mock:true}); },r+'바퀴 20일차 모의고사'); return; }
+  if(r===3 && !D.review){ go(function(el){ quiz(el,buildDayQuiz(r,D),{r:r,d:d}); },r+'바퀴 '+d+'일차'); return; }
+  go(function(el){ dayView(el,r,D); },r+'바퀴 '+d+'일차');
+}
+
+/* 하루 공부 화면 */
+function dayView(v,r,D){
+  let h='<div class="tip">'+ROUND_HOW[r]+'</div>';
+  let list=[];
+  if(D.review){
+    list=uniqBy(S1S.concat(S2S,S3S).filter(function(s){ return s.star; }));
+    h+='<div class="h3">★ 자꾸 나오는 문장 '+list.length+'개</div>'+patternTip();
+  } else {
+    list=D.cards.concat(D.pron);
+    h+='<div class="h3">📖 '+esc(STORY_NAME[D.story])+(D.listen?' — 처음부터 끝까지':'')+'</div>';
+    if(D.listen) h+='<button class="big sub" id="all" style="margin:0 0 12px">▶ 이야기 전체 이어 듣기</button>';
+  }
+  const storyN=D.review?list.length:D.cards.length;
+  list.forEach(function(it,i){
+    if(!D.review && i===storyN){
+      h+='<div class="h3">🔤 발음 · '+pronLabel(D.pron)+'</div>';
+      if(D.pron===PRON_PLAN[0]) h+=toneBoard();
+    }
+    h+=cardHTML(it,i,r===2);
+  });
+  h+='<button class="big" id="q">'+(D.review?'★ 문제 15개 풀기':'문제 '+(r===3?15:10)+'개 풀기')+' ✏️</button>';
+  v.innerHTML=h;
+  bindSay(v,list);
+  v.querySelectorAll('[data-tone]').forEach(function(b){ b.onclick=function(){ play(TONES[+b.dataset.tone]); }; });
+  if(D.listen) $('all').onclick=function(){ playAll(D.cards); };
+  $('q').onclick=function(){
+    const qs=D.review?buildReviewQuiz():buildDayQuiz(r,D);
+    stack[stack.length-1]=[function(el){ quiz(el,qs,{r:r,d:D.no}); },r+'바퀴 '+D.no+'일차 문제'];
+    render();
+  };
+}
+function toneBoard(){
+  let h='<div class="tones">';
+  TONES.forEach(function(t,i){
+    h+='<button class="tone c'+t.t+'" data-tone="'+i+'">'+toneSvg(t.t)+'<div class="py">'+t.py+'</div>'+
+       '<div class="ko">'+t.name+' · '+t.how+'</div></button>';
+  });
+  return h+'</div><div class="tip">★ <span class="py">bù</span> 뒤에 4성이 오면 <span class="py">bú</span>로 바뀌어요. (<span class="py">búshì, búkèqi</span>)</div>';
+}
+function patternTip(){
+  return '<div class="tip"><b>문장 틀 5개 — 빈칸만 바꿔요</b><br>'+
+    '<span class="py">___ hǎo ma?</span> ___ 잘 지내?<br>'+
+    '<span class="py">Zhè shì wǒ de ___.</span> 이것은 나의 ___이야.<br>'+
+    '<span class="py">Zhèr yǒu / méiyǒu ___.</span> 여기 ___가 있어요 / 없어요.<br>'+
+    '<span class="py">___ hěn dà.</span> ___가 매우 커요.<br>'+
+    '<span class="py">Gěi wǒ ___.</span> 나에게 ___를 주세요.</div>';
+}
+
+/* 교재 전체 보기 */
+function unitList(v){
+  let h='<div class="tip">찾아보고 싶은 단원을 눌러요.</div>';
+  UNITS.forEach(function(u){
+    h+='<button class="unit" data-id="'+u.id+'"><div class="n">'+u.emo+'</div>'+
+       '<div><div class="t">'+u.t+'</div><div class="d" style="font-family:\'Noto Sans\',sans-serif;font-weight:500">'+esc(u.d)+'</div></div></button>';
+  });
+  v.innerHTML=h;
+  v.querySelectorAll('.unit').forEach(function(b){
+    b.onclick=function(){ const u=UNITS.find(function(x){ return x.id===b.dataset.id; }); go(function(el){ unitView(el,u); },u.t); };
+  });
+}
+
+/* ================================================================
+   문제 고르기
+   ================================================================ */
+function kindOf(it){ return TONES.indexOf(it)>=0?'t':VOWELS.indexOf(it)>=0?'v':it.kind; }
+function typesFor(it){
+  const k=kindOf(it);
+  if(k==='t') return ['tone4'];
+  if(k==='v') return ['vowel'];
+  if(k==='s') return it.src==='P'?['smean','ksent','tsent']:['smean','ksent','blank','order','tsent','ksent','blank'];
+  if(it.src==='P') return ['tone','initial','starts','hear','wmean'];
+  return ['tone','wmean','kword','hear','wmean'];
+}
+/* 낱말 하나로 문제 하나 (안 되면 다른 종류로) */
+function qFor(it,out){
+  const ts=shuffle(typesFor(it));
+  for(let i=0;i<ts.length;i++){
+    const q=makeQ(ts[i],it);
+    if(q && !out.some(function(o){ return o.item===q.item && o.type===q.type; })) return q;
+  }
+  return null;
+}
+/* 뽑기: ★ 는 두 번 넣어 더 자주 나오게 */
+function weighted(list){ return list.reduce(function(a,x){ return a.concat(x.star?[x,x]:[x]); },[]); }
+function wrongItems(filter){
+  return Object.keys(DB.wrong).map(function(k){ const w=DB.wrong[k]; return findItem(w.py,w.kind); })
+    .filter(function(x){ return x && (!filter||filter(x)); });
+}
+function take(out,pool,n){
+  let c=0,g=0; pool=weighted(pool);
+  while(c<n && g++<120 && pool.length){ const q=qFor(pick(pool),out); if(q){ out.push(q); c++; } }
+}
+function storyBefore(no){ return DAYS.filter(function(x){ return x.cards && x.no<no; }).reduce(function(a,x){ return a.concat(x.cards); },[]); }
+function pronBefore(no){ return DAYS.filter(function(x){ return x.pron && x.no<no; }).reduce(function(a,x){ return a.concat(x.pron); },[]); }
+
+function buildDayQuiz(r,D){
+  const n=r===3?15:10, nS=Math.round(n*(r===1?0.6:0.7)), nP=n-nS;
+  const out=[];
+  const isStory=function(x){ return /^S/.test(x.src||''); };
+  const sToday=Math.ceil(nS*0.7), pToday=Math.ceil(nP*0.7);
+  /* 1) 틀렸던 것 먼저 (복습 칸) */
+  take(out,shuffle(wrongItems(isStory)).slice(0,2),Math.min(2,nS-sToday));
+  take(out,shuffle(wrongItems(function(x){ return !isStory(x); })).slice(0,1),Math.min(1,nP-pToday));
+  /* 2) 오늘 것 */
+  take(out,D.cards,sToday);
+  take(out,D.pron,pToday);
+  /* 3) 모자라면 지난 날 복습 */
+  const sPrev=storyBefore(D.no), pPrev=pronBefore(D.no);
+  take(out,sPrev.length?sPrev:D.cards,nS-out.filter(function(q){ return isStory(q.item); }).length);
+  take(out,pPrev.length?pPrev:D.pron,n-out.length);
+  take(out,D.cards,n-out.length);
+  return shuffle(out).slice(0,n);
+}
+function buildReviewQuiz(){
+  const out=[]; const stars=ALLW.concat(ALLS).filter(function(x){ return x.star; });
+  take(out,shuffle(wrongItems()).slice(0,5),5);
+  take(out,stars.concat(TONES),15-out.length);
+  return shuffle(out);
+}
+/* 모의고사 40: 발음 16 + 회화 24 */
+function buildMock(){
+  const out=[];
+  take(out,TONES,2); take(out,VOWELS,2); take(out,PWORDS,12);
+  take(out,S1W.concat(S2W,S3W),8);
+  take(out,S1S.concat(S2S,S3S,PSENT),40-out.length);
+  return out;
+}
 /* 틀린 문제 다시 */
 function wrongStart(v){
-  const keys=Object.keys(DB.wrong);
-  if(!keys.length){ v.innerHTML='<div class="result"><div class="medal">🌟</div><div class="gr">틀린 문제가 없어요!</div><div class="msg">모의고사나 연습 문제를 풀면 여기 모여요.</div></div>'; return; }
-  const qs=[];
-  shuffle(keys).slice(0,15).forEach(function(k){
-    const w=DB.wrong[k]; const it=findItem(w.py,w.kind);
-    if(!it){ return; }
-    const q=Q[w.type] && makeQ(w.type,it); if(q) qs.push(q);
+  const its=shuffle(wrongItems()).slice(0,15);
+  if(!its.length){ v.innerHTML='<div class="result"><div class="medal">🌟</div><div class="gr">틀린 문제가 없어요!</div><div class="msg">매일 문제를 풀면 틀린 것이 여기 모여요.</div></div>'; return; }
+  const out=[];
+  its.forEach(function(it){
+    const key=Object.keys(DB.wrong).find(function(k){ return DB.wrong[k].py===it.py; });
+    const t=DB.wrong[key].type; let q=t&&Q[t]?makeQ(t,it):null;
+    if(!q) q=qFor(it,out); if(q) out.push(q);
   });
-  quiz(v,qs,'wrong');
+  quiz(v,out,{wrong:true});
 }
 function findItem(py,kind){
   const pool=kind==='t'?TONES:kind==='v'?VOWELS:kind==='s'?ALLS:ALLW;
@@ -778,7 +975,7 @@ function findItem(py,kind){
 /* ================================================================
    문제 풀기 화면
    ================================================================ */
-function quiz(v,qs,mode){
+function quiz(v,qs,ctx){
   let i=0,score=0; const wrongs=[];
   function show(){
     const q=qs[i];
@@ -804,9 +1001,9 @@ function quiz(v,qs,mode){
     const bs=v.querySelectorAll('.opt');
     bs.forEach(function(b){ b.disabled=true; });
     bs[q.ans].classList.add('ok'); if(!ok) bs[k].classList.add('no');
-    const it=q.item; const key=q.kind+'|'+it.py;
-    if(ok){ score++; if(DB.wrong[key]){ delete DB.wrong[key]; } }
-    else { wrongs.push(q); DB.wrong[key]={py:it.py,type:q.type,kind:TONES.indexOf(it)>=0?'t':VOWELS.indexOf(it)>=0?'v':it.kind}; }
+    const it=q.item; const key=q.type+'|'+it.py;
+    if(ok){ score++; delete DB.wrong[key]; }
+    else { wrongs.push(q); DB.wrong[key]={py:it.py,type:q.type,kind:kindOf(it)}; }
     save(DB);
     $('fb').innerHTML='<div class="fb"><div class="body"><div class="res '+(ok?'ok':'no')+'">'+(ok?'딩동댕! 맞았어요 🎉':'아까워요! 정답은 '+(q.ans+1)+'번')+'</div>'+
       '<div class="py">'+esc(it.py)+'</div><div class="hz">'+esc(it.hz)+'</div><div class="ko">'+esc(it.ko)+'</div>'+
@@ -818,30 +1015,37 @@ function quiz(v,qs,mode){
   }
   function result(){
     const pct=Math.round(score/qs.length*100);
+    /* 도장: 오늘 칸을 끝냈으면 다음 날로 */
+    let stamped=false;
+    if(ctx.r){
+      const k=ctx.r+'-'+ctx.d; if(!DB.stamps[k]){ DB.stamps[k]=1; stamped=true; }
+      if(DB.pos.r===ctx.r && DB.pos.d===ctx.d){
+        DB.pos.d++; if(DB.pos.d>DAYS_PER){ DB.pos.d=1; DB.pos.r++; }
+      }
+    }
+    if(ctx.mock && (DB.best==null||pct>DB.best)) DB.best=pct;
+    save(DB);
     let h='<div class="result">';
-    if(mode==='mock'){
-      const g=gradeOf(pct);
-      if(DB.best==null||pct>DB.best){ DB.best=pct; save(DB); }
+    if(ctx.mock){
       h+='<div class="medal">'+(pct>=90?'🏆':pct>=70?'🥇':pct>=50?'🥈':'💪')+'</div><div class="sc">'+pct+'점</div>'+
-         '<div class="gr">'+g+(pct>=90?'!':'')+'</div><div class="msg">'+qs.length+'문제 중 '+score+'개 맞았어요.'+(pct<90?'<br>특급까지 '+Math.ceil((90-pct)/2.5)+'문제 더!':'')+'</div>';
+         '<div class="gr">'+gradeOf(pct)+(pct>=90?'!':'')+'</div><div class="msg">'+qs.length+'문제 중 '+score+'개 맞았어요.'+(pct<90?'<br>특급까지 '+Math.ceil((90-pct)*qs.length/100)+'문제 더!':'')+'</div>';
     } else {
       h+='<div class="medal">'+(pct===100?'🌟':pct>=70?'😊':'💪')+'</div><div class="sc">'+score+' / '+qs.length+'</div>'+
-         '<div class="msg">'+(pct===100?'다 맞았어요!':'틀린 문제는 「틀린 문제 다시」에 모아 뒀어요.')+'</div>';
+         '<div class="msg">'+(pct===100?'다 맞았어요!':'틀린 것은 내일 문제에 또 나와요.')+'</div>';
     }
+    if(stamped) h+='<div class="stamp">🐼<span>도장 쾅!</span></div>';
     h+='</div>';
     if(wrongs.length){
       h+='<div class="h3">틀린 것 한 번 더 보기</div><div class="wrong-list">';
       wrongs.forEach(function(q,k){ h+=cardHTML(q.item,k); });
       h+='</div>';
     }
-    h+='<button class="big" id="again">다시 풀기</button><button class="big sub" id="home">처음으로</button>';
+    h+='<button class="big" id="home">'+(ctx.r?'오늘 공부 끝! 처음으로':'처음으로')+'</button>';
+    if(!ctx.r) h+='<button class="big sub" id="again">한 번 더 풀기</button>';
     v.innerHTML=h;
     bindSay(v,wrongs.map(function(q){ return q.item; }));
-    $('again').onclick=function(){
-      const fresh=mode==='mock'?buildMock():mode==='wrong'?null:buildUnitQuiz(UNITS.find(function(u){ return u.id===mode; }),10);
-      if(fresh) quiz(v,fresh,mode); else wrongStart(v);
-    };
     $('home').onclick=function(){ stack.length=1; render(); };
+    if($('again')) $('again').onclick=function(){ if(ctx.wrong) wrongStart(v); else quiz(v,buildMock(),ctx); };
     window.scrollTo(0,0);
   }
   if(!qs.length){ v.innerHTML='<div class="tip">문제를 만들지 못했어요.</div>'; return; }
@@ -850,6 +1054,7 @@ function quiz(v,qs,mode){
 
 stack.push([home,'']);
 render();
+
 </script>
 </body>
 </html>
