@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>중국어 인증제 · 특급 도전</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Noto+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  :root{
+    --paper:#fff8ef;
+    --ink:#4a3528;
+    --muted:#9b8574;
+    --red:#e2553f;        /* 주조색: 교재 표지 빨강 */
+    --gold:#f4b73d;
+    --line:#f0dfcb;
+    --ok:#3f9b5a;
+    --no:#d9534f;
+    --t1:#3b82c4; --t2:#3f9b5a; --t3:#e0912b; --t4:#d94c5b;  /* 성조 색 */
+  }
+  body{
+    font-family:'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    background:var(--paper);color:var(--ink);min-height:100vh;padding:20px 16px 80px;
+  }
+  .wrap{max-width:560px;margin:0 auto;}
+  .py{font-family:'Noto Sans','Segoe UI',sans-serif;font-weight:700;}
+  .hz{font-family:'PingFang SC','Noto Sans SC','Microsoft YaHei',sans-serif;}
+  .ga{font-family:'Gaegu',sans-serif;}
+  button{font-family:inherit;cursor:pointer;}
+  .hide{display:none!important;}
+
+  /* 윗줄 */
+  .top{display:flex;align-items:center;gap:8px;margin-bottom:14px;min-height:40px;}
+  .back{background:#fff;border:2px solid var(--line);border-radius:99px;width:40px;height:40px;font-size:20px;color:var(--muted);}
+  .top h2{flex:1;font-size:21px;color:var(--red);font-weight:400;}
+  .krbtn{background:#fff;border:2px solid var(--line);border-radius:99px;padding:6px 12px;font-size:14px;color:var(--muted);font-family:'Gaegu',sans-serif;font-weight:700;}
+  body.kr .krbtn{background:var(--gold);border-color:var(--gold);color:#fff;}
+
+  /* 첫 화면 */
+  .hero{text-align:center;padding:10px 0 18px;}
+  .hero .flag{font-size:44px;}
+  .hero h1{font-size:30px;color:var(--red);margin-top:4px;}
+  .hero .sub{font-family:'Gaegu',sans-serif;font-size:17px;color:var(--muted);margin-top:2px;}
+  .dday{display:flex;gap:10px;margin:16px 0 6px;}
+  .dday div{flex:1;background:#fff;border-radius:18px;padding:12px 8px;text-align:center;box-shadow:0 3px 10px rgba(180,120,80,.10);}
+  .dday b{display:block;font-size:26px;color:var(--red);font-weight:400;}
+  .dday span{font-family:'Gaegu',sans-serif;font-size:14px;color:var(--muted);font-weight:700;}
+  .grade{font-family:'Gaegu',sans-serif;font-size:14px;color:var(--muted);text-align:center;margin-bottom:6px;}
+
+  .menu{display:flex;align-items:center;gap:14px;background:#fff;border-radius:20px;padding:16px;margin-top:12px;
+        box-shadow:0 4px 12px rgba(180,120,80,.12);border:none;width:100%;text-align:left;color:inherit;}
+  .menu:active{transform:scale(.98);}
+  .menu .ic{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex:none;}
+  .menu .t{font-size:19px;}
+  .menu .d{font-family:'Gaegu',sans-serif;font-size:15px;color:var(--muted);font-weight:700;}
+  .menu .ar{margin-left:auto;color:#e8c9ad;font-size:24px;}
+
+  /* 단원 목록 */
+  .week{font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;color:var(--red);margin:18px 4px 6px;}
+  .unit{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:13px 14px;margin-bottom:8px;
+        border:2px solid transparent;width:100%;text-align:left;color:inherit;}
+  .unit.done{border-color:#cfe8d5;}
+  .unit .n{width:38px;height:38px;border-radius:12px;background:#fdebd9;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--red);flex:none;}
+  .unit.done .n{background:var(--ok);color:#fff;}
+  .unit .t{font-size:17px;}
+  .unit .d{font-family:'Gaegu',sans-serif;font-size:14px;color:var(--muted);font-weight:700;}
+
+  /* 공부 카드 */
+  .card{background:#fff;border-radius:20px;padding:16px 16px 14px;margin-bottom:10px;box-shadow:0 3px 10px rgba(180,120,80,.10);
+        display:flex;align-items:center;gap:12px;}
+  .card .body{flex:1;min-width:0;}
+  .card .py{font-size:23px;line-height:1.3;color:var(--ink);}
+  .card .hz{font-size:15px;color:var(--muted);margin-top:2px;}
+  .card .ko{font-family:'Gaegu',sans-serif;font-weight:700;font-size:18px;color:#7a5a45;margin-top:4px;}
+  .card .kr{font-family:'Gaegu',sans-serif;font-size:16px;color:#c07a2a;margin-top:2px;display:none;}
+  body.kr .card .kr{display:block;}
+  .star{color:var(--gold);font-size:15px;margin-right:4px;}
+  .say{width:48px;height:48px;border-radius:50%;border:none;background:#fdebd9;font-size:22px;flex:none;}
+  .say:active,.say.on{background:var(--gold);}
+  .tip{background:#fff3d6;border-radius:16px;padding:12px 14px;margin:6px 0 12px;font-family:'Gaegu',sans-serif;font-size:17px;font-weight:700;line-height:1.5;color:#7a5a30;}
+  .tip .py{font-family:'Noto Sans',sans-serif;font-size:15px;}
+  .h3{font-size:18px;color:var(--red);margin:18px 2px 8px;}
+
+  /* 성조 */
+  .tones{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px;}
+  .tone{background:#fff;border-radius:18px;padding:12px;text-align:center;border:none;color:inherit;box-shadow:0 3px 10px rgba(180,120,80,.10);}
+  .tone svg{width:70px;height:44px;display:block;margin:0 auto 2px;}
+  .tone .py{font-size:34px;}
+  .tone .ko{font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;color:var(--muted);}
+  .c1{color:var(--t1)}.c2{color:var(--t2)}.c3{color:var(--t3)}.c4{color:var(--t4)}
+
+  /* 첫소리 칸 */
+  .ini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;}
+  .ini button{background:#fff;border:none;border-radius:16px;padding:10px 4px;color:inherit;box-shadow:0 3px 8px rgba(180,120,80,.10);}
+  .ini .l{font-family:'Noto Sans',sans-serif;font-weight:700;font-size:26px;color:var(--red);}
+  .ini .w{font-family:'Noto Sans',sans-serif;font-size:14px;font-weight:700;}
+  .ini .k{font-family:'Gaegu',sans-serif;font-size:13px;color:var(--muted);font-weight:700;}
+
+  .big{display:block;width:100%;border:none;border-radius:18px;background:var(--red);color:#fff;font-size:19px;padding:15px;margin-top:14px;}
+  .big.sub{background:#fff;color:var(--red);border:2px solid var(--red);}
+
+  /* 문제 */
+  .bar{height:12px;background:#f3e3d2;border-radius:99px;overflow:hidden;margin-bottom:6px;}
+  .bar i{display:block;height:100%;background:var(--gold);border-radius:99px;transition:width .3s;}
+  .qno{font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;color:var(--muted);text-align:right;margin-bottom:10px;}
+  .qbox{background:#fff;border-radius:22px;padding:20px 16px;text-align:center;box-shadow:0 4px 12px rgba(180,120,80,.12);}
+  .qtype{display:inline-block;background:#fdebd9;color:var(--red);border-radius:99px;padding:3px 12px;font-size:14px;margin-bottom:10px;}
+  .qask{font-size:20px;line-height:1.4;}
+  .qshow{margin-top:12px;font-size:28px;line-height:1.35;}
+  .qshow .hz{display:block;font-size:16px;color:var(--muted);margin-top:4px;font-weight:400;}
+  .qshow.koq{font-family:'Gaegu',sans-serif;font-weight:700;color:#7a5a45;font-size:26px;}
+  .blank{display:inline-block;min-width:64px;border-bottom:3px solid var(--gold);margin:0 4px;}
+  .listen{margin:14px auto 0;width:84px;height:84px;border-radius:50%;border:none;background:var(--gold);font-size:38px;box-shadow:0 5px 0 #d49a25;}
+  .listen:active{transform:translateY(3px);box-shadow:0 2px 0 #d49a25;}
+  .opts{display:grid;gap:10px;margin-top:14px;}
+  .opts.two{grid-template-columns:1fr 1fr;}
+  .opt{background:#fff;border:3px solid var(--line);border-radius:18px;padding:14px 12px;font-size:21px;color:var(--ink);text-align:center;min-height:62px;}
+  .opt .py{font-size:22px;}
+  .opt.kotext{font-family:'Gaegu',sans-serif;font-weight:700;font-size:20px;}
+  .opt.ok{border-color:var(--ok);background:#e5f5ea;animation:pop .3s;}
+  .opt.no{border-color:var(--no);background:#fde8e7;animation:shake .3s;}
+  .opt:disabled{color:var(--ink);}
+  .opt .num{display:inline-block;width:24px;height:24px;border-radius:50%;background:#f3e3d2;font-size:14px;line-height:24px;margin-right:6px;color:var(--muted);vertical-align:3px;font-family:'Jua',sans-serif;}
+  .fb{margin-top:14px;background:#fff;border-radius:18px;padding:14px;display:flex;align-items:center;gap:10px;}
+  .fb .body{flex:1;text-align:left;}
+  .fb .res{font-size:20px;}
+  .fb .res.ok{color:var(--ok);} .fb .res.no{color:var(--no);}
+  .fb .py{font-size:19px;} .fb .hz{font-size:14px;color:var(--muted);} .fb .ko{font-family:'Gaegu',sans-serif;font-weight:700;font-size:16px;color:#7a5a45;}
+  .fb .kr{font-family:'Gaegu',sans-serif;font-size:15px;color:#c07a2a;display:none;}
+  body.kr .fb .kr{display:block;}
+  .next{position:sticky;bottom:12px;}
+
+  /* 결과 */
+  .result{text-align:center;padding:20px 0;}
+  .result .medal{font-size:80px;}
+  .result .sc{font-size:54px;color:var(--red);}
+  .result .gr{font-size:26px;margin-top:4px;}
+  .result .msg{font-family:'Gaegu',sans-serif;font-weight:700;font-size:18px;color:var(--muted);margin-top:8px;}
+  .wrong-list .card .py{font-size:19px;}
+
+  @keyframes pop{50%{transform:scale(1.05)}}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+
+  .voice-warn{background:#fde8e7;color:#a33;border-radius:14px;padding:10px 12px;font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;margin-bottom:10px;}
+  .foot{text-align:center;font-family:'Gaegu',sans-serif;font-size:13px;color:#c9b6a4;margin-top:28px;line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top hide" id="top">
+    <button class="back" id="back" aria-label="뒤로">‹</button>
+    <h2 id="ttl"></h2>
+    <button class="krbtn" id="krbtn">한글 발음</button>
+  </div>
+  <div id="warn"></div>
+  <main id="view"></main>
+</div>
+
+<script>
+/* ================================================================
+   교재 내용
+   - 발음책: 『发音, 你好! 1』
+   - 이야기책: 『汉语, 你是谁? 1』 (이야기 3편)
+   py 병음 · hz 한자 · ko 뜻 · kr 한글 발음(도움용) · star 꼭 외울 것
+   a: 음원 파일 이름 (CD 음원을 넣으면 채웁니다. 없으면 폰 목소리로 읽어요)
+   ================================================================ */
+
+const EXAM_DAY = '2026-12-14';
+
+/* 성조 */
+const TONES = [
+  {py:'mā', hz:'妈', ko:'엄마',   t:1, name:'1성', how:'높고 평평하게 쭉~'},
+  {py:'má', hz:'麻', ko:'삼베',   t:2, name:'2성', how:'아래에서 위로 올리며 ↗'},
+  {py:'mǎ', hz:'马', ko:'말(동물)', t:3, name:'3성', how:'내려갔다가 올라와요 ✓'},
+  {py:'mà', hz:'骂', ko:'혼내다', t:4, name:'4성', how:'위에서 뚝 떨어뜨려요 ↘'},
+];
+
+/* 모음 6개 — 읽어 줄 때는 그 소리가 나는 글자를 씁니다 */
+const VOWELS = [
+  {py:'a', hz:'啊', ko:'입을 크게 “아”', kr:'아'},
+  {py:'o', hz:'喔', ko:'입을 동그랗게 “오어”', kr:'오(어)'},
+  {py:'e', hz:'鹅', ko:'입을 살짝 “으어”', kr:'으어'},
+  {py:'i', hz:'衣', ko:'입을 옆으로 “이”', kr:'이'},
+  {py:'u', hz:'乌', ko:'입을 쭉 내밀고 “우”', kr:'우'},
+  {py:'ü', hz:'鱼', ko:'“우” 입 모양으로 “이”', kr:'위'},
+];
+
+/* 발음책 단어 — 첫소리(성모)별 */
+const PWORDS = [
+  ['bàba','爸爸','아빠','빠바',1],['bā','八','여덟(8)','빠'],['bào','报','신문','빠오'],
+  ['pá','爬','기어오르다','파'],['pútáo','葡萄','포도','푸타오',1],['píxié','皮鞋','가죽 구두','피시에'],
+  ['māma','妈妈','엄마','마마',1],['mǎ','马','말(동물)','마'],['mógu','蘑菇','버섯','모구'],
+  ['fā','发','보내다','파'],['fùmǔ','父母','부모님','푸무'],['fēijī','飞机','비행기','페이지',1],
+  ['dìdi','弟弟','남동생','띠디',1],['dà','大','크다','따'],['dùzi','肚子','배(몸)','뚜즈'],
+  ['tùzi','兔子','토끼','투즈',1],['táng','糖','사탕','탕'],['tīng','听','듣다','팅'],
+  ['nǎinai','奶奶','할머니','나이나이',1],['nán','男','남자','난'],['nǚ','女','여자','뉘'],
+  ['lǎba','喇叭','나팔','라바'],['lí','梨','배(과일)','리'],['lǎohǔ','老虎','호랑이','라오후',1],
+  ['gēge','哥哥','형·오빠','꺼거',1],['gǔ','鼓','북','구'],['gǒu','狗','개','거우'],
+  ['kělè','可乐','콜라','커러'],['kùzi','裤子','바지','쿠즈'],['kàn','看','보다','칸',1],
+  ['hē','喝','마시다','허',1],['húli','狐狸','여우','후리'],['hǎo','好','좋다','하오'],
+  ['jī','鸡','닭','지'],['jiā','家','집','지아'],['jiějie','姐姐','언니·누나','지에지에',1],
+  ['qī','七','일곱(7)','치',1],['qù','去','가다','취'],['qúnzi','裙子','치마','췬즈'],
+  ['xǐ','洗','씻다','시'],['xīguā','西瓜','수박','시과',1],['xiě','写','쓰다','시에'],
+  ['zhū','猪','돼지','쭈'],['zhǐ','纸','종이','즈(혀 말기)'],['Zhōngguó','中国','중국','쫑궈',1],
+  ['chē','车','자동차','처',1],['chá','茶','차(마시는 차)','차'],['chāzi','叉子','포크','차즈'],
+  ['shīzi','狮子','사자','스즈'],['shū','书','책','슈',1],['shé','蛇','뱀','셔'],
+  ['rè','热','덥다','르어'],['rìjì','日记','일기','르지'],['rén','人','사람','런',1],
+  ['zì','字','글자','쯔'],['zǐsè','紫色','보라색','즈써'],['zúqiú','足球','축구','주치우',1],
+  ['cài','菜','요리·채소','차이'],['cāntīng','餐厅','식당','찬팅'],['cǎoméi','草莓','딸기','차오메이',1],
+  ['sì','四','넷(4)','쓰'],['sān','三','셋(3)','싼',1],['sùshè','宿舍','기숙사','쑤셔'],
+  ['yéye','爷爷','할아버지','예예'],
+].map(function(w){ return {py:w[0],hz:w[1],ko:w[2],kr:w[3],star:!!w[4],kind:'w',src:'P'}; });
+
+/* 발음책 인사말 · 잰말놀이 */
+const PSENT = [
+  ['Nǐ hǎo!','你好！','안녕!','니 하오',1],
+  ['Bàba, nǐ hǎo!','爸爸，你好！','아빠, 안녕하세요!','빠바, 니 하오'],
+  ['Dìdi, zàijiàn!','弟弟，再见！','동생아, 잘 가!','띠디, 짜이찌엔'],
+  ['Nǎinai, zàijiàn!','奶奶，再见！','할머니, 안녕히 계세요!','나이나이, 짜이찌엔'],
+  ['Gēge, zàijiàn!','哥哥，再见！','형(오빠), 잘 가!','꺼거, 짜이찌엔'],
+  ['Xièxie!','谢谢！','고마워요!','씨에시에',1],
+  ['Māma, xièxie!','妈妈，谢谢！','엄마, 고마워요!','마마, 씨에시에'],
+].map(function(s){ return {py:s[0],hz:s[1],ko:s[2],kr:s[3],star:!!s[4],kind:'s',src:'P'}; });
+
+const TWISTERS = [
+  {py:'Māma qí mǎ, mǎ màn, māma mà mǎ.', hz:'妈妈骑马，马慢，妈妈骂马。', ko:'엄마가 말을 타요. 말이 느려서 엄마가 말을 혼내요.', kr:'마마 치 마, 마 만, 마마 마 마'},
+  {py:'Sì shì sì, shí shì shí, shísì shì shísì, sìshí shì sìshí.', hz:'四是四，十是十，十四是十四，四十是四十。', ko:'4는 4, 10은 10, 14는 14, 40은 40', kr:'쓰 스 쓰, 스 스 스, 스쓰 스 스쓰, 쓰스 스 쓰스'},
+];
+
+/* 이야기책 — 이야기별 단어와 문장 */
+function W(u,a){ return a.map(function(w){ return {py:w[0],hz:w[1],ko:w[2],kr:w[3],star:!!w[4],kind:'w',src:u}; }); }
+function S(u,a){ return a.map(function(s){ return {py:s[0],hz:s[1],ko:s[2],kr:s[3],star:!!s[4],kind:'s',src:u}; }); }
+
+const S1W = W('S1',[
+  ['bǎowù','宝物','보물','바오우',1],['fēng','风','바람','펑'],['pǎo','跑','달리다','파오'],
+  ['méiyǒu','没有','없다','메이여우',1],['bù','不','아니다','뿌'],['búshì','不是','~이 아니다','부스',1],
+  ['běnzi','本子','공책','번즈'],['nín','您','당신(높임말)','닌',1],['nǐmen','你们','너희들','니먼'],
+  ['wǒmen','我们','우리','워먼'],['hěn','很','매우','헌',1],['yǒu','有','있다','여우',1],
+]);
+const S1S = S('S1',[
+  ['Nǐ hǎo!','你好！','안녕!','니 하오',1],
+  ['Nín hǎo!','您好！','안녕하세요! (어른께)','닌 하오'],
+  ['Nǐ hǎo ma?','你好吗？','잘 지내?','니 하오 마',1],
+  ['Wǒ hěn hǎo.','我很好。','나는 잘 지내.','워 헌 하오',1],
+  ['Nǐ yǒu bǎowù ma?','你有宝物吗？','너는 보물이 있니?','니 여우 바오우 마',1],
+  ['Wǒ yǒu bǎowù.','我有宝物。','나는 보물이 있어.','워 여우 바오우'],
+  ['Zhè shì wǒ de bǎowù.','这是我的宝物。','이것은 나의 보물이야.','쩌 스 워 더 바오우',1],
+  ['Fēng hěn dà.','风很大。','바람이 매우 세요.','펑 헌 따'],
+  ['Kuài pǎo!','快跑！','빨리 도망가!','콰이 파오'],
+  ['Zhè búshì nǐ de.','这不是你的。','이것은 너의 것이 아니야.','쩌 부스 니 더',1],
+  ['Nǐmen hǎo ma?','你们好吗？','너희들 잘 지내니?','니먼 하오 마'],
+  ['Wǒmen bù hǎo.','我们不好。','우리는 잘 못 지내.','워먼 뿌 하오'],
+  ['Wǒmen méiyǒu bǎowù.','我们没有宝物。','우리는 보물이 없어.','워먼 메이여우 바오우'],
+  ['Nǐmen kànkan!','你们看看！','너희들 좀 봐 봐!','니먼 칸칸'],
+  ['Zhè shì wǒ de běnzi.','这是我的本子。','이것은 나의 공책이야.','쩌 스 워 더 번즈'],
+  ['Tā hěn hǎo.','他很好。','그는 잘 지내.','타 헌 하오'],
+]);
+
+const S2W = W('S2',[
+  ['láng','狼','늑대','랑',1],['lái','来','오다','라이',1],['dàjiā','大家','모두','따지아',1],
+  ['zhèr','这儿','여기','쩔',1],['nàr','那儿','저기','날'],['nǎr','哪儿','어디','날(올렸다)',1],
+  ['duìbuqǐ','对不起','미안해요','뚜이부치',1],['bāng','帮','돕다','빵',1],['dà','大','크다','따'],
+  ['kuài','快','빨리','콰이'],['tā','它','그것','타'],['shénme','什么','무엇','선머'],
+  ['niúnǎi','牛奶','우유','니우나이'],['ěrduo','耳朵','귀','얼두오'],
+]);
+const S2S = S('S2',[
+  ['Zhèr yǒu láng ma?','这儿有狼吗？','여기 늑대가 있어요?','쩔 여우 랑 마'],
+  ['Zhèr méiyǒu láng.','这儿没有狼。','여기 늑대가 없어요.','쩔 메이여우 랑',1],
+  ['Nín qù nàr kànkan.','您去那儿看看。','저기 가서 보세요.','닌 취 날 칸칸'],
+  ['Zhèr yǒu láng.','这儿有狼。','여기 늑대가 있어요.','쩔 여우 랑',1],
+  ['Dàjiā lái bāng wǒ.','大家来帮我。','모두 와서 나를 도와줘요.','따지아 라이 빵 워'],
+  ['Láng zài nǎr?','狼在哪儿？','늑대는 어디에 있어요?','랑 짜이 날',1],
+  ['Duìbuqǐ.','对不起。','미안해요.','뚜이부치',1],
+  ['Dàjiā kuài lái bāng wǒ.','大家快来帮我。','모두 빨리 와서 나를 도와줘요.','따지아 콰이 라이 빵 워',1],
+  ['Nà shì shénme?','那是什么？','저것은 뭐예요?','나 스 선머'],
+  ['Tā shì láng.','它是狼。','그것은 늑대예요.','타 스 랑'],
+  ['Láng hěn dà.','狼很大。','늑대가 매우 커요.','랑 헌 따',1],
+  ['Zhèr yǒu niúnǎi.','这儿有牛奶。','여기 우유가 있어요.','쩔 여우 니우나이'],
+  ['Ěrduo hěn dà.','耳朵很大。','귀가 매우 커요.','얼두오 헌 따'],
+]);
+
+const S3W = W('S3',[
+  ['qián','钱','돈','치엔',1],['gěi','给','주다','게이',1],['kěshì','可是','하지만','커스',1],
+  ['gōngpíng','公平','공평하다','꽁핑'],['piàoliang','漂亮','예쁘다','피아오리앙'],['ài','爱','사랑하다','아이'],
+  ['děngdeng','等等','기다려 봐','덩덩',1],['xièxie','谢谢','고마워요','씨에시에',1],['búkèqi','不客气','천만에요','부커치',1],
+  ['píngguǒ','苹果','사과','핑궈'],['bōluó','菠萝','파인애플','뽀루오'],['gēge','哥哥','형·오빠','꺼거'],
+  ['tīngting','听听','들어 봐','팅팅'],['shuōshuo','说说','말해 봐','슈오슈오'],
+]);
+const S3S = S('S3',[
+  ['Nǐ kàn!','你看！','봐!','니 칸',1],
+  ['Tā hěn piàoliang!','她很漂亮！','그녀는 매우 예뻐!','타 헌 피아오리앙'],
+  ['Wǒ ài tā.','我爱她。','나는 그녀를 사랑해.','워 아이 타'],
+  ['Kěshì, wǒ méiyǒu qián.','可是，我没有钱。','하지만, 나는 돈이 없어.','커스, 워 메이여우 치엔',1],
+  ['Nǐ yǒu qián ma?','你有钱吗？','너는 돈이 있니?','니 여우 치엔 마',1],
+  ['Nǐ děngdeng.','你等等。','기다려 봐.','니 덩덩',1],
+  ['Xièxie!','谢谢！','고마워!','씨에시에',1],
+  ['Búkèqi.','不客气。','천만에.','부커치',1],
+  ['Kuài gěi wǒ qián.','快给我钱。','빨리 나에게 돈을 줘요.','콰이 게이 워 치엔'],
+  ['Nín děngdeng.','您等等。','기다려 주세요.','닌 덩덩'],
+  ['Nǐ tīngting.','你听听。','들어 봐.','니 팅팅'],
+  ['Hǎo, nín shuōshuo.','好，您说说。','좋아요, 말해 보세요.','하오, 닌 슈오슈오'],
+  ['Nà bù gōngpíng.','那不公平。','그것은 불공평해요.','나 뿌 꽁핑',1],
+  ['Gěi wǒ qián.','给我钱。','나에게 돈을 주세요.','게이 워 치엔',1],
+  ['Bù xíng.','不行。','안 돼요.','뿌 싱'],
+  ['Gěi wǒ píngguǒ.','给我苹果。','나에게 사과를 주세요.','게이 워 핑궈'],
+]);
+
+/* 첫소리(성모) 21개와 대표 단어 */
+const INITIALS = [
+  ['b','bàba'],['p','pútáo'],['m','māma'],['f','fēijī'],
+  ['d','dìdi'],['t','tùzi'],['n','nǎinai'],['l','lǎohǔ'],
+  ['g','gēge'],['k','kàn'],['h','hē'],
+  ['j','jiějie'],['q','qī'],['x','xīguā'],
+  ['zh','Zhōngguó'],['ch','chē'],['sh','shū'],['r','rén'],
+  ['z','zúqiú'],['c','cǎoméi'],['s','sān'],
+];
+/* 헷갈리는 짝 — 첫소리 문제의 보기로 씁니다 */
+const INI_NEAR = {b:'pdm',p:'bft',m:'nfb',f:'hpb',d:'tbn',t:'dpk',n:'lmd',l:'nrd',g:'khd',k:'ghq',h:'fkg',
+  j:'q x zh z'.split(' '),q:'j x ch c'.split(' '),x:'s sh j q'.split(' '),
+  zh:'z ch j sh'.split(' '),ch:'c zh q sh'.split(' '),sh:'s x ch r'.split(' '),r:'l sh zh n'.split(' '),
+  z:'zh c j s'.split(' '),c:'ch z q s'.split(' '),s:'sh x z c'.split(' ')};
+
+/* 단원(공부 순서) — 12주 */
+const UNITS = [
+  {id:'u1', wk:'1주', t:'성조 4개', d:'mā má mǎ mà', emo:'🎵'},
+  {id:'u2', wk:'2주', t:'모음 6개', d:'a o e i u ü', emo:'👄'},
+  {id:'u3', wk:'3주', t:'첫소리 b p m f', d:'bàba · pútáo · māma · fēijī', emo:'🅱️', ini:['b','p','m','f']},
+  {id:'u4', wk:'3주', t:'첫소리 d t n l', d:'dìdi · tùzi · nǎinai · lǎohǔ', emo:'🐰', ini:['d','t','n','l']},
+  {id:'u5', wk:'4주', t:'첫소리 g k h', d:'gēge · kàn · hē', emo:'🥤', ini:['g','k','h']},
+  {id:'u6', wk:'4주', t:'첫소리 j q x', d:'jiějie · qī · xīguā', emo:'🍉', ini:['j','q','x']},
+  {id:'u7', wk:'5주', t:'첫소리 zh ch sh r', d:'Zhōngguó · chē · shū · rén', emo:'🚗', ini:['zh','ch','sh','r']},
+  {id:'u8', wk:'5주', t:'첫소리 z c s', d:'zúqiú · cǎoméi · sān', emo:'🍓', ini:['z','c','s']},
+  {id:'u9', wk:'5주', t:'인사말 · 잰말놀이', d:'Nǐ hǎo! · zàijiàn · xièxie', emo:'👋'},
+  {id:'S1', wk:'6~7주', t:'이야기 ① 보물은 어디에?', d:'Bǎowù zài nǎr?', emo:'💰'},
+  {id:'S2', wk:'8~9주', t:'이야기 ② 여기 늑대가 있어요', d:'Zhèr yǒu láng.', emo:'🐺'},
+  {id:'S3', wk:'10~11주', t:'이야기 ③ 기다려 주세요', d:'Nǐ děngdeng.', emo:'⏳'},
+];
+
+/* ================================================================
+   병음 도우미 — 성조 떼기/붙이기, 음절 나누기
+   ================================================================ */
+const MARK = {a:'āáǎà',e:'ēéěè',i:'īíǐì',o:'ōóǒò',u:'ūúǔù','ü':'ǖǘǚǜ'};
+const UNMARK = {};
+Object.keys(MARK).forEach(function(v){
+  MARK[v].split('').forEach(function(c,i){ UNMARK[c]=[v,i+1]; UNMARK[c.toUpperCase()]=[v.toUpperCase(),i+1]; });
+});
+function parseSyl(s){
+  let base='',tone=0;
+  for(const ch of s){ if(UNMARK[ch]){ base+=UNMARK[ch][0]; tone=UNMARK[ch][1]; } else base+=ch; }
+  return {base:base,tone:tone};
+}
+function markSyl(base,tone){
+  if(!tone) return base;
+  const lo=base.toLowerCase(); let i=lo.indexOf('a');
+  if(i<0) i=lo.indexOf('e');
+  if(i<0) i=lo.indexOf('ou');
+  if(i<0){ for(let k=lo.length-1;k>=0;k--){ if('iouü'.indexOf(lo[k])>=0){ i=k; break; } } }
+  if(i<0) return base;
+  let m=MARK[lo[i]][tone-1]; if(base[i]!==lo[i]) m=m.toUpperCase();
+  return base.slice(0,i)+m+base.slice(i+1);
+}
+const SYL = /^(zh|ch|sh|[bpmfdtnlgkhjqxrzcsyw])?(iang|iong|uang|ang|eng|ing|ong|ian|iao|uai|uan|üan|ai|ei|ao|ou|er|ia|ie|iu|ua|uo|ui|üe|ue|an(?![aeiouü])|en(?![aeiouü])|in(?![aeiouü])|un(?![aeiouü])|ün(?![aeiouü])|a|o|e|i|u|ü)(r(?![aeiouü]))?/;
+/* 한 낱말(띄어쓰기 없는 병음)을 음절로 나눕니다. 실패하면 null */
+function splitWord(w){
+  const base=parseSyl(w).base.toLowerCase(); const out=[]; let p=0;
+  while(p<base.length){
+    const m=SYL.exec(base.slice(p)); if(!m) return null;
+    out.push(w.slice(p,p+m[0].length)); p+=m[0].length;
+  }
+  return out;
+}
+function initialOf(w){
+  const m=/^(zh|ch|sh|[bpmfdtnlgkhjqxrzcs])/.exec(parseSyl(w).base.toLowerCase());
+  return m?m[1]:null;
+}
+/* 성조만 바꾼 가짜 보기들 */
+function toneFakes(w){
+  const syl=splitWord(w); if(!syl) return [];
+  const idx=[]; syl.forEach(function(s,i){ if(parseSyl(s).tone) idx.push(i); });
+  if(!idx.length) return [];
+  const out=[];
+  shuffle(idx).forEach(function(i){
+    const p=parseSyl(syl[i]);
+    [1,2,3,4].forEach(function(t){
+      if(t===p.tone) return;
+      const c=syl.slice(); c[i]=markSyl(p.base,t); out.push(c.join(''));
+    });
+  });
+  return uniq(out).filter(function(x){ return x!==w; });
+}
+/* 문장 → 낱말 조각 */
+function tokens(py){ return py.replace(/[.!?,，。！？]/g,'').split(/\s+/).filter(Boolean); }
+function endMark(py){ const m=/[.!?]$/.exec(py); return m?m[0]:'.'; }
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function joinSent(tk,end){ return cap(tk.join(' '))+end; }
+
+/* ================================================================
+   작은 도구
+   ================================================================ */
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function uniq(a){ return a.filter(function(x,i){ return a.indexOf(x)===i; }); }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+const $=function(id){ return document.getElementById(id); };
+
+/* 저장 */
+const STORE='chinese-cert-v1';
+let mem={};
+function load(){ try{ return JSON.parse(localStorage.getItem(STORE))||{}; }catch(e){ return mem; } }
+function save(d){ mem=d; try{ localStorage.setItem(STORE,JSON.stringify(d)); }catch(e){} }
+let DB=load(); DB.done=DB.done||{}; DB.wrong=DB.wrong||{}; DB.best=DB.best||null;
+
+/* ================================================================
+   소리 — 음원 파일이 있으면 그걸, 없으면 폰의 중국어 목소리로
+   ================================================================ */
+const audioEl=new Audio();
+let zhVoice=null;
+function findVoice(){
+  if(!('speechSynthesis' in window)) return;
+  const vs=speechSynthesis.getVoices();
+  zhVoice=vs.find(function(v){ return /zh[-_]CN/i.test(v.lang); })||vs.find(function(v){ return /^zh/i.test(v.lang); })||null;
+}
+if('speechSynthesis' in window){ findVoice(); speechSynthesis.onvoiceschanged=findVoice; }
+function play(item){
+  audioEl.pause();
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  if(item.a){ audioEl.src='audio/'+item.a; audioEl.play().catch(function(){ speak(item.hz); }); return; }
+  speak(item.hz);
+}
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='zh-CN'; u.rate=0.75; if(zhVoice) u.voice=zhVoice;
+  speechSynthesis.speak(u);
+}
+setTimeout(function(){
+  if(!('speechSynthesis' in window) || (speechSynthesis.getVoices().length && !zhVoice)){
+    $('warn').innerHTML='<div class="voice-warn">이 기기에 중국어 목소리가 없어서 소리가 안 나올 수 있어요. CD 음원을 넣으면 해결돼요.</div>';
+  }
+},1500);
+
+/* 한글 발음 켜기/끄기 */
+try{ if(localStorage.getItem('chinese-show-kr')==='1') document.body.classList.add('kr'); }catch(e){}
+$('krbtn').onclick=function(){
+  document.body.classList.toggle('kr');
+  try{ localStorage.setItem('chinese-show-kr',document.body.classList.contains('kr')?'1':'0'); }catch(e){}
+};
+
+/* ================================================================
+   화면
+   ================================================================ */
+const stack=[];
+function go(fn,title){ stack.push([fn,title]); render(); }
+function back(){ stack.pop(); render(); }
+$('back').onclick=back;
+function render(){
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  const cur=stack[stack.length-1];
+  $('top').classList.toggle('hide',stack.length<=1);
+  $('ttl').textContent=cur[1]||'';
+  $('view').innerHTML='';
+  cur[0]($('view'));
+  window.scrollTo(0,0);
+}
+
+function daysLeft(){
+  const now=new Date(); now.setHours(0,0,0,0);
+  return Math.round((new Date(EXAM_DAY+'T00:00:00')-now)/86400000);
+}
+function gradeOf(s){ return s>=90?'특급':s>=70?'1급':s>=50?'2급':'다시 도전'; }
+
+/* 첫 화면 */
+function home(v){
+  const dl=daysLeft(); const done=Object.keys(DB.done).length;
+  const wrongN=Object.keys(DB.wrong).length;
+  v.innerHTML=
+    '<div class="hero"><div class="flag">🐼</div><h1>중국어 인증제</h1>'+
+    '<div class="sub">특급 도전! 발음1 · 스토리1 교재</div></div>'+
+    '<div class="dday"><div><b>'+(dl>0?'D-'+dl:dl===0?'D-DAY':'끝!')+'</b><span>12월 14일 시험</span></div>'+
+    '<div><b>'+done+' / '+UNITS.length+'</b><span>공부한 단원</span></div>'+
+    '<div><b>'+(DB.best==null?'–':DB.best)+'</b><span>모의고사 최고</span></div></div>'+
+    '<div class="grade">객관식 40문제 · 특급 90점 · 1급 70점 · 2급 50점</div>'+
+    menu('today','📖','#fdebd9','오늘 공부','12주 순서대로 한 단원씩')+
+    menu('must','⭐','#fff1c9','꼭 외울 것','시험에 계속 나오는 것만 모았어요')+
+    menu('prac','✏️','#e3f1e6','연습 문제','단원을 골라 10문제')+
+    menu('mock','📝','#e4eefa','모의고사','진짜처럼 40문제, 점수와 급수까지')+
+    menu('wrong','🔁','#fde4e4','틀린 문제 다시',wrongN?wrongN+'개 남았어요':'아직 없어요')+
+    '<div class="foot">누르면 중국어로 읽어 줘요 🔊<br>「한글 발음」은 막힐 때만 잠깐 켜 보세요</div>';
+  v.querySelectorAll('.menu').forEach(function(b){
+    b.onclick=function(){
+      const k=b.dataset.k;
+      if(k==='today') go(unitList,'오늘 공부');
+      if(k==='must') go(mustView,'꼭 외울 것');
+      if(k==='prac') go(pracList,'연습 문제');
+      if(k==='mock') go(function(el){ quiz(el,buildMock(),'mock'); },'모의고사');
+      if(k==='wrong') go(function(el){ wrongStart(el); },'틀린 문제 다시');
+    };
+  });
+}
+function menu(k,ic,bg,t,d){
+  return '<button class="menu" data-k="'+k+'"><div class="ic" style="background:'+bg+'">'+ic+'</div>'+
+    '<div><div class="t">'+t+'</div><div class="d">'+d+'</div></div><div class="ar">›</div></button>';
+}
+
+/* 단원 목록 */
+function unitList(v){
+  let h='',wk='';
+  UNITS.forEach(function(u){
+    if(u.wk!==wk){ wk=u.wk; h+='<div class="week">'+wk+'</div>'; }
+    h+='<button class="unit'+(DB.done[u.id]?' done':'')+'" data-id="'+u.id+'"><div class="n">'+(DB.done[u.id]?'✓':u.emo)+'</div>'+
+       '<div><div class="t">'+u.t+'</div><div class="d py" style="font-family:\'Noto Sans\',sans-serif;font-weight:500">'+esc(u.d)+'</div></div></button>';
+  });
+  h+='<div class="week">12주</div><div class="tip">모의고사를 여러 번 풀고, 틀린 문제만 다시 봐요.</div>';
+  v.innerHTML=h;
+  v.querySelectorAll('.unit').forEach(function(b){
+    b.onclick=function(){ const u=UNITS.find(function(x){ return x.id===b.dataset.id; }); go(function(el){ unitView(el,u); },u.t); };
+  });
+}
+
+function cardHTML(it,i){
+  return '<div class="card"><div class="body">'+
+    '<div class="py">'+(it.star?'<span class="star">★</span>':'')+esc(it.py)+'</div>'+
+    '<div class="hz">'+esc(it.hz)+'</div>'+
+    '<div class="ko">'+esc(it.ko)+'</div>'+
+    (it.kr?'<div class="kr">'+esc(it.kr)+'</div>':'')+
+    '</div><button class="say" data-i="'+i+'" aria-label="듣기">🔊</button></div>';
+}
+function bindSay(el,list){
+  el.querySelectorAll('[data-i]').forEach(function(b){ b.onclick=function(){ play(list[+b.dataset.i]); }; });
+}
+function toneSvg(t){
+  const p={1:'M8 10 L62 10',2:'M8 36 L62 8',3:'M8 18 L35 38 L62 12',4:'M8 8 L62 38'}[t];
+  return '<svg viewBox="0 0 70 44"><path d="'+p+'" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+
+function unitItems(u){
+  if(u.id==='u1') return TONES;
+  if(u.id==='u2') return VOWELS;
+  if(u.ini) return PWORDS.filter(function(w){ return u.ini.indexOf(initialOf(w.py))>=0; });
+  if(u.id==='u9') return PSENT.concat(TWISTERS);
+  return ({S1:S1W.concat(S1S),S2:S2W.concat(S2S),S3:S3W.concat(S3S)})[u.id];
+}
+
+function unitView(v,u){
+  const list=unitItems(u); let h='';
+  if(u.id==='u1'){
+    h+='<div class="tip">중국어는 같은 <span class="py">ma</span>도 소리 높낮이(성조)에 따라 뜻이 달라져요. 선을 따라 손가락으로 그리며 읽어 보세요.</div><div class="tones">';
+    TONES.forEach(function(t,i){
+      h+='<button class="tone c'+t.t+'" data-i="'+i+'">'+toneSvg(t.t)+'<div class="py">'+t.py+'</div>'+
+         '<div class="ko">'+t.name+' · '+t.ko+'</div><div class="ko">'+t.how+'</div></button>';
+    });
+    h+='</div><div class="tip">★ 규칙: <span class="py">bù</span> 뒤에 4성이 오면 <span class="py">bú</span>로 바뀌어요.<br><span class="py">bù + shì → búshì</span>, <span class="py">bù + kèqi → búkèqi</span></div>';
+    v.innerHTML=h;
+  } else if(u.ini){
+    h+='<div class="tip">첫소리마다 <b>대표 단어 하나</b>만 먼저 외워요. ★ 표시가 대표 단어예요.</div><div class="ini">';
+    u.ini.forEach(function(l){
+      const rep=INITIALS.find(function(x){ return x[0]===l; })[1];
+      const w=PWORDS.find(function(x){ return x.py===rep; });
+      h+='<button data-i="'+list.indexOf(w)+'"><div class="l">'+l+'</div><div class="w">'+w.py+'</div><div class="k">'+w.ko+'</div></button>';
+    });
+    h+='</div><div class="h3">단어 모두</div>';
+    list.forEach(function(it,i){ h+=cardHTML(it,i); });
+    v.innerHTML=h;
+  } else if(u.src==null && /^S/.test(u.id)){
+    const words=list.filter(function(x){ return x.kind==='w'; }), sents=list.filter(function(x){ return x.kind==='s'; });
+    h+='<div class="h3">새 단어</div>';
+    words.forEach(function(it){ h+=cardHTML(it,list.indexOf(it)); });
+    h+='<div class="h3">이야기 문장</div>';
+    sents.forEach(function(it){ h+=cardHTML(it,list.indexOf(it)); });
+    v.innerHTML=h;
+  } else {
+    list.forEach(function(it,i){ h+=cardHTML(it,i); });
+    v.innerHTML=h;
+  }
+  bindSay(v,list);
+  const f=document.createElement('div');
+  f.innerHTML='<button class="big">이 단원 문제 풀기 ✏️</button>'+
+    '<button class="big sub">'+(DB.done[u.id]?'공부 끝 ✓ (다시 누르면 취소)':'다 봤어요! 공부 끝 표시')+'</button>';
+  v.appendChild(f);
+  f.children[0].onclick=function(){ go(function(el){ quiz(el,buildUnitQuiz(u,10),u.id); },u.t+' 문제'); };
+  f.children[1].onclick=function(){
+    if(DB.done[u.id]) delete DB.done[u.id]; else DB.done[u.id]=1;
+    save(DB); back();
+  };
+}
+
+/* 꼭 외울 것 */
+function mustView(v){
+  let h='<div class="h3">★★★ 1. 성조 4개</div><div class="tones">';
+  TONES.forEach(function(t,i){ h+='<button class="tone c'+t.t+'" data-t="'+i+'">'+toneSvg(t.t)+'<div class="py">'+t.py+'</div><div class="ko">'+t.name+'</div></button>'; });
+  h+='</div><div class="h3">★★★ 2. 첫소리 21개 · 대표 단어</div><div class="ini">';
+  const reps=INITIALS.map(function(x){ return PWORDS.find(function(w){ return w.py===x[1]; }); });
+  INITIALS.forEach(function(x,i){ h+='<button data-r="'+i+'"><div class="l">'+x[0]+'</div><div class="w">'+reps[i].py+'</div><div class="k">'+reps[i].ko+'</div></button>'; });
+  h+='</div><div class="h3">★★★ 3. 자꾸 나오는 문장</div>';
+  const sents=uniqBy(S1S.concat(S2S,S3S).filter(function(s){ return s.star; }));
+  sents.forEach(function(s,i){ h+=cardHTML(s,i); });
+  h+='<div class="h3">★★★ 4. 문장 틀 5개 — 빈칸만 바꿔요</div>'+
+    '<div class="tip"><span class="py">___ hǎo ma?</span> ___ 잘 지내?<br>'+
+    '<span class="py">Zhè shì wǒ de ___.</span> 이것은 나의 ___이야.<br>'+
+    '<span class="py">Zhèr yǒu / méiyǒu ___.</span> 여기 ___가 있어요 / 없어요.<br>'+
+    '<span class="py">___ hěn dà.</span> ___가 매우 커요.<br>'+
+    '<span class="py">Gěi wǒ ___.</span> 나에게 ___를 주세요.</div>'+
+    '<div class="h3">★★ 규칙 2개</div>'+
+    '<div class="tip">① <span class="py">bù</span> + 4성 → <span class="py">bú</span> (búshì, búkèqi)<br>'+
+    '② 같은 말을 두 번 → “좀 ~해 봐” (<span class="py">kànkan, děngdeng, tīngting, shuōshuo</span>)</div>'+
+    '<div class="h3">★★ 헷갈리는 짝</div>'+
+    '<div class="tip"><span class="py">yǒu</span> 있다 ↔ <span class="py">yóu</span> ✗<br>'+
+    '<span class="py">bāng</span> 돕다 ↔ <span class="py">bàng</span> ✗<br>'+
+    '<span class="py">nǎr</span> 어디 ↔ <span class="py">nàr</span> 저기<br>'+
+    '<span class="py">zhèr</span> 여기 ↔ <span class="py">nàr</span> 저기</div>';
+  v.innerHTML=h;
+  v.querySelectorAll('[data-t]').forEach(function(b){ b.onclick=function(){ play(TONES[+b.dataset.t]); }; });
+  v.querySelectorAll('[data-r]').forEach(function(b){ b.onclick=function(){ play(reps[+b.dataset.r]); }; });
+  bindSay(v,sents);
+}
+function uniqBy(a){ const seen={}; return a.filter(function(x){ if(seen[x.py]) return false; seen[x.py]=1; return true; }); }
+
+/* 연습 문제 — 단원 고르기 */
+function pracList(v){
+  let h='<div class="tip">단원을 고르면 10문제가 나와요.</div>';
+  UNITS.forEach(function(u){
+    h+='<button class="unit" data-id="'+u.id+'"><div class="n">'+u.emo+'</div><div><div class="t">'+u.t+'</div><div class="d">'+u.wk+'</div></div></button>';
+  });
+  v.innerHTML=h;
+  v.querySelectorAll('.unit').forEach(function(b){
+    b.onclick=function(){ const u=UNITS.find(function(x){ return x.id===b.dataset.id; }); go(function(el){ quiz(el,buildUnitQuiz(u,10),u.id); },u.t+' 문제'); };
+  });
+}
+
+/* ================================================================
+   문제 만들기 — 전부 객관식
+   각 문제: {kind, ask, show, audio(item), opts[], ans, item}
+   ================================================================ */
+const ALLW=PWORDS.concat(S1W,S2W,S3W);
+const ALLS=S1S.concat(S2S,S3S,PSENT);
+
+function mc(correct,fakes,n){
+  const o=shuffle([correct].concat(shuffle(uniq(fakes).filter(function(x){ return x!==correct; })).slice(0,(n||4)-1)));
+  return {opts:o,ans:o.indexOf(correct)};
+}
+
+const Q = {
+  /* 듣고 성조 고르기 */
+  tone:function(w){
+    const f=toneFakes(w.py); if(f.length<2) return null;
+    return Object.assign({kind:'듣고 성조 고르기',ask:'들리는 소리에 맞는 것은?',audio:w,item:w,py:true},mc(w.py,f));
+  },
+  /* 기본 성조 (mā má mǎ mà) */
+  tone4:function(t){
+    return Object.assign({kind:'듣고 성조 고르기',ask:'몇 성일까요?',audio:t,item:t,py:true},mc(t.py,TONES.map(function(x){ return x.py; })));
+  },
+  vowel:function(x){
+    return Object.assign({kind:'듣고 모음 고르기',ask:'들리는 소리는?',audio:x,item:x,py:true,two:true},mc(x.py,VOWELS.map(function(y){ return y.py; }),4));
+  },
+  /* 듣고 첫소리 고르기 */
+  initial:function(w){
+    const ini=initialOf(w.py); if(!ini) return null;
+    const near=INI_NEAR[ini]; const f=Array.isArray(near)?near:near.split('');
+    return Object.assign({kind:'듣고 첫소리 고르기',ask:'첫소리(성모)는 무엇일까요?',audio:w,item:w,py:true,two:true},mc(ini,f));
+  },
+  /* ○로 시작하는 단어 */
+  starts:function(w){
+    const ini=initialOf(w.py); if(!ini) return null;
+    const pool=ALLW.filter(function(x){ const i=initialOf(x.py); return i && i!==ini; }).map(function(x){ return x.py; });
+    return Object.assign({kind:'첫소리 찾기',ask:'<span class="py" style="color:var(--red);font-size:26px">'+ini+'</span> 로 시작하는 단어는?',item:w,py:true},mc(w.py,shuffle(pool),3));
+  },
+  /* 듣고 단어 고르기 */
+  hear:function(w){
+    const pool=ALLW.filter(function(x){ return x.py!==w.py && (x.src===w.src || initialOf(x.py)===initialOf(w.py)); }).map(function(x){ return x.py; });
+    return Object.assign({kind:'듣고 고르기',ask:'들리는 단어는?',audio:w,item:w,py:true},mc(w.py,pool.concat(toneFakes(w.py).slice(0,1))));
+  },
+  /* 단어 뜻 */
+  wmean:function(w){
+    const pool=ALLW.filter(function(x){ return x.ko!==w.ko; }).map(function(x){ return x.ko; });
+    return Object.assign({kind:'뜻 고르기',ask:'무슨 뜻일까요?',show:w.py,showHz:w.hz,audio:w,item:w,ko:true,two:true},mc(w.ko,shuffle(pool)));
+  },
+  /* 한국말 → 단어 */
+  kword:function(w){
+    const pool=ALLW.filter(function(x){ return x.ko!==w.ko && x.src===w.src; }).map(function(x){ return x.py; });
+    return Object.assign({kind:'중국어로 뭐예요?',ask:'중국어로 무엇일까요?',showKo:w.ko,item:w,py:true,two:true},mc(w.py,pool));
+  },
+  /* 문장 뜻 */
+  smean:function(s){
+    const pool=ALLS.filter(function(x){ return x.ko!==s.ko; }).map(function(x){ return x.ko; });
+    return Object.assign({kind:'문장 뜻 고르기',ask:'무슨 뜻일까요?',show:s.py,showHz:s.hz,audio:s,item:s,ko:true},mc(s.ko,shuffle(pool.filter(function(k,i){ return i<40; }))));
+  },
+  /* 한국말 → 문장 */
+  ksent:function(s){
+    const pool=ALLS.filter(function(x){ return x.py!==s.py && x.src===s.src; }).map(function(x){ return x.py; });
+    return Object.assign({kind:'이럴 때 뭐라고 해요?',ask:'알맞은 말은?',showKo:s.ko,item:s,py:true},mc(s.py,pool));
+  },
+  /* 빈칸 채우기 */
+  blank:function(s){
+    const tk=tokens(s.py); if(tk.length<2) return null;
+    const i=Math.floor(Math.random()*tk.length); const ans=tk[i].toLowerCase();
+    const pool=ALLS.filter(function(x){ return x.src===s.src; }).reduce(function(a,x){ return a.concat(tokens(x.py).map(function(t){ return t.toLowerCase(); })); },[]);
+    const shown=tk.map(function(t,k){ return k===i?'<span class="blank">&nbsp;</span>':esc(t); }).join(' ')+endMark(s.py);
+    return Object.assign({kind:'빈칸 채우기',ask:'빈칸에 들어갈 말은?',showHTML:shown,sub:s.ko,audio:s,item:s,py:true,two:true},mc(ans,pool.concat(toneFakes(ans))));
+  },
+  /* 바른 순서 */
+  order:function(s){
+    const tk=tokens(s.py).map(function(t){ return t.toLowerCase(); }); if(tk.length<3) return null;
+    const right=joinSent(tk,endMark(s.py)); const f=[];
+    for(let k=0;k<12 && f.length<3;k++){ const x=joinSent(shuffle(tk),endMark(s.py)); if(x!==right && f.indexOf(x)<0) f.push(x); }
+    if(f.length<2) return null;
+    return Object.assign({kind:'바른 순서 고르기',ask:'순서가 바른 문장은?',sub:s.ko,item:s,py:true},mc(right,f,3));
+  },
+  /* 성조가 바른 문장 */
+  tsent:function(s){
+    const tk=tokens(s.py); const f=[];
+    shuffle(tk.map(function(_,i){ return i; })).forEach(function(i){
+      toneFakes(tk[i]).slice(0,1).forEach(function(v){ const c=tk.slice(); c[i]=v; f.push(c.join(' ')+endMark(s.py)); });
+    });
+    if(f.length<2) return null;
+    return Object.assign({kind:'바르게 쓴 문장',ask:'성조가 바르게 쓰인 문장은?',audio:s,item:s,py:true},mc(s.py,f,3));
+  },
+};
+
+/* 문제 하나 만들기 — 어떤 종류였는지 적어 둡니다 (틀린 문제 다시 풀 때 씀) */
+function makeQ(type,item){ const q=Q[type](item); if(q) q.type=type; return q; }
+
+/* 단원별 문제 */
+function buildUnitQuiz(u,n){
+  const list=unitItems(u); const out=[];
+  let types;
+  if(u.id==='u1') return shuffle(TONES.concat(TONES,TONES)).slice(0,n).map(function(t){ return makeQ('tone4',t); });
+  if(u.id==='u2') return shuffle(VOWELS.concat(VOWELS)).slice(0,n).map(function(x){ return makeQ('vowel',x); });
+  const words=list.filter(function(x){ return x.kind==='w'; }), sents=list.filter(function(x){ return x.kind==='s' && x.src!=null; });
+  if(u.ini) types=[['tone',words],['initial',words],['starts',words],['hear',words],['wmean',words]];
+  else if(u.id==='u9') types=[['smean',sents],['ksent',sents],['tsent',sents]];
+  else types=[['tone',words],['wmean',words],['kword',words],['smean',sents],['ksent',sents],['blank',sents],['order',sents],['tsent',sents]];
+  let guard=0;
+  while(out.length<n && guard++<200){
+    const t=pick(types); if(!t[1].length) continue;
+    const q=makeQ(t[0],pick(t[1]));
+    if(q && !out.some(function(o){ return o.kind===q.kind && o.item===q.item; })) out.push(q);
+  }
+  return out;
+}
+
+/* 모의고사 40문제: 발음 16 + 회화 24 */
+function buildMock(){
+  const out=[]; let guard=0;
+  function add(type,pool,k){
+    let c=0;
+    while(c<k && guard++<800){
+      const q=makeQ(type,pick(pool));
+      if(q && !out.some(function(o){ return o.kind===q.kind && o.item===q.item; })){ out.push(q); c++; }
+    }
+  }
+  const storyW=S1W.concat(S2W,S3W), storyS=S1S.concat(S2S,S3S);
+  add('tone4',TONES,2); add('vowel',VOWELS,2);
+  add('tone',PWORDS,4); add('initial',PWORDS,4); add('starts',PWORDS,2); add('hear',PWORDS,2);
+  add('tone',storyW,3); add('wmean',storyW,3); add('kword',storyW,2);
+  add('smean',storyS,4); add('ksent',storyS.concat(PSENT),4); add('blank',storyS,4); add('order',storyS,2); add('tsent',storyS,2);
+  return out;
+}
+
+/* 틀린 문제 다시 */
+function wrongStart(v){
+  const keys=Object.keys(DB.wrong);
+  if(!keys.length){ v.innerHTML='<div class="result"><div class="medal">🌟</div><div class="gr">틀린 문제가 없어요!</div><div class="msg">모의고사나 연습 문제를 풀면 여기 모여요.</div></div>'; return; }
+  const qs=[];
+  shuffle(keys).slice(0,15).forEach(function(k){
+    const w=DB.wrong[k]; const it=findItem(w.py,w.kind);
+    if(!it){ return; }
+    const q=Q[w.type] && makeQ(w.type,it); if(q) qs.push(q);
+  });
+  quiz(v,qs,'wrong');
+}
+function findItem(py,kind){
+  const pool=kind==='t'?TONES:kind==='v'?VOWELS:kind==='s'?ALLS:ALLW;
+  return pool.find(function(x){ return x.py===py; });
+}
+
+/* ================================================================
+   문제 풀기 화면
+   ================================================================ */
+function quiz(v,qs,mode){
+  let i=0,score=0; const wrongs=[];
+  function show(){
+    const q=qs[i];
+    let h='<div class="bar"><i style="width:'+(i/qs.length*100)+'%"></i></div><div class="qno">'+(i+1)+' / '+qs.length+'</div>'+
+      '<div class="qbox"><div class="qtype">'+q.kind+'</div><div class="qask">'+q.ask+'</div>';
+    if(q.show) h+='<div class="qshow py">'+esc(q.show)+(q.showHz?'<span class="hz">'+esc(q.showHz)+'</span>':'')+'</div>';
+    if(q.showKo) h+='<div class="qshow koq">“'+esc(q.showKo)+'”</div>';
+    if(q.showHTML) h+='<div class="qshow py">'+q.showHTML+'</div>';
+    if(q.sub) h+='<div class="qshow koq" style="font-size:18px">'+esc(q.sub)+'</div>';
+    if(q.audio) h+='<button class="listen" id="lis" aria-label="다시 듣기">🔊</button>';
+    h+='</div><div class="opts'+(q.two?' two':'')+'">';
+    q.opts.forEach(function(o,k){
+      h+='<button class="opt'+(q.ko?' kotext':'')+'" data-k="'+k+'"><span class="num">'+(k+1)+'</span>'+(q.py?'<span class="py">'+esc(o)+'</span>':esc(o))+'</button>';
+    });
+    h+='</div><div id="fb"></div>';
+    v.innerHTML=h;
+    if(q.audio){ $('lis').onclick=function(){ play(q.audio); }; setTimeout(function(){ play(q.audio); },250); }
+    v.querySelectorAll('.opt').forEach(function(b){ b.onclick=function(){ answer(+b.dataset.k); }; });
+    window.scrollTo(0,0);
+  }
+  function answer(k){
+    const q=qs[i]; const ok=k===q.ans;
+    const bs=v.querySelectorAll('.opt');
+    bs.forEach(function(b){ b.disabled=true; });
+    bs[q.ans].classList.add('ok'); if(!ok) bs[k].classList.add('no');
+    const it=q.item; const key=q.kind+'|'+it.py;
+    if(ok){ score++; if(DB.wrong[key]){ delete DB.wrong[key]; } }
+    else { wrongs.push(q); DB.wrong[key]={py:it.py,type:q.type,kind:TONES.indexOf(it)>=0?'t':VOWELS.indexOf(it)>=0?'v':it.kind}; }
+    save(DB);
+    $('fb').innerHTML='<div class="fb"><div class="body"><div class="res '+(ok?'ok':'no')+'">'+(ok?'딩동댕! 맞았어요 🎉':'아까워요! 정답은 '+(q.ans+1)+'번')+'</div>'+
+      '<div class="py">'+esc(it.py)+'</div><div class="hz">'+esc(it.hz)+'</div><div class="ko">'+esc(it.ko)+'</div>'+
+      (it.kr?'<div class="kr">'+esc(it.kr)+'</div>':'')+'</div><button class="say" id="fbsay">🔊</button></div>'+
+      '<div class="next"><button class="big" id="nx">'+(i+1<qs.length?'다음 문제 →':'결과 보기')+'</button></div>';
+    $('fbsay').onclick=function(){ play(it); };
+    $('nx').onclick=function(){ i++; if(i<qs.length) show(); else result(); };
+    $('nx').scrollIntoView({behavior:'smooth',block:'end'});
+  }
+  function result(){
+    const pct=Math.round(score/qs.length*100);
+    let h='<div class="result">';
+    if(mode==='mock'){
+      const g=gradeOf(pct);
+      if(DB.best==null||pct>DB.best){ DB.best=pct; save(DB); }
+      h+='<div class="medal">'+(pct>=90?'🏆':pct>=70?'🥇':pct>=50?'🥈':'💪')+'</div><div class="sc">'+pct+'점</div>'+
+         '<div class="gr">'+g+(pct>=90?'!':'')+'</div><div class="msg">'+qs.length+'문제 중 '+score+'개 맞았어요.'+(pct<90?'<br>특급까지 '+Math.ceil((90-pct)/2.5)+'문제 더!':'')+'</div>';
+    } else {
+      h+='<div class="medal">'+(pct===100?'🌟':pct>=70?'😊':'💪')+'</div><div class="sc">'+score+' / '+qs.length+'</div>'+
+         '<div class="msg">'+(pct===100?'다 맞았어요!':'틀린 문제는 「틀린 문제 다시」에 모아 뒀어요.')+'</div>';
+    }
+    h+='</div>';
+    if(wrongs.length){
+      h+='<div class="h3">틀린 것 한 번 더 보기</div><div class="wrong-list">';
+      wrongs.forEach(function(q,k){ h+=cardHTML(q.item,k); });
+      h+='</div>';
+    }
+    h+='<button class="big" id="again">다시 풀기</button><button class="big sub" id="home">처음으로</button>';
+    v.innerHTML=h;
+    bindSay(v,wrongs.map(function(q){ return q.item; }));
+    $('again').onclick=function(){
+      const fresh=mode==='mock'?buildMock():mode==='wrong'?null:buildUnitQuiz(UNITS.find(function(u){ return u.id===mode; }),10);
+      if(fresh) quiz(v,fresh,mode); else wrongStart(v);
+    };
+    $('home').onclick=function(){ stack.length=1; render(); };
+    window.scrollTo(0,0);
+  }
+  if(!qs.length){ v.innerHTML='<div class="tip">문제를 만들지 못했어요.</div>'; return; }
+  show();
+}
+
+stack.push([home,'']);
+render();
+</script>
+</body>
+</html>
