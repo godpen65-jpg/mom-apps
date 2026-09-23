@@ -7,171 +7,217 @@
 <title>중국어 인증제 · 특급 도전</title>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Noto+Sans:wght@500;700&display=swap" rel="stylesheet">
 <style>
+  /* 갤럭시 탭을 눕혀서 쓰는 화면에 맞췄어요. 한 화면에 다 들어가고 스크롤이 없어요.
+     폰이나 세로 화면에서는 위아래로 쌓이고 스크롤돼요. */
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
   :root{
-    --paper:#fff8ef;
-    --ink:#4a3528;
-    --muted:#9b8574;
-    --red:#e2553f;        /* 주조색: 교재 표지 빨강 */
-    --gold:#f4b73d;
-    --line:#f0dfcb;
-    --ok:#3f9b5a;
-    --no:#d9534f;
-    --t1:#3b82c4; --t2:#3f9b5a; --t3:#e0912b; --t4:#d94c5b;  /* 성조 색 */
+    --paper:#fff8ef; --ink:#4a3528; --muted:#9b8574;
+    --red:#e2553f; --gold:#f4b73d; --line:#f0dfcb; --ok:#3f9b5a; --no:#d9534f;
+    --t1:#3b82c4; --t2:#3f9b5a; --t3:#e0912b; --t4:#d94c5b;
   }
-  body{
-    font-family:'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
-    background:var(--paper);color:var(--ink);min-height:100vh;padding:20px 16px 80px;
-  }
-  .wrap{max-width:560px;margin:0 auto;}
+  html,body{height:100%;}
+  body{font-family:'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--paper);color:var(--ink);overflow:hidden;}
+  .app{height:100vh;height:100dvh;display:flex;flex-direction:column;padding:12px 24px 16px;max-width:1400px;margin:0 auto;}
   .py{font-family:'Noto Sans','Segoe UI',sans-serif;font-weight:700;}
   .hz{font-family:'PingFang SC','Noto Sans SC','Microsoft YaHei',sans-serif;}
-  .ga{font-family:'Gaegu',sans-serif;}
-  button{font-family:inherit;cursor:pointer;}
+  button{font-family:inherit;cursor:pointer;color:inherit;}
   .hide{display:none!important;}
+  main{flex:1;min-height:0;display:flex;flex-direction:column;}
 
   /* 윗줄 */
-  .top{display:flex;align-items:center;gap:8px;margin-bottom:14px;min-height:40px;}
-  .back{background:#fff;border:2px solid var(--line);border-radius:99px;width:40px;height:40px;font-size:20px;color:var(--muted);}
-  .top h2{flex:1;font-size:21px;color:var(--red);font-weight:400;}
-  .krbtn{background:#fff;border:2px solid var(--line);border-radius:99px;padding:6px 12px;font-size:14px;color:var(--muted);font-family:'Gaegu',sans-serif;font-weight:700;}
+  .top{display:flex;align-items:center;gap:12px;height:54px;flex:none;margin-bottom:8px;}
+  .back{background:#fff;border:2px solid var(--line);border-radius:99px;width:48px;height:48px;font-size:24px;color:var(--muted);flex:none;}
+  .top h2{flex:1;font-size:24px;color:var(--red);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .krbtn{background:#fff;border:2px solid var(--line);border-radius:99px;padding:8px 16px;font-size:16px;color:var(--muted);font-family:'Gaegu',sans-serif;font-weight:700;flex:none;}
   body.kr .krbtn{background:var(--gold);border-color:var(--gold);color:#fff;}
+  .voice-warn{background:#fde8e7;color:#a33;border-radius:14px;padding:8px 12px;font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;margin-bottom:8px;}
+  .ga{font-family:'Gaegu',sans-serif;font-weight:700;}
 
-  /* 첫 화면 */
-  .hero{text-align:center;padding:10px 0 18px;}
-  .hero .flag{font-size:44px;}
-  .hero h1{font-size:30px;color:var(--red);margin-top:4px;}
-  .hero .sub{font-family:'Gaegu',sans-serif;font-size:17px;color:var(--muted);margin-top:2px;}
-  .dday{display:flex;gap:10px;margin:16px 0 6px;}
-  .dday div{flex:1;background:#fff;border-radius:18px;padding:12px 8px;text-align:center;box-shadow:0 3px 10px rgba(180,120,80,.10);}
-  .dday b{display:block;font-size:26px;color:var(--red);font-weight:400;}
-  .dday span{font-family:'Gaegu',sans-serif;font-size:14px;color:var(--muted);font-weight:700;}
-  .grade{font-family:'Gaegu',sans-serif;font-size:14px;color:var(--muted);text-align:center;margin-bottom:6px;}
+  /* ---------- 첫 화면 ---------- */
+  .home{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1.2fr;gap:24px;padding-top:6px;}
+  .col{display:flex;flex-direction:column;gap:14px;min-height:0;}
+  .brand{display:flex;align-items:center;gap:14px;}
+  .brand .flag{font-size:54px;}
+  .brand h1{font-size:34px;color:var(--red);font-weight:400;line-height:1.1;}
+  .brand .sub{font-family:'Gaegu',sans-serif;font-weight:700;font-size:17px;color:var(--muted);}
+  .stats{display:flex;gap:10px;}
+  .stats div{flex:1;background:#fff;border-radius:18px;padding:10px 6px;text-align:center;box-shadow:0 3px 10px rgba(180,120,80,.10);}
+  .stats b{display:block;font-size:28px;color:var(--red);font-weight:400;}
+  .stats span{font-family:'Gaegu',sans-serif;font-size:15px;color:var(--muted);font-weight:700;}
+  .go{flex:1;min-height:150px;border:none;border-radius:28px;background:var(--red);color:#fff;padding:16px;
+      box-shadow:0 7px 0 #b83d2b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+  .go:active{transform:translateY(5px);box-shadow:0 2px 0 #b83d2b;}
+  .go .r{font-family:'Gaegu',sans-serif;font-weight:700;font-size:20px;opacity:.92;}
+  .go .t{font-size:40px;}
+  .go .d{font-family:'Gaegu',sans-serif;font-weight:700;font-size:19px;opacity:.92;}
+  .pace{text-align:center;font-family:'Gaegu',sans-serif;font-weight:700;font-size:18px;color:#7a5a45;}
+  .stampbox{flex:1;min-height:0;background:#fff;border-radius:22px;padding:14px 16px;box-shadow:0 3px 10px rgba(180,120,80,.10);
+            display:flex;flex-direction:column;justify-content:space-around;gap:6px;}
+  .srow{display:flex;align-items:center;gap:10px;}
+  .slab{font-family:'Gaegu',sans-serif;font-weight:700;font-size:16px;color:var(--muted);width:44px;flex:none;}
+  .sgrid{flex:1;display:grid;grid-template-columns:repeat(10,1fr);gap:5px;}
+  .st{aspect-ratio:1;max-height:5.2vh;width:100%;margin:0 auto;border:none;border-radius:9px;background:#f6ece1;color:#c9b6a4;font-size:13px;padding:0;font-family:'Jua',sans-serif;}
+  .st.mk{background:#fbe3dc;}
+  .st.done{background:#fff1c9;font-size:17px;}
+  .st.now{background:var(--gold);color:#fff;font-size:15px;box-shadow:0 0 0 2px #fff,0 0 0 4px var(--gold);}
+  .menus{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .menu{display:flex;align-items:center;gap:10px;background:#fff;border:none;border-radius:18px;padding:12px;text-align:left;box-shadow:0 3px 10px rgba(180,120,80,.12);}
+  .menu .ic{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex:none;}
+  .menu .t{font-size:17px;}
+  .menu .d{font-family:'Gaegu',sans-serif;font-size:14px;color:var(--muted);font-weight:700;}
 
-  .menu{display:flex;align-items:center;gap:14px;background:#fff;border-radius:20px;padding:16px;margin-top:12px;
-        box-shadow:0 4px 12px rgba(180,120,80,.12);border:none;width:100%;text-align:left;color:inherit;}
-  .menu:active{transform:scale(.98);}
-  .menu .ic{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex:none;}
-  .menu .t{font-size:19px;}
-  .menu .d{font-family:'Gaegu',sans-serif;font-size:15px;color:var(--muted);font-weight:700;}
-  .menu .ar{margin-left:auto;color:#e8c9ad;font-size:24px;}
+  /* ---------- 카드 넘기기 ---------- */
+  .pager{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;}
+  .phead{display:flex;align-items:center;gap:10px;flex:none;}
+  .chip{background:#fdebd9;color:var(--red);border-radius:99px;padding:6px 14px;font-size:17px;white-space:nowrap;}
+  .howto{flex:1;font-family:'Gaegu',sans-serif;font-weight:700;font-size:17px;color:#9a7a55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pbtn{background:#fff;border:2px solid var(--gold);color:#b9801c;border-radius:99px;padding:6px 16px;font-size:17px;flex:none;}
+  .fc{flex:1;min-height:0;background:#fff;border-radius:28px;box-shadow:0 5px 16px rgba(180,120,80,.14);
+      display:flex;align-items:center;gap:20px;padding:20px 32px;position:relative;overflow:hidden;}
+  .fc .body{flex:1;min-width:0;text-align:center;}
+  .fc .py{font-size:clamp(34px,8.5vh,78px);line-height:1.2;}
+  .fc .py.long{font-size:clamp(28px,6.2vh,56px);}
+  .fc .hz{font-size:clamp(18px,4vh,32px);color:var(--muted);margin-top:6px;}
+  .fc .ko{font-family:'Gaegu',sans-serif;font-weight:700;font-size:clamp(22px,5vh,40px);color:#7a5a45;margin-top:10px;}
+  .fc .kr{font-family:'Gaegu',sans-serif;font-weight:700;font-size:clamp(18px,3.6vh,28px);color:#c07a2a;margin-top:4px;display:none;}
+  body.kr .fc .kr{display:block;}
+  .fc .star{color:var(--gold);font-size:.6em;vertical-align:.25em;margin-right:6px;}
+  .fc.veil .ko,.fc.veil .kr{display:none!important;}
+  .fc .peek{display:none;font-family:'Gaegu',sans-serif;font-weight:700;font-size:clamp(20px,4vh,30px);color:#d0a57a;margin-top:10px;}
+  .fc.veil .peek{display:block;}
+  .say{width:96px;height:96px;border-radius:50%;border:none;background:var(--gold);font-size:44px;flex:none;box-shadow:0 5px 0 #d49a25;}
+  .say:active{transform:translateY(3px);box-shadow:0 2px 0 #d49a25;}
+  .say.sm{width:48px;height:48px;font-size:22px;box-shadow:none;background:#fdebd9;}
+  .pfoot{display:flex;align-items:center;gap:14px;flex:none;}
+  .arrow{width:84px;height:64px;border:none;border-radius:20px;background:#fff;font-size:30px;color:var(--red);box-shadow:0 3px 10px rgba(180,120,80,.12);flex:none;}
+  .arrow:disabled{opacity:.3;}
+  .dots{flex:1;display:flex;justify-content:center;flex-wrap:wrap;gap:6px;}
+  .dots i{width:12px;height:12px;border-radius:50%;background:#f0dcc6;}
+  .dots i.sec{background:#f7cfa6;}
+  .dots i.on{background:var(--red);transform:scale(1.3);}
+  .gobtn{height:64px;border:none;border-radius:20px;background:var(--red);color:#fff;font-size:24px;padding:0 28px;box-shadow:0 5px 0 #b83d2b;flex:none;}
 
-  /* 단원 목록 */
-  .week{font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;color:var(--red);margin:18px 4px 6px;}
-  .unit{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:13px 14px;margin-bottom:8px;
-        border:2px solid transparent;width:100%;text-align:left;color:inherit;}
-  .unit.done{border-color:#cfe8d5;}
-  .unit .n{width:38px;height:38px;border-radius:12px;background:#fdebd9;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--red);flex:none;}
-  .unit.done .n{background:var(--ok);color:#fff;}
-  .unit .t{font-size:17px;}
-  .unit .d{font-family:'Gaegu',sans-serif;font-size:14px;color:var(--muted);font-weight:700;}
-
-  /* 공부 카드 */
-  .card{background:#fff;border-radius:20px;padding:16px 16px 14px;margin-bottom:10px;box-shadow:0 3px 10px rgba(180,120,80,.10);
-        display:flex;align-items:center;gap:12px;}
-  .card .body{flex:1;min-width:0;}
-  .card .py{font-size:23px;line-height:1.3;color:var(--ink);}
-  .card .hz{font-size:15px;color:var(--muted);margin-top:2px;}
-  .card .ko{font-family:'Gaegu',sans-serif;font-weight:700;font-size:18px;color:#7a5a45;margin-top:4px;}
-  .card .kr{font-family:'Gaegu',sans-serif;font-size:16px;color:#c07a2a;margin-top:2px;display:none;}
-  body.kr .card .kr{display:block;}
-  .star{color:var(--gold);font-size:15px;margin-right:4px;}
-  .say{width:48px;height:48px;border-radius:50%;border:none;background:#fdebd9;font-size:22px;flex:none;}
-  .say:active,.say.on{background:var(--gold);}
-  .tip{background:#fff3d6;border-radius:16px;padding:12px 14px;margin:6px 0 12px;font-family:'Gaegu',sans-serif;font-size:17px;font-weight:700;line-height:1.5;color:#7a5a30;}
-  .tip .py{font-family:'Noto Sans',sans-serif;font-size:15px;}
-  .h3{font-size:18px;color:var(--red);margin:18px 2px 8px;}
-
-  /* 성조 */
-  .tones{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px;}
-  .tone{background:#fff;border-radius:18px;padding:12px;text-align:center;border:none;color:inherit;box-shadow:0 3px 10px rgba(180,120,80,.10);}
-  .tone svg{width:70px;height:44px;display:block;margin:0 auto 2px;}
-  .tone .py{font-size:34px;}
-  .tone .ko{font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;color:var(--muted);}
+  /* 카드 안 판: 성조, 첫소리, 문장 틀 */
+  .board{flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px;}
+  .board .bt{font-size:24px;color:var(--red);text-align:center;}
+  .tones{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .tone{background:#fffaf3;border:2px solid var(--line);border-radius:20px;padding:10px 6px;text-align:center;}
+  .tone svg{width:80px;height:46px;display:block;margin:0 auto;}
+  .tone .py{font-size:clamp(30px,7vh,52px);}
+  .tone .ko{font-family:'Gaegu',sans-serif;font-weight:700;font-size:16px;color:var(--muted);}
   .c1{color:var(--t1)}.c2{color:var(--t2)}.c3{color:var(--t3)}.c4{color:var(--t4)}
+  .rule{font-family:'Gaegu',sans-serif;font-weight:700;font-size:20px;color:#7a5a30;text-align:center;line-height:1.5;}
+  .rule .py{font-family:'Noto Sans',sans-serif;font-size:18px;}
+  .ini{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+  .ini.few{grid-template-columns:repeat(4,1fr);}
+  .ini button{background:#fffaf3;border:2px solid var(--line);border-radius:16px;padding:8px 4px;}
+  .ini .l{font-family:'Noto Sans',sans-serif;font-weight:700;font-size:clamp(22px,4.6vh,34px);color:var(--red);}
+  .ini .w{font-family:'Noto Sans',sans-serif;font-size:15px;font-weight:700;}
+  .ini .k{font-family:'Gaegu',sans-serif;font-size:14px;color:var(--muted);font-weight:700;}
+  .pat{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;}
+  .pat div{background:#fffaf3;border-radius:14px;padding:10px 14px;}
+  .pat .py{font-size:22px;} .pat .ga{font-size:18px;color:#7a5a45;}
 
-  /* 첫소리 칸 */
-  .ini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;}
-  .ini button{background:#fff;border:none;border-radius:16px;padding:10px 4px;color:inherit;box-shadow:0 3px 8px rgba(180,120,80,.10);}
-  .ini .l{font-family:'Noto Sans',sans-serif;font-weight:700;font-size:26px;color:var(--red);}
-  .ini .w{font-family:'Noto Sans',sans-serif;font-size:14px;font-weight:700;}
-  .ini .k{font-family:'Gaegu',sans-serif;font-size:13px;color:var(--muted);font-weight:700;}
-
-  .big{display:block;width:100%;border:none;border-radius:18px;background:var(--red);color:#fff;font-size:19px;padding:15px;margin-top:14px;}
-  .big.sub{background:#fff;color:var(--red);border:2px solid var(--red);}
-
-  /* 문제 */
-  .bar{height:12px;background:#f3e3d2;border-radius:99px;overflow:hidden;margin-bottom:6px;}
+  /* ---------- 문제 ---------- */
+  .qz{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  .qleft{display:flex;flex-direction:column;gap:10px;min-height:0;}
+  .bar{height:14px;background:#f3e3d2;border-radius:99px;overflow:hidden;flex:none;}
   .bar i{display:block;height:100%;background:var(--gold);border-radius:99px;transition:width .3s;}
-  .qno{font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;color:var(--muted);text-align:right;margin-bottom:10px;}
-  .qbox{background:#fff;border-radius:22px;padding:20px 16px;text-align:center;box-shadow:0 4px 12px rgba(180,120,80,.12);}
-  .qtype{display:inline-block;background:#fdebd9;color:var(--red);border-radius:99px;padding:3px 12px;font-size:14px;margin-bottom:10px;}
-  .qask{font-size:20px;line-height:1.4;}
-  .qshow{margin-top:12px;font-size:28px;line-height:1.35;}
-  .qshow .hz{display:block;font-size:16px;color:var(--muted);margin-top:4px;font-weight:400;}
-  .qshow.koq{font-family:'Gaegu',sans-serif;font-weight:700;color:#7a5a45;font-size:26px;}
-  .blank{display:inline-block;min-width:64px;border-bottom:3px solid var(--gold);margin:0 4px;}
-  .listen{margin:14px auto 0;width:84px;height:84px;border-radius:50%;border:none;background:var(--gold);font-size:38px;box-shadow:0 5px 0 #d49a25;}
-  .listen:active{transform:translateY(3px);box-shadow:0 2px 0 #d49a25;}
-  .opts{display:grid;gap:10px;margin-top:14px;}
+  .qbox{flex:1;min-height:0;background:#fff;border-radius:26px;padding:18px;box-shadow:0 4px 14px rgba(180,120,80,.12);
+        display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;}
+  .qtop{display:flex;gap:8px;align-items:center;}
+  .qtype{background:#fdebd9;color:var(--red);border-radius:99px;padding:4px 14px;font-size:16px;}
+  .qno{font-family:'Gaegu',sans-serif;font-weight:700;font-size:17px;color:var(--muted);}
+  .qask{font-size:clamp(20px,4vh,28px);line-height:1.35;}
+  .qshow{font-size:clamp(26px,6vh,44px);line-height:1.3;}
+  .qshow .hz{display:block;font-size:clamp(16px,3vh,22px);color:var(--muted);font-weight:400;}
+  .qshow.koq{font-family:'Gaegu',sans-serif;font-weight:700;color:#7a5a45;}
+  .qsub{font-family:'Gaegu',sans-serif;font-weight:700;color:#7a5a45;font-size:clamp(18px,3.4vh,24px);}
+  .blank{display:inline-block;min-width:70px;border-bottom:4px solid var(--gold);margin:0 4px;}
+  .listen{width:104px;height:104px;border-radius:50%;border:none;background:var(--gold);font-size:48px;box-shadow:0 6px 0 #d49a25;flex:none;}
+  .listen:active{transform:translateY(4px);box-shadow:0 2px 0 #d49a25;}
+  .qright{display:flex;flex-direction:column;gap:12px;min-height:0;justify-content:center;}
+  .opts{display:grid;gap:12px;}
   .opts.two{grid-template-columns:1fr 1fr;}
-  .opt{background:#fff;border:3px solid var(--line);border-radius:18px;padding:14px 12px;font-size:21px;color:var(--ink);text-align:center;min-height:62px;}
-  .opt .py{font-size:22px;}
-  .opt.kotext{font-family:'Gaegu',sans-serif;font-weight:700;font-size:20px;}
+  .opt{background:#fff;border:3px solid var(--line);border-radius:20px;padding:10px 14px;font-size:clamp(20px,4vh,28px);text-align:center;min-height:clamp(58px,11vh,96px);
+       display:flex;align-items:center;justify-content:center;gap:8px;}
+  .opt .py{font-size:inherit;}
+  .opt.kotext{font-family:'Gaegu',sans-serif;font-weight:700;}
   .opt.ok{border-color:var(--ok);background:#e5f5ea;animation:pop .3s;}
   .opt.no{border-color:var(--no);background:#fde8e7;animation:shake .3s;}
-  .opt:disabled{color:var(--ink);}
-  .opt .num{display:inline-block;width:24px;height:24px;border-radius:50%;background:#f3e3d2;font-size:14px;line-height:24px;margin-right:6px;color:var(--muted);vertical-align:3px;font-family:'Jua',sans-serif;}
-  .fb{margin-top:14px;background:#fff;border-radius:18px;padding:14px;display:flex;align-items:center;gap:10px;}
-  .fb .body{flex:1;text-align:left;}
-  .fb .res{font-size:20px;}
-  .fb .res.ok{color:var(--ok);} .fb .res.no{color:var(--no);}
-  .fb .py{font-size:19px;} .fb .hz{font-size:14px;color:var(--muted);} .fb .ko{font-family:'Gaegu',sans-serif;font-weight:700;font-size:16px;color:#7a5a45;}
-  .fb .kr{font-family:'Gaegu',sans-serif;font-size:15px;color:#c07a2a;display:none;}
+  .opt .num{width:28px;height:28px;border-radius:50%;background:#f3e3d2;font-size:15px;line-height:28px;color:var(--muted);font-family:'Jua',sans-serif;flex:none;}
+  .fb{display:flex;align-items:center;gap:12px;background:#fff;border-radius:20px;padding:10px 14px;}
+  .fb .body{flex:1;min-width:0;}
+  .fb .res{font-size:20px;} .fb .res.ok{color:var(--ok);} .fb .res.no{color:var(--no);}
+  .fb .line{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fb .ko{font-family:'Gaegu',sans-serif;font-weight:700;color:#7a5a45;font-size:18px;}
+  .fb .kr{font-family:'Gaegu',sans-serif;font-weight:700;color:#c07a2a;font-size:16px;display:none;}
   body.kr .fb .kr{display:block;}
-  .next{position:sticky;bottom:12px;}
+  .fb .gobtn{height:58px;font-size:21px;padding:0 20px;}
 
-  /* 결과 */
-  .result{text-align:center;padding:20px 0;}
-  .result .medal{font-size:80px;}
-  .result .sc{font-size:54px;color:var(--red);}
-  .result .gr{font-size:26px;margin-top:4px;}
-  .result .msg{font-family:'Gaegu',sans-serif;font-weight:700;font-size:18px;color:var(--muted);margin-top:8px;}
-  .wrong-list .card .py{font-size:19px;}
+  /* ---------- 결과 ---------- */
+  .res2{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1.2fr;gap:22px;}
+  .rleft{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;}
+  .medal{font-size:84px;}
+  .sc{font-size:60px;color:var(--red);}
+  .gr{font-size:30px;}
+  .msg{font-family:'Gaegu',sans-serif;font-weight:700;font-size:20px;color:var(--muted);}
+  .stamp{width:118px;height:118px;border-radius:50%;border:5px solid var(--red);color:var(--red);display:flex;flex-direction:column;
+         align-items:center;justify-content:center;font-size:44px;transform:rotate(-12deg);animation:stampin .45s ease-out both;}
+  .stamp span{font-size:17px;}
+  .rright{background:#fff;border-radius:24px;padding:14px 16px;display:flex;flex-direction:column;min-height:0;box-shadow:0 3px 10px rgba(180,120,80,.10);}
+  .rright h3{font-size:20px;color:var(--red);font-weight:400;margin-bottom:8px;}
+  .wl{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start;}
+  .wi{display:flex;align-items:center;gap:8px;background:#fffaf3;border-radius:14px;padding:8px 10px;}
+  .wi .body{flex:1;min-width:0;}
+  .wi .py{font-size:18px;} .wi .ga{font-size:16px;color:#7a5a45;}
+  .rbtns{display:flex;gap:10px;margin-top:8px;}
+  .big{flex:1;border:none;border-radius:20px;background:var(--red);color:#fff;font-size:22px;padding:14px 18px;}
+  .big.sub{background:#fff;color:var(--red);border:2px solid var(--red);}
 
+  /* ---------- 꼭 외울 것 · 교재 ---------- */
+  .tabs{display:flex;gap:8px;flex:none;}
+  .tab{border:2px solid var(--line);background:#fff;border-radius:99px;padding:8px 18px;font-size:18px;color:var(--muted);}
+  .tab.on{background:var(--red);border-color:var(--red);color:#fff;}
+  .page{flex:1;min-height:0;background:#fff;border-radius:26px;padding:18px 22px;box-shadow:0 4px 14px rgba(180,120,80,.12);display:flex;flex-direction:column;overflow:auto;}
+  .slist{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;align-content:start;}
+  .units{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:12px;}
+  .unit{background:#fff;border:none;border-radius:20px;padding:12px;box-shadow:0 3px 10px rgba(180,120,80,.10);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;}
+  .unit .n{font-size:32px;}
+  .unit .t{font-size:18px;}
+  .unit .d{font-family:'Noto Sans',sans-serif;font-size:13px;color:var(--muted);font-weight:500;}
 
-  /* 오늘 공부 큰 단추 · 도장판 */
-  .go{display:block;width:100%;border:none;border-radius:24px;background:var(--red);color:#fff;padding:18px 16px;margin-top:8px;
-      box-shadow:0 6px 0 #b83d2b;text-align:center;}
-  .go:active{transform:translateY(4px);box-shadow:0 2px 0 #b83d2b;}
-  .go .r{font-family:'Gaegu',sans-serif;font-weight:700;font-size:16px;opacity:.9;}
-  .go .t{font-size:26px;margin:2px 0;}
-  .go .d{font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;opacity:.9;}
-  .pace{text-align:center;font-family:'Gaegu',sans-serif;font-weight:700;font-size:16px;color:#7a5a45;margin:14px 0 6px;}
-  .stampbox{background:#fff;border-radius:20px;padding:12px 10px;box-shadow:0 3px 10px rgba(180,120,80,.10);}
-  .srow{display:flex;align-items:center;gap:6px;margin:4px 0;}
-  .slab{font-family:'Gaegu',sans-serif;font-weight:700;font-size:13px;color:var(--muted);width:34px;flex:none;}
-  .sgrid{flex:1;display:grid;grid-template-columns:repeat(10,1fr);gap:4px;}
-  .st{aspect-ratio:1;border:none;border-radius:8px;background:#f6ece1;color:#c9b6a4;font-size:11px;padding:0;font-family:'Jua',sans-serif;}
-  .st.mk{background:#fbe3dc;}
-  .st.done{background:#fff1c9;font-size:15px;}
-  .st.now{background:var(--gold);color:#fff;font-size:13px;box-shadow:0 0 0 2px #fff,0 0 0 4px var(--gold);}
-  .card.veil .ko,body.kr .card.veil .kr{display:none;}
-  .card.veil .body::after{content:'👆 눌러서 뜻 보기';display:block;font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;color:#d0a57a;margin-top:4px;}
-  .stamp{margin:14px auto 0;width:120px;height:120px;border-radius:50%;border:5px solid var(--red);color:var(--red);display:flex;flex-direction:column;
-         align-items:center;justify-content:center;font-size:44px;transform:rotate(-12deg);animation:stampin .45s ease-out;}
-  .stamp span{font-size:18px;}
-  @keyframes stampin{0%{transform:scale(2) rotate(-12deg);opacity:0}100%{transform:scale(1) rotate(-12deg);opacity:1}}
   @keyframes pop{50%{transform:scale(1.05)}}
   @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  @keyframes stampin{0%{transform:scale(2) rotate(-12deg);opacity:0}100%{transform:scale(1) rotate(-12deg);opacity:1}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 
-  .voice-warn{background:#fde8e7;color:#a33;border-radius:14px;padding:10px 12px;font-family:'Gaegu',sans-serif;font-weight:700;font-size:15px;margin-bottom:10px;}
-  .foot{text-align:center;font-family:'Gaegu',sans-serif;font-size:13px;color:#c9b6a4;margin-top:28px;line-height:1.7;}
+  /* 키가 작은 태블릿 */
+  @media (max-height:640px) and (orientation:landscape){
+    .medal{font-size:60px;} .sc{font-size:46px;} .gr{font-size:24px;} .msg{font-size:17px;}
+    .stamp{width:90px;height:90px;font-size:32px;} .stamp span{font-size:14px;}
+    .pat{gap:6px 16px;} .pat div{padding:6px 12px;} .pat .py{font-size:18px;} .pat .ga{font-size:15px;}
+    .board{gap:8px;} .board .bt{font-size:20px;}
+  }
+  /* 세로 화면·폰: 위아래로 쌓고 스크롤 */
+  @media (orientation:portrait), (max-width:760px){
+    body{overflow:auto;}
+    .app{height:auto;min-height:100dvh;padding:12px 14px 24px;}
+    .home,.qz,.res2{grid-template-columns:1fr;}
+    .go{min-height:140px;}
+    .menus{grid-template-columns:1fr;}
+    .fc{min-height:52vh;flex-direction:column;padding:24px 18px;}
+    .tones{grid-template-columns:1fr 1fr;}
+    .ini{grid-template-columns:repeat(3,1fr);}
+    .pat,.slist,.wl{grid-template-columns:1fr;}
+    .units{grid-template-columns:1fr 1fr;}
+    .qbox{min-height:40vh;}
+    .howto{white-space:normal;}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="app">
   <div class="top hide" id="top">
     <button class="back" id="back" aria-label="뒤로">‹</button>
     <h2 id="ttl"></h2>
@@ -182,6 +228,7 @@
 </div>
 
 <script>
+
 /* ================================================================
    교재 내용
    - 발음책: 『发音, 你好! 1』
@@ -479,7 +526,7 @@ function go(fn,title){ stack.push([fn,title]); render(); }
 function back(){ stack.pop(); render(); }
 $('back').onclick=back;
 function render(){
-  if('speechSynthesis' in window) speechSynthesis.cancel();
+  audioEl.pause(); if('speechSynthesis' in window) speechSynthesis.cancel();
   const cur=stack[stack.length-1];
   $('top').classList.toggle('hide',stack.length<=1);
   $('ttl').textContent=cur[1]||'';
@@ -487,120 +534,29 @@ function render(){
   cur[0]($('view'));
   window.scrollTo(0,0);
 }
-
 function daysLeft(){
   const now=new Date(); now.setHours(0,0,0,0);
   return Math.round((new Date(EXAM_DAY+'T00:00:00')-now)/86400000);
 }
 function gradeOf(s){ return s>=90?'특급':s>=70?'1급':s>=50?'2급':'다시 도전'; }
+function uniqBy(a){ const seen={}; return a.filter(function(x){ if(seen[x.py]) return false; seen[x.py]=1; return true; }); }
 
-function menu(k,ic,bg,t,d){
-  return '<button class="menu" data-k="'+k+'"><div class="ic" style="background:'+bg+'">'+ic+'</div>'+
-    '<div><div class="t">'+t+'</div><div class="d">'+d+'</div></div><div class="ar">›</div></button>';
-}
-/* veil: 2바퀴에서는 뜻을 가려 두고, 카드를 누르면 보여요 */
-function cardHTML(it,i,veil){
-  return '<div class="card'+(veil?' veil':'')+'"><div class="body">'+
-    '<div class="py">'+(it.star?'<span class="star">★</span>':'')+esc(it.py)+'</div>'+
-    '<div class="hz">'+esc(it.hz)+'</div>'+
-    '<div class="ko">'+esc(it.ko)+'</div>'+
-    (it.kr?'<div class="kr">'+esc(it.kr)+'</div>':'')+
-    '</div><button class="say" data-i="'+i+'" aria-label="듣기">🔊</button></div>';
-}
-function bindSay(el,list){
-  el.querySelectorAll('[data-i]').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); play(list[+b.dataset.i]); }; });
-  el.querySelectorAll('.card.veil').forEach(function(c){ c.onclick=function(){ c.classList.remove('veil'); }; });
-}
-/* 이야기 전체 이어 듣기 */
-function playAll(list){
+/* 이어 듣기: 하나씩 읽으며 onEach(번호) 로 알려 줘요 */
+let seqId=0;
+function playAll(list,onEach){
   audioEl.pause(); if('speechSynthesis' in window) speechSynthesis.cancel();
-  let k=0;
+  const my=++seqId; let k=0;
   function next(){
-    if(k>=list.length) return; const it=list[k++];
-    if(it.a){ audioEl.src='audio/'+it.a; audioEl.onended=next; audioEl.play().catch(next); return; }
+    if(my!==seqId || k>=list.length) return;
+    const idx=k, it=list[k++]; if(onEach) onEach(idx);
+    if(it.a){ audioEl.src='audio/'+it.a; audioEl.onended=function(){ setTimeout(next,500); }; audioEl.play().catch(next); return; }
     if(!('speechSynthesis' in window)) return;
     const u=new SpeechSynthesisUtterance(it.hz); u.lang='zh-CN'; u.rate=0.75; if(zhVoice) u.voice=zhVoice;
-    u.onend=function(){ setTimeout(next,500); }; speechSynthesis.speak(u);
+    u.onend=function(){ setTimeout(next,700); }; speechSynthesis.speak(u);
   }
   next();
 }
-function toneSvg(t){
-  const p={1:'M8 10 L62 10',2:'M8 36 L62 8',3:'M8 18 L35 38 L62 12',4:'M8 8 L62 38'}[t];
-  return '<svg viewBox="0 0 70 44"><path d="'+p+'" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-}
-
-function unitItems(u){
-  if(u.id==='u1') return TONES;
-  if(u.id==='u2') return VOWELS;
-  if(u.ini) return PWORDS.filter(function(w){ return u.ini.indexOf(initialOf(w.py))>=0; });
-  if(u.id==='u9') return PSENT.concat(TWISTERS);
-  return ({S1:S1W.concat(S1S),S2:S2W.concat(S2S),S3:S3W.concat(S3S)})[u.id];
-}
-
-function unitView(v,u){
-  const list=unitItems(u); let h='';
-  if(u.id==='u1'){
-    h+='<div class="tip">중국어는 같은 <span class="py">ma</span>도 소리 높낮이(성조)에 따라 뜻이 달라져요. 선을 따라 손가락으로 그리며 읽어 보세요.</div><div class="tones">';
-    TONES.forEach(function(t,i){
-      h+='<button class="tone c'+t.t+'" data-i="'+i+'">'+toneSvg(t.t)+'<div class="py">'+t.py+'</div>'+
-         '<div class="ko">'+t.name+' · '+t.ko+'</div><div class="ko">'+t.how+'</div></button>';
-    });
-    h+='</div><div class="tip">★ 규칙: <span class="py">bù</span> 뒤에 4성이 오면 <span class="py">bú</span>로 바뀌어요.<br><span class="py">bù + shì → búshì</span>, <span class="py">bù + kèqi → búkèqi</span></div>';
-    v.innerHTML=h;
-  } else if(u.ini){
-    h+='<div class="tip">첫소리마다 <b>대표 단어 하나</b>만 먼저 외워요. ★ 표시가 대표 단어예요.</div><div class="ini">';
-    u.ini.forEach(function(l){
-      const rep=INITIALS.find(function(x){ return x[0]===l; })[1];
-      const w=PWORDS.find(function(x){ return x.py===rep; });
-      h+='<button data-i="'+list.indexOf(w)+'"><div class="l">'+l+'</div><div class="w">'+w.py+'</div><div class="k">'+w.ko+'</div></button>';
-    });
-    h+='</div><div class="h3">단어 모두</div>';
-    list.forEach(function(it,i){ h+=cardHTML(it,i); });
-    v.innerHTML=h;
-  } else if(u.src==null && /^S/.test(u.id)){
-    const words=list.filter(function(x){ return x.kind==='w'; }), sents=list.filter(function(x){ return x.kind==='s'; });
-    h+='<div class="h3">새 단어</div>';
-    words.forEach(function(it){ h+=cardHTML(it,list.indexOf(it)); });
-    h+='<div class="h3">이야기 문장</div>';
-    sents.forEach(function(it){ h+=cardHTML(it,list.indexOf(it)); });
-    v.innerHTML=h;
-  } else {
-    list.forEach(function(it,i){ h+=cardHTML(it,i); });
-    v.innerHTML=h;
-  }
-  bindSay(v,list);
-}
-
-/* 꼭 외울 것 */
-function mustView(v){
-  let h='<div class="h3">★★★ 1. 성조 4개</div><div class="tones">';
-  TONES.forEach(function(t,i){ h+='<button class="tone c'+t.t+'" data-t="'+i+'">'+toneSvg(t.t)+'<div class="py">'+t.py+'</div><div class="ko">'+t.name+'</div></button>'; });
-  h+='</div><div class="h3">★★★ 2. 첫소리 21개 · 대표 단어</div><div class="ini">';
-  const reps=INITIALS.map(function(x){ return PWORDS.find(function(w){ return w.py===x[1]; }); });
-  INITIALS.forEach(function(x,i){ h+='<button data-r="'+i+'"><div class="l">'+x[0]+'</div><div class="w">'+reps[i].py+'</div><div class="k">'+reps[i].ko+'</div></button>'; });
-  h+='</div><div class="h3">★★★ 3. 자꾸 나오는 문장</div>';
-  const sents=uniqBy(S1S.concat(S2S,S3S).filter(function(s){ return s.star; }));
-  sents.forEach(function(s,i){ h+=cardHTML(s,i); });
-  h+='<div class="h3">★★★ 4. 문장 틀 5개 — 빈칸만 바꿔요</div>'+
-    '<div class="tip"><span class="py">___ hǎo ma?</span> ___ 잘 지내?<br>'+
-    '<span class="py">Zhè shì wǒ de ___.</span> 이것은 나의 ___이야.<br>'+
-    '<span class="py">Zhèr yǒu / méiyǒu ___.</span> 여기 ___가 있어요 / 없어요.<br>'+
-    '<span class="py">___ hěn dà.</span> ___가 매우 커요.<br>'+
-    '<span class="py">Gěi wǒ ___.</span> 나에게 ___를 주세요.</div>'+
-    '<div class="h3">★★ 규칙 2개</div>'+
-    '<div class="tip">① <span class="py">bù</span> + 4성 → <span class="py">bú</span> (búshì, búkèqi)<br>'+
-    '② 같은 말을 두 번 → “좀 ~해 봐” (<span class="py">kànkan, děngdeng, tīngting, shuōshuo</span>)</div>'+
-    '<div class="h3">★★ 헷갈리는 짝</div>'+
-    '<div class="tip"><span class="py">yǒu</span> 있다 ↔ <span class="py">yóu</span> ✗<br>'+
-    '<span class="py">bāng</span> 돕다 ↔ <span class="py">bàng</span> ✗<br>'+
-    '<span class="py">nǎr</span> 어디 ↔ <span class="py">nàr</span> 저기<br>'+
-    '<span class="py">zhèr</span> 여기 ↔ <span class="py">nàr</span> 저기</div>';
-  v.innerHTML=h;
-  v.querySelectorAll('[data-t]').forEach(function(b){ b.onclick=function(){ play(TONES[+b.dataset.t]); }; });
-  v.querySelectorAll('[data-r]').forEach(function(b){ b.onclick=function(){ play(reps[+b.dataset.r]); }; });
-  bindSay(v,sents);
-}
-function uniqBy(a){ const seen={}; return a.filter(function(x){ if(seen[x.py]) return false; seen[x.py]=1; return true; }); }
+function stopAll(){ seqId++; }
 
 /* ================================================================
    문제 만들기 — 전부 객관식
@@ -772,122 +728,9 @@ function paceMsg(){
 }
 const ROUND_NAME={1:'익히기',2:'떠올리기',3:'실전'};
 const ROUND_HOW={
-  1:'카드를 눌러 듣고 따라 읽어요. 그다음 문제 10개!',
-  2:'뜻이 가려져 있어요. 먼저 말해 보고 카드를 눌러 확인해요.',
-  3:'카드 없이 바로 문제 15개! 틀린 것만 카드로 다시 봐요.'};
-
-/* 첫 화면 */
-function home(v){
-  const dl=daysLeft(); const r=DB.pos.r, d=DB.pos.d; const fin=r>ROUNDS;
-  const wrongN=Object.keys(DB.wrong).length;
-  let h='<div class="hero"><div class="flag">🐼</div><h1>중국어 인증제</h1>'+
-    '<div class="sub">특급 도전! 발음1 · 스토리1 교재</div></div>'+
-    '<div class="dday"><div><b>'+(dl>0?'D-'+dl:dl===0?'D-DAY':'끝!')+'</b><span>12월 14일 시험</span></div>'+
-    '<div><b>'+Math.min(curIdx()-1,60)+' / 60</b><span>도장</span></div>'+
-    '<div><b>'+(DB.best==null?'–':DB.best)+'</b><span>모의고사 최고</span></div></div>';
-  if(fin){
-    h+='<button class="go" id="go"><div class="r">3바퀴 완주 🏆</div><div class="t">모의고사 40문제</div><div class="d">시험 전까지 여러 번 풀어 봐요</div></button>';
-  } else {
-    const D=DAYS[d-1];
-    h+='<button class="go" id="go"><div class="r">'+r+'바퀴 · '+ROUND_NAME[r]+'</div>'+
-       '<div class="t">'+d+'일차 공부 시작 ▶</div><div class="d">'+esc(dayTitle(D))+(D.pron?' + '+pronLabel(D.pron):'')+'</div></button>';
-  }
-  h+='<div class="pace">'+paceMsg()+'</div>';
-  h+='<div class="stampbox">';
-  for(let rr=1;rr<=ROUNDS;rr++){
-    h+='<div class="srow"><div class="slab">'+rr+'바퀴</div><div class="sgrid">';
-    for(let dd=1;dd<=DAYS_PER;dd++){
-      const k=rr+'-'+dd, done=!!DB.stamps[k], now=!fin&&rr===r&&dd===d;
-      const open=done||now;
-      h+='<button class="st'+(done?' done':'')+(now?' now':'')+(dd===20?' mk':'')+'" '+(open?'data-r="'+rr+'" data-d="'+dd+'"':'disabled')+'>'+(done?'🐼':dd)+'</button>';
-    }
-    h+='</div></div>';
-  }
-  h+='</div>';
-  h+=menu('must','⭐','#fff1c9','꼭 외울 것','시험에 계속 나오는 것만')+
-     menu('book','📚','#fdebd9','교재 전체 보기','단원별로 찾아보기')+
-     menu('wrong','🔁','#fde4e4','틀린 문제 다시',wrongN?wrongN+'개 남았어요':'아직 없어요')+
-     '<div class="foot">누르면 중국어로 읽어 줘요 🔊<br>「한글 발음」은 막힐 때만 잠깐 켜 보세요</div>';
-  v.innerHTML=h;
-  $('go').onclick=function(){ if(fin) go(function(el){ quiz(el,buildMock(3),{mock:true}); },'모의고사'); else openDay(r,d); };
-  v.querySelectorAll('.st[data-r]').forEach(function(b){ b.onclick=function(){ openDay(+b.dataset.r,+b.dataset.d); }; });
-  v.querySelectorAll('.menu').forEach(function(b){
-    b.onclick=function(){
-      const k=b.dataset.k;
-      if(k==='must') go(mustView,'꼭 외울 것');
-      if(k==='book') go(unitList,'교재 전체 보기');
-      if(k==='wrong') go(wrongStart,'틀린 문제 다시');
-    };
-  });
-}
-
-function openDay(r,d){
-  const D=DAYS[d-1];
-  if(D.mock){ go(function(el){ quiz(el,buildMock(r),{r:r,d:d,mock:true}); },r+'바퀴 20일차 모의고사'); return; }
-  if(r===3 && !D.review){ go(function(el){ quiz(el,buildDayQuiz(r,D),{r:r,d:d}); },r+'바퀴 '+d+'일차'); return; }
-  go(function(el){ dayView(el,r,D); },r+'바퀴 '+d+'일차');
-}
-
-/* 하루 공부 화면 */
-function dayView(v,r,D){
-  let h='<div class="tip">'+ROUND_HOW[r]+'</div>';
-  let list=[];
-  if(D.review){
-    list=uniqBy(S1S.concat(S2S,S3S).filter(function(s){ return s.star; }));
-    h+='<div class="h3">★ 자꾸 나오는 문장 '+list.length+'개</div>'+patternTip();
-  } else {
-    list=D.cards.concat(D.pron);
-    h+='<div class="h3">📖 '+esc(STORY_NAME[D.story])+(D.listen?' — 처음부터 끝까지':'')+'</div>';
-    if(D.listen) h+='<button class="big sub" id="all" style="margin:0 0 12px">▶ 이야기 전체 이어 듣기</button>';
-  }
-  const storyN=D.review?list.length:D.cards.length;
-  list.forEach(function(it,i){
-    if(!D.review && i===storyN){
-      h+='<div class="h3">🔤 발음 · '+pronLabel(D.pron)+'</div>';
-      if(D.pron===PRON_PLAN[0]) h+=toneBoard();
-    }
-    h+=cardHTML(it,i,r===2);
-  });
-  h+='<button class="big" id="q">'+(D.review?'★ 문제 15개 풀기':'문제 '+(r===3?15:10)+'개 풀기')+' ✏️</button>';
-  v.innerHTML=h;
-  bindSay(v,list);
-  v.querySelectorAll('[data-tone]').forEach(function(b){ b.onclick=function(){ play(TONES[+b.dataset.tone]); }; });
-  if(D.listen) $('all').onclick=function(){ playAll(D.cards); };
-  $('q').onclick=function(){
-    const qs=D.review?buildReviewQuiz():buildDayQuiz(r,D);
-    stack[stack.length-1]=[function(el){ quiz(el,qs,{r:r,d:D.no}); },r+'바퀴 '+D.no+'일차 문제'];
-    render();
-  };
-}
-function toneBoard(){
-  let h='<div class="tones">';
-  TONES.forEach(function(t,i){
-    h+='<button class="tone c'+t.t+'" data-tone="'+i+'">'+toneSvg(t.t)+'<div class="py">'+t.py+'</div>'+
-       '<div class="ko">'+t.name+' · '+t.how+'</div></button>';
-  });
-  return h+'</div><div class="tip">★ <span class="py">bù</span> 뒤에 4성이 오면 <span class="py">bú</span>로 바뀌어요. (<span class="py">búshì, búkèqi</span>)</div>';
-}
-function patternTip(){
-  return '<div class="tip"><b>문장 틀 5개 — 빈칸만 바꿔요</b><br>'+
-    '<span class="py">___ hǎo ma?</span> ___ 잘 지내?<br>'+
-    '<span class="py">Zhè shì wǒ de ___.</span> 이것은 나의 ___이야.<br>'+
-    '<span class="py">Zhèr yǒu / méiyǒu ___.</span> 여기 ___가 있어요 / 없어요.<br>'+
-    '<span class="py">___ hěn dà.</span> ___가 매우 커요.<br>'+
-    '<span class="py">Gěi wǒ ___.</span> 나에게 ___를 주세요.</div>';
-}
-
-/* 교재 전체 보기 */
-function unitList(v){
-  let h='<div class="tip">찾아보고 싶은 단원을 눌러요.</div>';
-  UNITS.forEach(function(u){
-    h+='<button class="unit" data-id="'+u.id+'"><div class="n">'+u.emo+'</div>'+
-       '<div><div class="t">'+u.t+'</div><div class="d" style="font-family:\'Noto Sans\',sans-serif;font-weight:500">'+esc(u.d)+'</div></div></button>';
-  });
-  v.innerHTML=h;
-  v.querySelectorAll('.unit').forEach(function(b){
-    b.onclick=function(){ const u=UNITS.find(function(x){ return x.id===b.dataset.id; }); go(function(el){ unitView(el,u); },u.t); };
-  });
-}
+  1:'카드를 듣고 따라 읽어요. ▶ 로 넘겨요',
+  2:'뜻을 먼저 말해 보고, 카드를 눌러 확인해요',
+  3:'카드 없이 바로 문제 15개!'};
 
 /* ================================================================
    문제 고르기
@@ -973,28 +816,251 @@ function findItem(py,kind){
 }
 
 /* ================================================================
-   문제 풀기 화면
+   첫 화면 — 왼쪽: 오늘 공부 / 오른쪽: 도장판과 메뉴
+   ================================================================ */
+function home(v){
+  const dl=daysLeft(); const r=DB.pos.r, d=DB.pos.d; const fin=r>ROUNDS;
+  const wrongN=Object.keys(DB.wrong).length;
+  let L='<div class="brand"><div class="flag">🐼</div><div><h1>중국어 인증제</h1><div class="sub">특급 도전! 발음1 · 스토리1 교재</div></div></div>'+
+    '<div class="stats"><div><b>'+(dl>0?'D-'+dl:dl===0?'D-DAY':'끝!')+'</b><span>12월 14일 시험</span></div>'+
+    '<div><b>'+Math.min(curIdx()-1,60)+'/60</b><span>도장</span></div>'+
+    '<div><b>'+(DB.best==null?'–':DB.best)+'</b><span>모의고사 최고</span></div></div>';
+  if(fin){
+    L+='<button class="go" id="go"><div class="r">3바퀴 완주 🏆</div><div class="t">모의고사 40문제</div><div class="d">시험 전까지 여러 번 풀어 봐요</div></button>';
+  } else {
+    const D=DAYS[d-1];
+    L+='<button class="go" id="go"><div class="r">'+r+'바퀴 · '+ROUND_NAME[r]+'</div>'+
+       '<div class="t">'+d+'일차 시작 ▶</div><div class="d">'+esc(dayTitle(D))+(D.pron?' + '+pronLabel(D.pron):'')+'</div></button>';
+  }
+  L+='<div class="pace">'+paceMsg()+'</div>';
+  let R='<div class="stampbox">';
+  for(let rr=1;rr<=ROUNDS;rr++){
+    for(let half=0;half<2;half++){
+      R+='<div class="srow"><div class="slab">'+(half?'':rr+'바퀴')+'</div><div class="sgrid">';
+      for(let dd=half*10+1;dd<=half*10+10;dd++){
+        const k=rr+'-'+dd, done=!!DB.stamps[k], now=!fin&&rr===r&&dd===d;
+        R+='<button class="st'+(done?' done':'')+(now?' now':'')+(dd===20?' mk':'')+'" '+(done||now?'data-r="'+rr+'" data-d="'+dd+'"':'disabled')+'>'+(done?'🐼':dd)+'</button>';
+      }
+      R+='</div></div>';
+    }
+  }
+  R+='</div><div class="menus">'+
+     menu('must','⭐','#fff1c9','꼭 외울 것','자꾸 나오는 것')+
+     menu('book','📚','#fdebd9','교재 보기','단원별로')+
+     menu('wrong','🔁','#fde4e4','틀린 문제',wrongN?wrongN+'개 남음':'없어요')+'</div>';
+  v.innerHTML='<div class="home"><div class="col">'+L+'</div><div class="col">'+R+'</div></div>';
+  $('go').onclick=function(){ if(fin) go(function(el){ quiz(el,buildMock(),{mock:true}); },'모의고사 40문제'); else openDay(r,d); };
+  v.querySelectorAll('.st[data-r]').forEach(function(b){ b.onclick=function(){ openDay(+b.dataset.r,+b.dataset.d); }; });
+  v.querySelectorAll('.menu').forEach(function(b){
+    b.onclick=function(){
+      const k=b.dataset.k;
+      if(k==='must') go(mustView,'꼭 외울 것');
+      if(k==='book') go(unitList,'교재 보기');
+      if(k==='wrong') go(wrongStart,'틀린 문제 다시');
+    };
+  });
+}
+function menu(k,ic,bg,t,d){
+  return '<button class="menu" data-k="'+k+'"><div class="ic" style="background:'+bg+'">'+ic+'</div>'+
+    '<div><div class="t">'+t+'</div><div class="d">'+d+'</div></div></button>';
+}
+
+function openDay(r,d){
+  const D=DAYS[d-1], title=r+'바퀴 '+d+'일차';
+  if(D.mock){ go(function(el){ quiz(el,buildMock(),{r:r,d:d,mock:true}); },title+' · 모의고사 40문제'); return; }
+  if(r===3 && !D.review){ go(function(el){ quiz(el,buildDayQuiz(r,D),{r:r,d:d}); },title+' · 실전 15문제'); return; }
+  go(function(el){ dayView(el,r,D); },title+' · '+dayTitle(D));
+}
+
+/* ================================================================
+   카드 넘기기 — 한 장씩 크게. 좌우로 밀거나 ◀ ▶
+   pages: [{it, sec}] 또는 [{board:'tone'|'ini'|'pat', sec}]
+   ================================================================ */
+function pager(v,pages,opt){
+  let i=0;
+  const secs=uniq(pages.map(function(p){ return p.sec; }));
+  v.innerHTML='<div class="pager"><div class="phead"><div class="chip" id="pchip"></div><div class="howto">'+(opt.how||'')+'</div>'+
+    (opt.listenAll?'<button class="pbtn" id="pall">▶ 처음부터 끝까지 듣기</button>':'')+'</div>'+
+    '<div class="fc" id="fc"></div>'+
+    '<div class="pfoot"><button class="arrow" id="prev" aria-label="앞 카드">◀</button><div class="dots" id="dots"></div>'+
+    '<button class="arrow" id="next" aria-label="다음 카드">▶</button>'+
+    (opt.done?'<button class="gobtn" id="pdone">'+opt.doneText+'</button>':'')+'</div></div>';
+  function draw(auto){
+    const p=pages[i], fc=$('fc');
+    $('pchip').textContent=p.sec;
+    fc.className='fc'+(opt.veil&&p.it?' veil':'');
+    if(p.board){ fc.innerHTML=boardHTML(p.board,p.list); bindBoard(fc,p.board,p.list); }
+    else {
+      const it=p.it;
+      fc.innerHTML='<div class="body"><div class="py'+(it.py.length>18?' long':'')+'">'+(it.star?'<span class="star">★</span>':'')+esc(it.py)+'</div>'+
+        '<div class="hz">'+esc(it.hz)+'</div><div class="ko">'+esc(it.ko)+'</div>'+(it.kr?'<div class="kr">'+esc(it.kr)+'</div>':'')+
+        '<div class="peek">👆 눌러서 뜻 보기</div></div><button class="say" id="say" aria-label="듣기">🔊</button>';
+      fc.onclick=function(){ fc.classList.remove('veil'); play(it); };
+      if(auto) setTimeout(function(){ play(it); },200);
+    }
+    $('prev').disabled=i===0; $('next').disabled=i===pages.length-1;
+    $('dots').innerHTML=pages.map(function(q,k){ return '<i class="'+(k===i?'on':(secs.indexOf(q.sec)%2?'sec':''))+'"></i>'; }).join('');
+    if($('pdone')) $('pdone').classList.toggle('hide',!opt.doneAlways && i<pages.length-1);
+  }
+  function move(n){ const j=i+n; if(j<0||j>=pages.length) return; stopAll(); i=j; draw(true); }
+  $('prev').onclick=function(){ move(-1); };
+  $('next').onclick=function(){ move(1); };
+  if($('pdone')) $('pdone').onclick=function(){ stopAll(); opt.done(); };
+  if(opt.listenAll) $('pall').onclick=function(){
+    const idx=[]; pages.forEach(function(p,k){ if(p.it && p.sec===opt.listenAll) idx.push(k); });
+    playAll(idx.map(function(k){ return pages[k].it; }),function(n){ i=idx[n]; draw(false); });
+  };
+  /* 손가락으로 밀어서 넘기기 */
+  let sx=null;
+  $('fc').addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; },{passive:true});
+  $('fc').addEventListener('touchend',function(e){
+    if(sx==null) return; const dx=e.changedTouches[0].clientX-sx; sx=null;
+    if(Math.abs(dx)>60) move(dx<0?1:-1);
+  });
+  draw(true);
+}
+function toneSvg(t){
+  const p={1:'M8 10 L62 10',2:'M8 36 L62 8',3:'M8 18 L35 38 L62 12',4:'M8 8 L62 38'}[t];
+  return '<svg viewBox="0 0 70 44"><path d="'+p+'" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+function boardHTML(b,list){
+  if(b==='tone'){
+    let h='<div class="board"><div class="bt">성조 4개 — 선을 따라 손으로 그리며 읽어요</div><div class="tones">';
+    TONES.forEach(function(t,i){ h+='<button class="tone c'+t.t+'" data-t="'+i+'">'+toneSvg(t.t)+'<div class="py">'+t.py+'</div><div class="ko">'+t.name+' · '+t.ko+'</div><div class="ko">'+t.how+'</div></button>'; });
+    return h+'</div><div class="rule">★ <span class="py">bù</span> 뒤에 4성이 오면 <span class="py">bú</span>로 바뀌어요 (<span class="py">búshì, búkèqi</span>)</div></div>';
+  }
+  if(b==='ini'){
+    let h='<div class="board"><div class="bt">첫소리 '+list.length+'개 · 대표 단어</div><div class="ini'+(list.length<7?' few':'')+'">';
+    list.forEach(function(x,i){ const w=repOf(x); h+='<button data-r="'+i+'"><div class="l">'+x+'</div><div class="w">'+w.py+'</div><div class="k">'+w.ko+'</div></button>'; });
+    return h+'</div></div>';
+  }
+  if(b==='pat'){
+    return '<div class="board"><div class="bt">문장 틀 5개 — 빈칸만 바꿔 끼워요</div><div class="pat">'+
+      '<div><div class="py">___ hǎo ma?</div><div class="ga">___ 잘 지내?</div></div>'+
+      '<div><div class="py">Zhè shì wǒ de ___.</div><div class="ga">이것은 나의 ___이야.</div></div>'+
+      '<div><div class="py">Zhèr yǒu / méiyǒu ___.</div><div class="ga">여기 ___가 있어요 / 없어요.</div></div>'+
+      '<div><div class="py">___ hěn dà.</div><div class="ga">___가 매우 커요.</div></div>'+
+      '<div><div class="py">Gěi wǒ ___.</div><div class="ga">나에게 ___를 주세요.</div></div>'+
+      '<div><div class="py">kànkan · děngdeng</div><div class="ga">두 번 말하면 “좀 ~해 봐”</div></div></div></div>';
+  }
+  if(b==='pairs'){
+    return '<div class="board"><div class="bt">헷갈리는 짝</div><div class="pat">'+
+      '<div><div class="py">yǒu ✔ · yóu ✘</div><div class="ga">있다</div></div>'+
+      '<div><div class="py">bāng ✔ · bàng ✘</div><div class="ga">돕다</div></div>'+
+      '<div><div class="py">nǎr · nàr</div><div class="ga">어디 · 저기</div></div>'+
+      '<div><div class="py">zhèr · nàr</div><div class="ga">여기 · 저기</div></div>'+
+      '<div><div class="py">bù hǎo · búshì</div><div class="ga">bù + 4성 → bú</div></div>'+
+      '<div><div class="py">nǐ · nín</div><div class="ga">너 · 당신(높임)</div></div></div></div>';
+  }
+  return '';
+}
+function repOf(ini){ const rep=INITIALS.find(function(x){ return x[0]===ini; })[1]; return PWORDS.find(function(w){ return w.py===rep; }); }
+function bindBoard(el,b,list){
+  el.onclick=null;
+  el.querySelectorAll('[data-t]').forEach(function(x){ x.onclick=function(){ play(TONES[+x.dataset.t]); }; });
+  el.querySelectorAll('[data-r]').forEach(function(x){ x.onclick=function(){ play(repOf(list[+x.dataset.r])); }; });
+}
+
+/* 하루 공부: 이야기 카드 → 발음 카드 → 문제 */
+function dayView(v,r,D){
+  const pages=[];
+  let listenAll=null;
+  if(D.review){
+    pages.push({board:'pat',sec:'★ 문장 틀'});
+    pages.push({board:'pairs',sec:'★ 헷갈리는 짝'});
+    uniqBy(S1S.concat(S2S,S3S).filter(function(s){ return s.star; })).forEach(function(s){ pages.push({it:s,sec:'★ 자꾸 나오는 문장'}); });
+  } else {
+    const sec='📖 '+STORY_NAME[D.story]+(D.listen?' · 이어 듣기':'');
+    D.cards.forEach(function(it){ pages.push({it:it,sec:sec}); });
+    if(D.listen) listenAll=sec;
+    const psec='🔤 발음 · '+pronLabel(D.pron);
+    if(D.pron===PRON_PLAN[0]) pages.push({board:'tone',sec:psec});
+    else if(D.pron[0].kind==='w'){
+      const inis=uniq(D.pron.map(function(w){ return initialOf(w.py); }).filter(Boolean));
+      pages.push({board:'ini',list:inis,sec:psec});
+    }
+    D.pron.forEach(function(it){ pages.push({it:it,sec:psec}); });
+  }
+  const n=D.review?15:(r===3?15:10);
+  pager(v,pages,{
+    how:ROUND_HOW[r], veil:r===2, listenAll:listenAll,
+    doneText:'문제 '+n+'개 풀기 ✏️',
+    done:function(){
+      const qs=D.review?buildReviewQuiz():buildDayQuiz(r,D);
+      stack[stack.length-1]=[function(el){ quiz(el,qs,{r:r,d:D.no}); },r+'바퀴 '+D.no+'일차 · 문제'];
+      render();
+    }
+  });
+}
+
+/* 꼭 외울 것: 탭 4개 */
+function mustView(v){
+  const tabs=[['tone','성조'],['ini','첫소리 21'],['sent','자꾸 나오는 문장'],['pat','문장 틀'],['pairs','헷갈리는 짝']];
+  const sents=uniqBy(S1S.concat(S2S,S3S).filter(function(s){ return s.star; }));
+  v.innerHTML='<div class="pager"><div class="tabs">'+tabs.map(function(t,i){ return '<button class="tab'+(i?'':' on')+'" data-k="'+t[0]+'">'+t[1]+'</button>'; }).join('')+
+    '</div><div class="page" id="pg"></div></div>';
+  function show(k){
+    const pg=$('pg');
+    v.querySelectorAll('.tab').forEach(function(b){ b.classList.toggle('on',b.dataset.k===k); });
+    if(k==='sent'){
+      pg.innerHTML='<div class="slist">'+sents.map(function(s,i){
+        return '<div class="wi"><div class="body"><div class="py">'+esc(s.py)+'</div><div class="ga">'+esc(s.ko)+'</div></div><button class="say sm" data-i="'+i+'">🔊</button></div>';
+      }).join('')+'</div>';
+      pg.querySelectorAll('[data-i]').forEach(function(b){ b.onclick=function(){ play(sents[+b.dataset.i]); }; });
+    } else {
+      const list=k==='ini'?INITIALS.map(function(x){ return x[0]; }):null;
+      pg.innerHTML=boardHTML(k,list); bindBoard(pg,k,list);
+    }
+  }
+  v.querySelectorAll('.tab').forEach(function(b){ b.onclick=function(){ show(b.dataset.k); }; });
+  show('tone');
+}
+
+/* 교재 보기 */
+function unitItems(u){
+  if(u.id==='u1') return [{board:'tone',sec:'성조'}].concat(TONES.map(function(t){ return {it:t,sec:'성조'}; }));
+  if(u.id==='u2') return VOWELS.map(function(x){ return {it:x,sec:'모음'}; });
+  if(u.ini) return [{board:'ini',list:u.ini,sec:u.t}].concat(PWORDS.filter(function(w){ return u.ini.indexOf(initialOf(w.py))>=0; }).map(function(w){ return {it:w,sec:u.t}; }));
+  if(u.id==='u9') return PSENT.concat(TWISTERS).map(function(x){ return {it:x,sec:u.t}; });
+  const L=STORY_LIST[u.id];
+  return L.w.map(function(x){ return {it:x,sec:'새 단어'}; }).concat(L.s.map(function(x){ return {it:x,sec:'이야기 문장'}; }));
+}
+function unitList(v){
+  v.innerHTML='<div class="units">'+UNITS.map(function(u){
+    return '<button class="unit" data-id="'+u.id+'"><div class="n">'+u.emo+'</div><div class="t">'+u.t+'</div><div class="d">'+esc(u.d)+'</div></button>';
+  }).join('')+'</div>';
+  v.querySelectorAll('.unit').forEach(function(b){
+    b.onclick=function(){
+      const u=UNITS.find(function(x){ return x.id===b.dataset.id; });
+      go(function(el){ pager(el,unitItems(u),{how:'카드를 누르면 읽어 줘요', listenAll:/^S/.test(u.id)?'이야기 문장':null}); },u.t);
+    };
+  });
+}
+
+/* ================================================================
+   문제 풀기 — 왼쪽 문제, 오른쪽 보기
    ================================================================ */
 function quiz(v,qs,ctx){
   let i=0,score=0; const wrongs=[];
   function show(){
     const q=qs[i];
-    let h='<div class="bar"><i style="width:'+(i/qs.length*100)+'%"></i></div><div class="qno">'+(i+1)+' / '+qs.length+'</div>'+
-      '<div class="qbox"><div class="qtype">'+q.kind+'</div><div class="qask">'+q.ask+'</div>';
-    if(q.show) h+='<div class="qshow py">'+esc(q.show)+(q.showHz?'<span class="hz">'+esc(q.showHz)+'</span>':'')+'</div>';
-    if(q.showKo) h+='<div class="qshow koq">“'+esc(q.showKo)+'”</div>';
-    if(q.showHTML) h+='<div class="qshow py">'+q.showHTML+'</div>';
-    if(q.sub) h+='<div class="qshow koq" style="font-size:18px">'+esc(q.sub)+'</div>';
-    if(q.audio) h+='<button class="listen" id="lis" aria-label="다시 듣기">🔊</button>';
-    h+='</div><div class="opts'+(q.two?' two':'')+'">';
+    let L='<div class="bar"><i style="width:'+(i/qs.length*100)+'%"></i></div><div class="qbox">'+
+      '<div class="qtop"><span class="qtype">'+q.kind+'</span><span class="qno">'+(i+1)+' / '+qs.length+'</span></div>'+
+      '<div class="qask">'+q.ask+'</div>';
+    if(q.show) L+='<div class="qshow py">'+esc(q.show)+(q.showHz?'<span class="hz">'+esc(q.showHz)+'</span>':'')+'</div>';
+    if(q.showKo) L+='<div class="qshow koq">“'+esc(q.showKo)+'”</div>';
+    if(q.showHTML) L+='<div class="qshow py">'+q.showHTML+'</div>';
+    if(q.sub) L+='<div class="qsub">'+esc(q.sub)+'</div>';
+    if(q.audio) L+='<button class="listen" id="lis" aria-label="다시 듣기">🔊</button>';
+    L+='</div>';
+    let R='<div class="opts'+(q.two?' two':'')+'">';
     q.opts.forEach(function(o,k){
-      h+='<button class="opt'+(q.ko?' kotext':'')+'" data-k="'+k+'"><span class="num">'+(k+1)+'</span>'+(q.py?'<span class="py">'+esc(o)+'</span>':esc(o))+'</button>';
+      R+='<button class="opt'+(q.ko?' kotext':'')+'" data-k="'+k+'"><span class="num">'+(k+1)+'</span>'+(q.py?'<span class="py">'+esc(o)+'</span>':'<span>'+esc(o)+'</span>')+'</button>';
     });
-    h+='</div><div id="fb"></div>';
-    v.innerHTML=h;
+    R+='</div><div id="fb"></div>';
+    v.innerHTML='<div class="qz"><div class="qleft">'+L+'</div><div class="qright">'+R+'</div></div>';
     if(q.audio){ $('lis').onclick=function(){ play(q.audio); }; setTimeout(function(){ play(q.audio); },250); }
     v.querySelectorAll('.opt').forEach(function(b){ b.onclick=function(){ answer(+b.dataset.k); }; });
-    window.scrollTo(0,0);
   }
   function answer(k){
     const q=qs[i]; const ok=k===q.ans;
@@ -1003,58 +1069,48 @@ function quiz(v,qs,ctx){
     bs[q.ans].classList.add('ok'); if(!ok) bs[k].classList.add('no');
     const it=q.item; const key=q.type+'|'+it.py;
     if(ok){ score++; delete DB.wrong[key]; }
-    else { wrongs.push(q); DB.wrong[key]={py:it.py,type:q.type,kind:kindOf(it)}; }
+    else { if(!wrongs.some(function(w){ return w.item===it; })) wrongs.push(q); DB.wrong[key]={py:it.py,type:q.type,kind:kindOf(it)}; }
     save(DB);
     $('fb').innerHTML='<div class="fb"><div class="body"><div class="res '+(ok?'ok':'no')+'">'+(ok?'딩동댕! 맞았어요 🎉':'아까워요! 정답은 '+(q.ans+1)+'번')+'</div>'+
-      '<div class="py">'+esc(it.py)+'</div><div class="hz">'+esc(it.hz)+'</div><div class="ko">'+esc(it.ko)+'</div>'+
-      (it.kr?'<div class="kr">'+esc(it.kr)+'</div>':'')+'</div><button class="say" id="fbsay">🔊</button></div>'+
-      '<div class="next"><button class="big" id="nx">'+(i+1<qs.length?'다음 문제 →':'결과 보기')+'</button></div>';
+      '<div class="line"><span class="py">'+esc(it.py)+'</span> <span class="hz" style="color:var(--muted)">'+esc(it.hz)+'</span></div><div class="ko">'+esc(it.ko)+'</div>'+
+      (it.kr?'<div class="kr">'+esc(it.kr)+'</div>':'')+'</div><button class="say sm" id="fbsay">🔊</button>'+
+      '<button class="gobtn" id="nx">'+(i+1<qs.length?'다음 →':'결과 보기')+'</button></div>';
     $('fbsay').onclick=function(){ play(it); };
     $('nx').onclick=function(){ i++; if(i<qs.length) show(); else result(); };
-    $('nx').scrollIntoView({behavior:'smooth',block:'end'});
+    if(!ok) setTimeout(function(){ play(it); },300);
   }
   function result(){
     const pct=Math.round(score/qs.length*100);
-    /* 도장: 오늘 칸을 끝냈으면 다음 날로 */
     let stamped=false;
     if(ctx.r){
       const k=ctx.r+'-'+ctx.d; if(!DB.stamps[k]){ DB.stamps[k]=1; stamped=true; }
-      if(DB.pos.r===ctx.r && DB.pos.d===ctx.d){
-        DB.pos.d++; if(DB.pos.d>DAYS_PER){ DB.pos.d=1; DB.pos.r++; }
-      }
+      if(DB.pos.r===ctx.r && DB.pos.d===ctx.d){ DB.pos.d++; if(DB.pos.d>DAYS_PER){ DB.pos.d=1; DB.pos.r++; } }
     }
     if(ctx.mock && (DB.best==null||pct>DB.best)) DB.best=pct;
     save(DB);
-    let h='<div class="result">';
+    let L='';
     if(ctx.mock){
-      h+='<div class="medal">'+(pct>=90?'🏆':pct>=70?'🥇':pct>=50?'🥈':'💪')+'</div><div class="sc">'+pct+'점</div>'+
-         '<div class="gr">'+gradeOf(pct)+(pct>=90?'!':'')+'</div><div class="msg">'+qs.length+'문제 중 '+score+'개 맞았어요.'+(pct<90?'<br>특급까지 '+Math.ceil((90-pct)*qs.length/100)+'문제 더!':'')+'</div>';
+      L+='<div class="medal">'+(pct>=90?'🏆':pct>=70?'🥇':pct>=50?'🥈':'💪')+'</div><div class="sc">'+pct+'점</div>'+
+         '<div class="gr">'+gradeOf(pct)+(pct>=90?'!':'')+'</div><div class="msg">'+qs.length+'문제 중 '+score+'개 맞았어요.'+(pct<90?' 특급까지 '+Math.ceil((90-pct)*qs.length/100)+'문제 더!':'')+'</div>';
     } else {
-      h+='<div class="medal">'+(pct===100?'🌟':pct>=70?'😊':'💪')+'</div><div class="sc">'+score+' / '+qs.length+'</div>'+
-         '<div class="msg">'+(pct===100?'다 맞았어요!':'틀린 것은 내일 문제에 또 나와요.')+'</div>';
+      L+='<div class="medal">'+(pct===100?'🌟':pct>=70?'😊':'💪')+'</div><div class="sc">'+score+' / '+qs.length+'</div>'+
+         '<div class="msg">'+(pct===100?'다 맞았어요!':'틀린 것은 다음 날 문제에 또 나와요.')+'</div>';
     }
-    if(stamped) h+='<div class="stamp">🐼<span>도장 쾅!</span></div>';
-    h+='</div>';
-    if(wrongs.length){
-      h+='<div class="h3">틀린 것 한 번 더 보기</div><div class="wrong-list">';
-      wrongs.forEach(function(q,k){ h+=cardHTML(q.item,k); });
-      h+='</div>';
-    }
-    h+='<button class="big" id="home">'+(ctx.r?'오늘 공부 끝! 처음으로':'처음으로')+'</button>';
-    if(!ctx.r) h+='<button class="big sub" id="again">한 번 더 풀기</button>';
-    v.innerHTML=h;
-    bindSay(v,wrongs.map(function(q){ return q.item; }));
+    if(stamped) L+='<div class="stamp">🐼<span>도장 쾅!</span></div>';
+    let R='<div class="rright"><h3>'+(wrongs.length?'틀린 것 한 번 더 보기':'틀린 것이 없어요 🎉')+'</h3><div class="wl">'+
+      wrongs.map(function(q,k){ return '<div class="wi"><div class="body"><div class="py">'+esc(q.item.py)+'</div><div class="ga">'+esc(q.item.ko)+'</div></div><button class="say sm" data-i="'+k+'">🔊</button></div>'; }).join('')+
+      '</div><div class="rbtns">'+(ctx.r?'':'<button class="big sub" id="again">한 번 더</button>')+'<button class="big" id="home">'+(ctx.r?'오늘 공부 끝! 처음으로':'처음으로')+'</button></div></div>';
+    v.innerHTML='<div class="res2"><div class="rleft">'+L+'</div>'+R+'</div>';
+    v.querySelectorAll('[data-i]').forEach(function(b){ b.onclick=function(){ play(wrongs[+b.dataset.i].item); }; });
     $('home').onclick=function(){ stack.length=1; render(); };
     if($('again')) $('again').onclick=function(){ if(ctx.wrong) wrongStart(v); else quiz(v,buildMock(),ctx); };
-    window.scrollTo(0,0);
   }
-  if(!qs.length){ v.innerHTML='<div class="tip">문제를 만들지 못했어요.</div>'; return; }
+  if(!qs.length){ v.innerHTML='<div class="page">문제를 만들지 못했어요.</div>'; return; }
   show();
 }
 
 stack.push([home,'']);
 render();
-
 </script>
 </body>
 </html>
