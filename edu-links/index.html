@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>초1 교육청 무료 자료 모음 📚</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Gaegu', sans-serif;
+    background: linear-gradient(160deg, #eafaf1 0%, #f5fce6 50%, #e8f7f6 100%);
+    min-height: 100vh;
+    color: #3d4f45;
+    padding: 24px 18px 60px;
+    overflow-x: hidden;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  .wrap { width: 100%; max-width: 480px; margin: 0 auto; }
+
+  .back {
+    display: inline-block;
+    font-family: 'Jua', sans-serif;
+    font-size: 14px;
+    color: #9bb9a9;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+  .back:hover { color: #2f9e74; }
+
+  header { text-align: center; margin-bottom: 22px; }
+  .emoji-top { font-size: 44px; }
+  h1 {
+    font-family: 'Jua', sans-serif;
+    font-size: 25px;
+    color: #2f9e74;
+    margin: 6px 0 10px;
+    line-height: 1.35;
+  }
+  .intro { font-size: 17px; color: #6d857a; line-height: 1.6; }
+  .intro b { color: #2f9e74; }
+
+  .tag {
+    display: inline-block;
+    font-size: 13px;
+    font-family: 'Jua', sans-serif;
+    background: #d9f2e4;
+    color: #2f9e74;
+    padding: 2px 10px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+
+  /* 순서 안내 */
+  .guide {
+    background: #fbffef;
+    border: 2px solid #ddf0bd;
+    border-radius: 20px;
+    padding: 16px 18px;
+    margin-bottom: 22px;
+    box-shadow: 0 5px 14px rgba(124,168,58,0.12);
+  }
+  .guide-title {
+    font-family: 'Jua', sans-serif;
+    font-size: 17px;
+    color: #74a233;
+    margin-bottom: 10px;
+  }
+  .step { display: flex; gap: 9px; align-items: flex-start; margin-bottom: 7px; font-size: 16px; line-height: 1.45; }
+  .step:last-of-type { margin-bottom: 0; }
+  .step .n {
+    font-family: 'Jua', sans-serif;
+    font-size: 13px;
+    background: #e4f4c9;
+    color: #6a9430;
+    border-radius: 999px;
+    min-width: 21px; height: 21px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step b { color: #3d4f45; }
+  .guide-note { font-size: 14.5px; color: #93a878; margin-top: 10px; line-height: 1.5; }
+
+  /* 자료 카드 */
+  .card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 6px 18px rgba(47,158,116,0.12);
+    border: 2px solid #d5efe1;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .card:hover, .card:active {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(47,158,116,0.22);
+  }
+  .card-row { display: flex; align-items: flex-start; gap: 13px; }
+  .badge {
+    font-size: 27px;
+    width: 50px; height: 50px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #eefaf3;
+    border-radius: 15px;
+  }
+  .card-text { flex: 1; min-width: 0; }
+  .office {
+    display: inline-block;
+    font-family: 'Jua', sans-serif;
+    font-size: 12px;
+    color: #4f9a94;
+    background: #e6f5f4;
+    border-radius: 999px;
+    padding: 1px 9px;
+    margin-bottom: 4px;
+  }
+  .card-title {
+    font-family: 'Jua', sans-serif;
+    font-size: 18px;
+    color: #3d4f45;
+    margin-bottom: 3px;
+    line-height: 1.3;
+  }
+  .card-desc { font-size: 15.5px; color: #7d8f85; line-height: 1.45; }
+  .card-desc b { color: #2f9e74; }
+  .card-note { font-size: 14px; color: #a8b79c; line-height: 1.45; margin-top: 5px; }
+  .card-note b { color: #74a233; }
+  .arrow { font-size: 20px; color: #86d3ac; flex-shrink: 0; margin-top: 12px; }
+
+  .sub {
+    display: block;
+    text-decoration: none;
+    font-size: 15px;
+    color: #8ca396;
+    margin-top: 6px;
+    padding-left: 2px;
+  }
+  .sub:hover { color: #2f9e74; }
+
+  /* 안내 */
+  .notice {
+    background: #f2fbf6;
+    border: 2px solid #d8eee2;
+    border-radius: 18px;
+    padding: 14px 16px;
+    margin-top: 22px;
+    font-size: 14.5px;
+    color: #7d968a;
+    line-height: 1.6;
+  }
+  .notice-title { font-family: 'Jua', sans-serif; font-size: 15px; color: #4f9a7a; margin-bottom: 7px; }
+  .notice li { margin-left: 16px; margin-bottom: 4px; }
+
+  footer {
+    text-align: center;
+    margin-top: 26px;
+    font-size: 15px;
+    color: #9bb0a4;
+    line-height: 1.7;
+  }
+  footer .heart { color: #3fb98a; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="../index.html">‹ 초1 엄마표 놀이터</a>
+
+    <header>
+      <div class="emoji-top">📚🌱</div>
+      <h1>초1 교육청 무료 자료 모음</h1>
+      <p class="intro">
+        전국 교육청이 만들어 무료로 푸는<br>
+        문해력·글쓰기 자료 중에서<br>
+        <b>초1에게 맞는 것만</b> 8개 골랐어요.<br>
+        전부 회원가입 없이 바로 받아요 🎈
+      </p>
+    </header>
+
+    <div class="guide">
+      <div class="guide-title">🧭 이 순서로 쓰면 돼요</div>
+      <div class="step"><span class="n">1</span><div>한글 아직이면 → <b>찬찬한글 · 손바닥 그림책 · 트멍배움 워크북</b></div></div>
+      <div class="step"><span class="n">2</span><div>한글 뗐으면 → <b>대전 하루읽기 기초단계</b>를 하루 한 편 (이게 중심!)</div></div>
+      <div class="step"><span class="n">3</span><div>교재 하나 더 → <b>충남 손에 잡히는 문해력 1학년</b></div></div>
+      <div class="step"><span class="n">4</span><div>막히는 부분만 → <b>경기 온국어</b>에서 그 주제만 뽑아서</div></div>
+      <div class="step"><span class="n">5</span><div>글쓰기 늘리기 → <b>인천 생각이 깊어지는 글쓰기</b></div></div>
+      <div class="step"><span class="n">6</span><div>다 끝나면 → <b>대전 하루읽기 심화단계</b></div></div>
+      <div class="guide-note">
+        한 번에 하나씩만 하세요. 초1한테 문해력 교재를<br>
+        여러 개 돌리면 오히려 책 읽기를 싫어해요 🥲
+      </div>
+    </div>
+
+    <span class="tag">📖 매일 하는 메인 교재</span>
+
+    <a class="card" href="https://www.dje.go.kr/boardCnts/view.do?s=dje&m=03&boardID=10395&viewBoardID=10395&boardSeq=3346732&lev=0&action=view&searchType=&statusYN=W&page=1" target="_blank" rel="noopener">
+      <div class="card-row">
+        <div class="badge">📖</div>
+        <div class="card-text">
+          <div class="office">대전광역시교육청</div>
+          <div class="card-title">하루읽기로 읽기가 술술 (기초단계)</div>
+          <div class="card-desc">하루 한 편씩 50일. 생활문·설명문·동시를 QR 음성으로 듣고 → 따라 읽고 → 혼자 읽은 뒤, 낱말·내용 확인·제목 붙이기·낱말 쓰기까지</div>
+          <div class="card-note">책 이름은 「초등학생 첫 읽기책」이에요</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+    </a>
+
+    <span class="tag">🔤 한글 떼기</span>
+
+    <a class="card" href="https://gnfe.gne.go.kr/ebook/na/ntt/ebookView.do?fileKey=1956946973835f6e766ee0464b931787" target="_blank" rel="noopener">
+      <div class="card-row">
+        <div class="badge">🔤</div>
+        <div class="card-text">
+          <div class="office">경상남도교육청</div>
+          <div class="card-title">찬찬한글</div>
+          <div class="card-desc">한글 떼기의 교과서 같은 자료. 자모 → 낱말 → 받침 순서로 차근차근. 다른 교육청들도 이걸 그대로 갖다 쓸 만큼 검증됐어요</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+    </a>
+
+    <a class="card" href="https://www.jbe.go.kr/mU4MoOkT" target="_blank" rel="noopener">
+      <div class="card-row">
+        <div class="badge">📚</div>
+        <div class="card-text">
+          <div class="office">전북특별자치도교육청</div>
+          <div class="card-title">손바닥 그림책 4세트</div>
+          <div class="card-desc">① 아이 입말로 쓴 일상 이야기 ② 가나다 그림책 ③ 대표받침 + 유창성 ④ 옛이야기. 엄마용 지도서 「우리 아이 읽기 쓰기 어떻게 지도할까?」도 같이 들어 있어요</div>
+          <div class="card-note">유튜브 해설 영상도 있어요 · 가정에서 쓰는 건 OK, 대량 복제는 안 돼요</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+    </a>
+
+    <a class="card" href="https://www.jje.go.kr/learn/board/view.jje?boardId=BBS_0000735&menuCd=DOM_000002003001000000&paging=ok&startPage=1&dataSid=1118480" target="_blank" rel="noopener">
+      <div class="card-row">
+        <div class="badge">✍️</div>
+        <div class="card-text">
+          <div class="office">제주특별자치도교육청</div>
+          <div class="card-title">트멍배움 한글쓰기 워크북</div>
+          <div class="card-desc">연필 잡고 글자 쓰는 것부터. PDF 바로 받아져요</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+    </a>
+
+    <span class="tag">✏️ 문해력 교재 · 글쓰기</span>
+
+    <a class="card" href="http://www.cne.go.kr/boardCnts/list.do?boardID=20720&m=082609&s=cne" target="_blank" rel="noopener">
+      <div class="card-row">
+        <div class="badge">✏️</div>
+        <div class="card-text">
+          <div class="office">충청남도교육청</div>
+          <div class="card-title">손에 잡히는 문해력 1학년</div>
+          <div class="card-desc">충남이 직접 만든 문해력 교재. <b>학생용과 해설서가 따로</b> 있어서 엄마가 봐주기 좋아요. 2·3학년용도 같은 게시판에</div>
+          <div class="card-note">게시판에서 「손에 잡히는 문해력_1학년」 찾으세요</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+    </a>
+
+    <a class="card" href="https://www.ice.go.kr/ice/na/ntt/selectNttInfo.do?mi=11633&nttSn=3367934&bbsId=1630" target="_blank" rel="noopener">
+      <div class="card-row">
+        <div class="badge">🖊️</div>
+        <div class="card-text">
+          <div class="office">인천광역시교육청</div>
+          <div class="card-title">생각이 깊어지는 글쓰기</div>
+          <div class="card-desc">일기만 반복하지 않아요. 소개하는 글, 의견 쓰기, 보고문까지 단계별로. 초1은 '겪은 일 떠올려 일기 쓰기'부터</div>
+          <div class="card-note">1~2학년군 학생용 교재 + 교사용 지도서</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+    </a>
+
+    <span class="tag">🧩 교과서 보충 · 다음 단계</span>
+
+    <a class="card" href="https://sites.google.com/ssem.re.kr/on-learning-class/1%ED%95%99%EB%85%84/%EA%B5%AD%EC%96%B4-1%ED%95%99%EB%85%84-1%ED%95%99%EA%B8%B0" target="_blank" rel="noopener">
+      <div class="card-row">
+        <div class="badge">🧩</div>
+        <div class="card-text">
+          <div class="office">경기도교육청</div>
+          <div class="card-title">경기초등온배움교실 「온국어」 1학년</div>
+          <div class="card-desc">단원별 학습지를 구글 드라이브에서 바로 출력. 받침 있는 글자, 또박또박 읽기, 그림일기 쓰기 등</div>
+          <div class="card-note">2021년에 만든 자료(옛 교육과정)예요. 단원 번호는 신경 쓰지 말고 <b>필요한 주제만</b> 골라 쓰세요</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+    </a>
+    <a class="sub" href="https://sites.google.com/ssem.re.kr/on-learning-class/1%ED%95%99%EB%85%84/%EA%B5%AD%EC%96%B4-1%ED%95%99%EB%85%84-2%ED%95%99%EA%B8%B0" target="_blank" rel="noopener">↳ 온국어 1학년 2학기 (띄어 읽기 · 겪은 일 글쓰기 등) ›</a>
+
+    <a class="card" href="https://www.dje.go.kr/boardCnts/view.do?s=dje&m=03&boardID=10395&viewBoardID=10395&boardSeq=3332487&lev=0&action=view&searchType=&statusYN=W&page=1" target="_blank" rel="noopener" style="margin-top:14px">
+      <div class="card-row">
+        <div class="badge">🚀</div>
+        <div class="card-text">
+          <div class="office">대전광역시교육청</div>
+          <div class="card-title">하루읽기로 읽기가 술술 (심화단계)</div>
+          <div class="card-desc">기초단계를 끝낸 다음에. 소리가 바뀌어 읽히는 낱말(예: 좋아요 → 조아요)이 들어간 글 50편</div>
+          <div class="card-note">초1 후반 ~ 초2용</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+    </a>
+
+    <div class="notice">
+      <div class="notice-title">💡 알아두면 좋아요</div>
+      <ul>
+        <li>전부 교육청이 무료로 푸는 자료예요. 회원가입·로그인 없이 받아져요.</li>
+        <li>선생님용 지도서가 같이 있는 자료가 많아요. 아이 봐줄 때 참고하면 좋아요.</li>
+        <li>교육청 홈페이지는 가끔 주소가 바뀌어요. 링크가 안 열리면 교육청 이름 + 자료 이름으로 검색해 보세요.</li>
+      </ul>
+    </div>
+
+    <footer>
+      초1 딸 키우는 엄마가 직접 찾아 정리했어요 <span class="heart">♥</span><br>
+      좋은 자료 더 찾으면 계속 추가할게요!
+    </footer>
+  </div>
+</body>
+</html>
