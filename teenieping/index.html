@@ -137,7 +137,7 @@
   <div class="sheet">
     <button class="x" id="finderClose" aria-label="닫기">×</button>
     <h2>📷 사진으로 찾기</h2>
-    <p class="help">장난감이나 그림을 찍으면<br>머리색·가슴 무늬 색이 닮은 친구 6명을 보여줘요.</p>
+    <p class="help">장난감이나 그림을 찍으면<br>머리색·가슴 무늬 색이 닮은 친구 9명을 보여줘요.</p>
     <label class="pick">사진 찍기 · 고르기<input type="file" id="photo" accept="image/*"></label>
     <img class="preview" id="preview" alt="">
     <div class="deco-title">머리 장식이 보이면 눌러 주세요 <span>(여러 개 골라도 돼요)</span></div>
@@ -355,8 +355,8 @@ function show() {
     return { w, score: best, file };
   }).sort((x, y) => y.score - x.score));
   const ranked = [];
-  for (let i = 0; ranked.length < 6; i++) for (const l of lists) if (ranked.length < 6 && !ranked.some(r => r.w === l[i].w)) ranked.push(l[i]);
-  ranked.sort((a, b) => a.w.order - b.w.order);   // 6명은 순위 없이 도감 순서대로 보여준다
+  for (let i = 0; ranked.length < 9; i++) for (const l of lists) if (ranked.length < 9 && !ranked.some(r => r.w === l[i].w)) ranked.push(l[i]);
+  ranked.sort((a, b) => a.w.order - b.w.order);   // 9명은 순위 없이 도감 순서대로 보여준다
   statusEl.textContent = '이 중에 있을까요?';
   $('fResults').innerHTML = ranked.map(({ w, file }) => {
     const p = w.p;
