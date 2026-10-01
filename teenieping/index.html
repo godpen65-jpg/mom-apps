@@ -354,7 +354,6 @@ function show() {
     });
     return { w, score: best, file };
   }).sort((x, y) => y.score - x.score));
-  // 배경을 덜 센 비교와 그대로 센 비교에서 번갈아 뽑아 6명을 채운다
   const ranked = [];
   for (let i = 0; ranked.length < 6; i++) for (const l of lists) if (ranked.length < 6 && !ranked.some(r => r.w === l[i].w)) ranked.push(l[i]);
   ranked.sort((a, b) => a.w.order - b.w.order);   // 6명은 순위 없이 도감 순서대로 보여준다
@@ -377,7 +376,8 @@ $('photo').addEventListener('change', async e => {
   try {
     await loadCatalog();
     const photo = await loadImg(url);
-    lastQs = [colorMap(photo, true, true), colorMap(photo, true, false)];
+    // 사진 가장자리 색(배경)은 덜 센다. 실제 장난감 사진 시험에서 이 방식이 가장 잘 맞았다.
+    lastQs = [colorMap(photo, true, true)];
     show();
   } catch (err) {
     console.error(err);
