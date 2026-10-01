@@ -94,8 +94,6 @@
   .pick input { display: none; }
   .preview { display: none; margin: 12px auto 0; max-width: 100%; max-height: 200px; border-radius: 14px; }
   .status { text-align: center; font-family: 'Jua', sans-serif; color: #8a7f95; font-size: 16px; margin-top: 12px; min-height: 22px; }
-  .bar { height: 10px; background: #ffe1ec; border-radius: 999px; overflow: hidden; margin-top: 6px; display: none; }
-  .bar i { display: block; height: 100%; width: 0; background: #e8698f; transition: width .2s; }
   .results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
   .results .card { padding: 8px 4px 10px; }
   .results .pic { height: 90px; }
@@ -135,13 +133,12 @@
   <div class="sheet">
     <button class="x" id="finderClose" aria-label="닫기">×</button>
     <h2>📷 사진으로 찾기</h2>
-    <p class="help">장난감이나 그림을 찍으면<br>가장 닮은 티니핑 친구를 찾아줘요.</p>
+    <p class="help">장난감이나 그림을 찍으면<br>머리색·눈색이 가장 닮은 친구를 찾아줘요.</p>
     <label class="pick">사진 찍기 · 고르기<input type="file" id="photo" accept="image/*"></label>
     <img class="preview" id="preview" alt="">
     <div class="status" id="fStatus"></div>
-    <div class="bar" id="fBar"><i></i></div>
     <div class="results" id="fResults"></div>
-    <p class="help" id="firstNote" style="font-size:14px;margin-top:14px">처음 한 번은 AI를 받느라 1분쯤 걸려요(약 90MB).<br>와이파이에서 해 주세요. 다음부터는 금방 돼요.<br>사진은 휴대폰 밖으로 나가지 않아요.</p>
+    <p class="help" style="font-size:14px;margin-top:14px">티니핑이 화면 가운데에 크게 나오게 찍으면 더 잘 찾아요.<br>사진은 휴대폰 밖으로 나가지 않아요.</p>
   </div>
 </div>
 <script>
@@ -234,85 +231,60 @@ listEl.addEventListener('click', e => {
 drawTabs(); render();
 </script>
 
-<script type="module">
-const LIB = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1';
-const MODEL = 'Xenova/clip-vit-base-patch32';
-const CACHE_KEY = 'clip-b32-v1';
+<script>
+(() => {
 const $ = id => document.getElementById(id);
-const modal = $('finder'), statusEl = $('fStatus'), bar = $('fBar'), barFill = bar.firstElementChild;
-
+const modal = $('finder'), statusEl = $('fStatus');
 $('finderBtn').addEventListener('click', () => modal.classList.add('open'));
 $('finderClose').addEventListener('click', () => modal.classList.remove('open'));
 modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
 
-function say(text, frac) {
-  statusEl.textContent = text;
-  if (frac == null) { bar.style.display = 'none'; return; }
-  bar.style.display = 'block'; barFill.style.width = Math.round(frac * 100) + '%';
+// 색깔 지도: 색이 뚜렷한 점만 골라 (색상 18칸 × 진하기 3칸)에 몇 개씩 있는지 센다.
+// 흰색·회색·검정은 배경과 섞이기 쉬워서 뺀다. 머리가 있는 윗부분과 옷이 있는 아랫부분을 따로 세어
+// 머리색이 가장 크게 비교되게 한다.
+const HB = 18, SB = 3, SMIN = 0.2, VMIN = 0.3, SIZE = 96;
+function colorMap(img, centerWeight) {
+  const k = Math.min(SIZE / img.naturalWidth, SIZE / img.naturalHeight, 1);
+  const W = Math.max(1, Math.round(img.naturalWidth * k)), H = Math.max(1, Math.round(img.naturalHeight * k));
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const ctx = c.getContext('2d'); ctx.imageSmoothingQuality = 'high'; ctx.drawImage(img, 0, 0, W, H);
+  const d = ctx.getImageData(0, 0, W, H).data;
+  const bin = new Int16Array(W * H).fill(-1), wt = new Float32Array(W * H);
+  let y0 = H, y1 = -1;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const n = y * W + x, i = n * 4;
+    let w = d[i + 3] / 255;
+    if (centerWeight) { const dx = (x - W / 2) / (W * 0.3), dy = (y - H / 2) / (H * 0.3); w *= Math.exp(-(dx * dx + dy * dy) / 2); }
+    if (w <= 0) continue;
+    const r = d[i] / 255, g = d[i + 1] / 255, b = d[i + 2] / 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), ch = mx - mn;
+    const s = mx > 0 ? ch / mx : 0;
+    if (!(s > SMIN && mx > VMIN)) continue;
+    let h = mx === r ? ((g - b) / ch) % 6 : mx === g ? (b - r) / ch + 2 : (r - g) / ch + 4;
+    if (h < 0) h += 6;
+    bin[n] = Math.min(Math.floor(h / 6 * HB), HB - 1) * SB + Math.min(Math.floor((s - SMIN) / (1 - SMIN) * SB), SB - 1);
+    wt[n] = w;
+    if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  const cut = y0 + (y1 - y0) * 0.45;
+  const whole = new Float32Array(HB * SB), top = new Float32Array(HB * SB), bot = new Float32Array(HB * SB);
+  for (let n = 0; n < bin.length; n++) {
+    if (bin[n] < 0) continue;
+    whole[bin[n]] += wt[n];
+    (Math.floor(n / W) < cut ? top : bot)[bin[n]] += wt[n];
+  }
+  for (const v of [whole, top, bot]) { let t = 0; for (const x of v) t += x; if (t > 0) for (let j = 0; j < v.length; j++) v[j] /= t; }
+  return { whole, top, bot };
 }
-
-// 모든 그림을 흰 바탕 정사각형 캔버스에 그려서 AI에 넣는다 (투명 배경이 검게 바뀌지 않게)
-function toCanvas(img) {
-  const size = 320, c = document.createElement('canvas');
-  c.width = c.height = size;
-  const ctx = c.getContext('2d');
-  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, size, size);
-  const k = Math.min(size / img.naturalWidth, size / img.naturalHeight);
-  const w = img.naturalWidth * k, h = img.naturalHeight * k;
-  ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
-  return c;
-}
+function overlap(a, b) { let m = 0; for (let k = 0; k < a.length; k++) m += Math.min(a[k], b[k]); return m; }
+function similar(q, v) { return 0.2 * overlap(q.whole, v.whole) + 0.8 * (0.6 * overlap(q.top, v.top) + 0.4 * overlap(q.bot, v.bot)); }
 function loadImg(src) {
   return new Promise((ok, bad) => { const im = new Image(); im.onload = () => ok(im); im.onerror = bad; im.src = src; });
 }
 
-let ai = null;
-async function loadAI() {
-  if (ai) return ai;
-  say('AI 불러오는 중…', 0);
-  const T = await import(LIB);
-  const files = {};
-  const progress_callback = p => {
-    if (p.status === 'progress' && p.total) {
-      files[p.file] = [p.loaded, p.total];
-      let a = 0, b = 0; Object.values(files).forEach(([l, t]) => { a += l; b += t; });
-      say('AI 받는 중… ' + Math.round(a / b * 100) + '%', a / b);
-    }
-  };
-  const processor = await T.AutoProcessor.from_pretrained(MODEL, { progress_callback });
-  const model = await T.CLIPVisionModelWithProjection.from_pretrained(MODEL, { progress_callback, dtype: 'q8' });
-  ai = { T, processor, model };
-  return ai;
-}
-async function embed(canvas) {
-  const { T, processor, model } = ai;
-  const inputs = await processor(T.RawImage.fromCanvas(canvas));
-  const { image_embeds } = await model(inputs);
-  const v = Float32Array.from(image_embeds.data);
-  let n = 0; for (const x of v) n += x * x; n = Math.sqrt(n) || 1;
-  return v.map(x => x / n);
-}
-
-// 도감 그림의 AI 값은 한 번 계산해서 휴대폰에 저장해 둔다
-function idb() {
-  return new Promise((ok, bad) => {
-    const r = indexedDB.open('ping-finder', 1);
-    r.onupgradeneeded = () => r.result.createObjectStore('emb');
-    r.onsuccess = () => ok(r.result); r.onerror = () => bad(r.error);
-  });
-}
-async function cacheGet(db, k) {
-  return new Promise(ok => { try { const q = db.transaction('emb').objectStore('emb').get(k); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); } catch (e) { ok(null); } });
-}
-async function cachePut(db, k, v) {
-  try { db.transaction('emb', 'readwrite').objectStore('emb').put(v, k); } catch (e) {}
-}
-
-const files = [];
 const people = {};   // 영어 이름 → { 카드 정보, 나온 시즌, 그림들 }
 Object.entries(DATA).forEach(([s, list]) => list.forEach(p => {
   const f = p.i.split('/').pop().replace(/\.png$/, '.webp');
-  if (!files.includes(f)) files.push(f);
   const who = people[p.e] || (people[p.e] = { p, seasons: [], files: [] });
   if (!who.seasons.includes(s)) who.seasons.push(s);
   if (!who.files.includes(f)) who.files.push(f);
@@ -321,20 +293,10 @@ Object.entries(DATA).forEach(([s, list]) => list.forEach(p => {
 let catalog = null;
 async function loadCatalog() {
   if (catalog) return catalog;
-  let db = null; try { db = await idb(); } catch (e) {}
   const out = {};
-  for (let i = 0; i < files.length; i++) {
-    const f = files[i], key = CACHE_KEY + '/' + f;
-    let v = db ? await cacheGet(db, key) : null;
-    if (!v) {
-      v = await embed(toCanvas(await loadImg('img/' + encodeURIComponent(f))));
-      if (db) await cachePut(db, key, v);
-    }
-    out[f] = v;
-    say('티니핑 친구들 익히는 중… ' + (i + 1) + '/' + files.length, (i + 1) / files.length);
-  }
-  catalog = out;
-  return catalog;
+  const all = [...new Set(Object.values(people).flatMap(w => w.files))];
+  await Promise.all(all.map(async f => { out[f] = colorMap(await loadImg('img/' + encodeURIComponent(f)), false); }));
+  return (catalog = out);
 }
 
 const esc = t => t.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -343,18 +305,17 @@ $('photo').addEventListener('change', async e => {
   const url = URL.createObjectURL(file);
   const pv = $('preview'); pv.src = url; pv.style.display = 'block';
   $('fResults').innerHTML = '';
+  statusEl.textContent = '찾는 중…';
   try {
-    await loadAI();
     const cat = await loadCatalog();
-    $('firstNote').style.display = 'none';
-    say('찾는 중…');
-    const q = await embed(toCanvas(await loadImg(url)));
+    const q = colorMap(await loadImg(url), true);
     const ranked = Object.values(people).map(w => {
-      let best = -1;
-      w.files.forEach(f => { const v = cat[f]; let d = 0; for (let k = 0; k < v.length; k++) d += v[k] * q[k]; if (d > best) best = d; });
+      let best = 0;
+      w.files.forEach(f => { const m = similar(q, cat[f]); if (m > best) best = m; });
       return { w, score: best };
-    }).sort((a, b) => b.score - a.score).slice(0, 3);
-    say('이 친구 아닐까요?');
+    }).sort((a, b) => b.score - a.score);
+    ranked.length = 3;
+    statusEl.textContent = '이 친구 아닐까요?';
     $('fResults').innerHTML = ranked.map(({ w }, i) => {
       const p = w.p;
       return `<div class="card" style="--c:${p.c}">
@@ -366,10 +327,11 @@ $('photo').addEventListener('change', async e => {
     }).join('');
   } catch (err) {
     console.error(err);
-    say('앗, 잘 안 됐어요. 인터넷 연결을 확인하고 다시 해 주세요.');
+    statusEl.textContent = '앗, 잘 안 됐어요. 다른 사진으로 다시 해 주세요.';
   }
   e.target.value = '';
 });
+})();
 </script>
 </body>
 </html>
