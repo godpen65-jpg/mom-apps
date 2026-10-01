@@ -99,7 +99,7 @@
   .results .pic { height: 90px; }
   .results .pic img { max-height: 90px; }
   .results .name { font-size: 17px; }
-  .rank { font-size: 22px; line-height: 1; }
+  .rank { font-size: 22px; line-height: 1; font-family: 'Jua', sans-serif; color: #b5abbf; }
   .seasons { font-size: 13px; color: #8a7f95; margin-top: 3px; }
 
   .empty { text-align: center; color: #a99fb5; font-size: 18px; padding: 30px 0; }
@@ -133,7 +133,7 @@
   <div class="sheet">
     <button class="x" id="finderClose" aria-label="닫기">×</button>
     <h2>📷 사진으로 찾기</h2>
-    <p class="help">장난감이나 그림을 찍으면<br>머리색·눈색이 가장 닮은 친구를 찾아줘요.</p>
+    <p class="help">장난감이나 그림을 찍으면<br>머리색·가슴 무늬 색이 닮은 친구 6명을 찾아줘요.</p>
     <label class="pick">사진 찍기 · 고르기<input type="file" id="photo" accept="image/*"></label>
     <img class="preview" id="preview" alt="">
     <div class="status" id="fStatus"></div>
@@ -241,7 +241,7 @@ modal.addEventListener('click', e => { if (e.target === modal) modal.classList.r
 
 // 색깔 지도: 색이 뚜렷한 점만 골라 (색상 18칸 × 진하기 3칸)에 몇 개씩 있는지 센다.
 // 흰색·회색·검정은 배경과 섞이기 쉬워서 뺀다. 머리가 있는 윗부분과 옷이 있는 아랫부분을 따로 세어
-// 머리색이 가장 크게 비교되게 한다.
+// 머리색이 가장 크게 비교되게 한다. 가슴 무늬가 있는 몸통 윗부분도 따로 센다.
 const HB = 18, SB = 3, SMIN = 0.2, VMIN = 0.3, SIZE = 96;
 function colorMap(img, centerWeight) {
   const k = Math.min(SIZE / img.naturalWidth, SIZE / img.naturalHeight, 1);
@@ -266,18 +266,23 @@ function colorMap(img, centerWeight) {
     wt[n] = w;
     if (y < y0) y0 = y; if (y > y1) y1 = y;
   }
-  const cut = y0 + (y1 - y0) * 0.45;
-  const whole = new Float32Array(HB * SB), top = new Float32Array(HB * SB), bot = new Float32Array(HB * SB);
+  const cut = y0 + (y1 - y0) * 0.45, cut2 = y0 + (y1 - y0) * 0.65;
+  const whole = new Float32Array(HB * SB), top = new Float32Array(HB * SB), bot = new Float32Array(HB * SB), chest = new Float32Array(HB * SB);
   for (let n = 0; n < bin.length; n++) {
     if (bin[n] < 0) continue;
     whole[bin[n]] += wt[n];
-    (Math.floor(n / W) < cut ? top : bot)[bin[n]] += wt[n];
+    const y = Math.floor(n / W);
+    (y < cut ? top : bot)[bin[n]] += wt[n];
+    if (y >= cut && y < cut2) chest[bin[n]] += wt[n];
   }
-  for (const v of [whole, top, bot]) { let t = 0; for (const x of v) t += x; if (t > 0) for (let j = 0; j < v.length; j++) v[j] /= t; }
-  return { whole, top, bot };
+  for (const v of [whole, top, bot, chest]) { let t = 0; for (const x of v) t += x; if (t > 0) for (let j = 0; j < v.length; j++) v[j] /= t; }
+  return { whole, top, bot, chest };
 }
 function overlap(a, b) { let m = 0; for (let k = 0; k < a.length; k++) m += Math.min(a[k], b[k]); return m; }
-function similar(q, v) { return 0.2 * overlap(q.whole, v.whole) + 0.8 * (0.6 * overlap(q.top, v.top) + 0.4 * overlap(q.bot, v.bot)); }
+function similar(q, v) {
+  return 0.2 * overlap(q.whole, v.whole)
+    + 0.8 * (0.6 * overlap(q.top, v.top) + 0.4 * (0.5 * overlap(q.bot, v.bot) + 0.5 * overlap(q.chest, v.chest)));
+}
 function loadImg(src) {
   return new Promise((ok, bad) => { const im = new Image(); im.onload = () => ok(im); im.onerror = bad; im.src = src; });
 }
@@ -314,12 +319,12 @@ $('photo').addEventListener('change', async e => {
       w.files.forEach(f => { const m = similar(q, cat[f]); if (m > best) best = m; });
       return { w, score: best };
     }).sort((a, b) => b.score - a.score);
-    ranked.length = 3;
+    ranked.length = 6;
     statusEl.textContent = '이 친구 아닐까요?';
     $('fResults').innerHTML = ranked.map(({ w }, i) => {
       const p = w.p;
       return `<div class="card" style="--c:${p.c}">
-        <div class="rank">${['🥇', '🥈', '🥉'][i]}</div>
+        <div class="rank">${['🥇', '🥈', '🥉', '4', '5', '6'][i]}</div>
         <div class="pic"><img src="img/${encodeURIComponent(w.files[w.files.length - 1])}" alt="${esc(p.k)}"></div>
         <div class="name">${esc(p.k)}</div>
         <div class="seasons">시즌 ${w.seasons.join(', ')}</div>
