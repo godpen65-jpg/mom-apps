@@ -77,6 +77,12 @@
 
 
   .finder-btn { background: #e8698f; border-color: #e8698f; color: #fff; }
+  .feat-btn { background: #7c8ce0; border-color: #7c8ce0; }
+  .tools { flex-wrap: nowrap; }
+  .tools input { min-width: 0; }
+  .finds .toggle { flex: 1; }
+  .tools .toggle { white-space: nowrap; }
+  .tools + .finds { margin-top: -6px; }
   .modal { position: fixed; inset: 0; background: rgba(74,63,85,.45); display: none; align-items: flex-end; justify-content: center; z-index: 10; }
   .modal.open { display: flex; }
   .sheet {
@@ -122,9 +128,11 @@
   <div class="tabs" id="tabs"></div>
   <div class="tools">
     <input id="q" type="search" placeholder="🔍 이름 찾기">
-    <button class="toggle finder-btn" id="finderBtn">📷 사진으로 찾기</button>
-    <button class="toggle finder-btn" id="featBtn">🔍 특징으로 찾기</button>
     <button class="toggle" id="quizBtn">🙈 이름 가리기</button>
+  </div>
+  <div class="tools finds">
+    <button class="toggle finder-btn" id="finderBtn">📷 사진으로 찾기</button>
+    <button class="toggle finder-btn feat-btn" id="featBtn">🔎 특징으로 찾기</button>
   </div>
   <div id="list"></div>
 
