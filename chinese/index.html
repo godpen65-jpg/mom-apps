@@ -500,10 +500,120 @@ function findVoice(){
   zhVoice=vs.find(function(v){ return /zh[-_]CN/i.test(v.lang); })||vs.find(function(v){ return /^zh/i.test(v.lang); })||null;
 }
 if('speechSynthesis' in window){ findVoice(); speechSynthesis.onvoiceschanged=findVoice; }
+/* CD 음원: 한자 → audio/ 안의 파일 이름. 여기 없는 건 폰 목소리로 읽어요 */
+const AUDIO = {
+  '爸爸':'pw01.mp3',
+  '葡萄':'pw05.mp3',
+  '皮鞋':'pw06.mp3',
+  '妈妈':'pw07.mp3',
+  '马':'pw08.mp3',
+  '飞机':'pw12.mp3',
+  '肚子':'pw15.mp3',
+  '兔子':'pw16.mp3',
+  '喇叭':'pw22.mp3',
+  '老虎':'pw24.mp3',
+  '哥哥':'pw25.mp3',
+  '可乐':'pw28.mp3',
+  '裤子':'pw29.mp3',
+  '看':'pw30.mp3',
+  '喝':'pw31.mp3',
+  '狐狸':'pw32.mp3',
+  '好':'pw33.mp3',
+  '家':'pw35.mp3',
+  '姐姐':'pw36.mp3',
+  '去':'pw38.mp3',
+  '裙子':'pw39.mp3',
+  '中国':'pw45.mp3',
+  '车':'pw46.mp3',
+  '茶':'pw47.mp3',
+  '叉子':'pw48.mp3',
+  '狮子':'pw49.mp3',
+  '蛇':'pw51.mp3',
+  '人':'pw54.mp3',
+  '紫色':'pw56.mp3',
+  '足球':'pw57.mp3',
+  '餐厅':'pw59.mp3',
+  '草莓':'pw60.mp3',
+  '四':'pw61.mp3',
+  '三':'pw62.mp3',
+  '宿舍':'pw63.mp3',
+  '爷爷':'pw64.mp3',
+  '你好！':'ps01.mp3',
+  '爸爸，你好！':'ps02.mp3',
+  '谢谢！':'ps06.mp3',
+  '妈妈，谢谢！':'ps07.mp3',
+  '宝物':'s1w01.mp3',
+  '风':'s1w02.mp3',
+  '跑':'s1w03.mp3',
+  '没有':'s1w04.mp3',
+  '不':'s1w05.mp3',
+  '不是':'s1w06.mp3',
+  '您好！':'s1s02.mp3',
+  '你好吗？':'s1s03.mp3',
+  '我很好。':'s1s04.mp3',
+  '你有宝物吗？':'s1s05.mp3',
+  '我有宝物。':'s1s06.mp3',
+  '这是我的宝物。':'s1s07.mp3',
+  '风很大。':'s1s08.mp3',
+  '快跑！':'s1s09.mp3',
+  '你们好吗？':'s1s11.mp3',
+  '我们不好。':'s1s12.mp3',
+  '我们没有宝物。':'s1s13.mp3',
+  '你们看看！':'s1s14.mp3',
+  '这是我的本子。':'s1s15.mp3',
+  '狼':'s2w01.mp3',
+  '来':'s2w02.mp3',
+  '大家':'s2w03.mp3',
+  '对不起':'s2w07.mp3',
+  '大':'s2w09.mp3',
+  '快':'s2w10.mp3',
+  '它':'s2w11.mp3',
+  '什么':'s2w12.mp3',
+  '这儿有狼吗？':'s2s01.mp3',
+  '这儿没有狼。':'s2s02.mp3',
+  '您去那儿看看。':'s2s03.mp3',
+  '这儿有狼。':'s2s04.mp3',
+  '大家来帮我。':'s2s05.mp3',
+  '狼在哪儿？':'s2s06.mp3',
+  '对不起。':'s2s07.mp3',
+  '大家快来帮我。':'s2s08.mp3',
+  '那是什么？':'s2s09.mp3',
+  '它是狼。':'s2s10.mp3',
+  '狼很大。':'s2s11.mp3',
+  '这儿有牛奶。':'s2s12.mp3',
+  '耳朵很大。':'s2s13.mp3',
+  '可是':'s3w03.mp3',
+  '公平':'s3w04.mp3',
+  '漂亮':'s3w05.mp3',
+  '等等':'s3w07.mp3',
+  '谢谢':'s3w08.mp3',
+  '不客气':'s3w09.mp3',
+  '苹果':'s3w10.mp3',
+  '菠萝':'s3w11.mp3',
+  '你看！':'s3s01.mp3',
+  '她很漂亮！':'s3s02.mp3',
+  '我爱她。':'s3s03.mp3',
+  '可是，我没有钱。':'s3s04.mp3',
+  '你有钱吗？':'s3s05.mp3',
+  '你等等。':'s3s06.mp3',
+  '不客气。':'s3s08.mp3',
+  '快给我钱。':'s3s09.mp3',
+  '您等等。':'s3s10.mp3',
+  '那不公平。':'s3s13.mp3',
+  '给我钱。':'s3s14.mp3',
+  '不行。':'s3s15.mp3',
+  '妈':'tone01.mp3',
+  '啊':'v01.mp3',
+  '喔':'v02.mp3',
+  '鹅':'v03.mp3'
+}; /*AUDIO*/
+function fileOf(it){ return it.a||AUDIO[it.hz]; }
 function play(item){
-  audioEl.pause();
+  audioEl.pause(); audioEl.onended=null; seqId++;
   if('speechSynthesis' in window) speechSynthesis.cancel();
-  if(item.a){ audioEl.src='audio/'+item.a; audioEl.play().catch(function(){ speak(item.hz); }); return; }
+  const f=fileOf(item);
+  // 새 소리로 바뀌며 끊긴 것(AbortError)은 무시해야 폰 목소리가 겹치지 않아요
+  if(f){ audioEl.src='audio/'+f; audioEl.play().catch(function(e){ if(e.name!=='AbortError') speak(item.hz); }); return; }
   speak(item.hz);
 }
 function speak(text){
@@ -556,7 +666,8 @@ function playAll(list,onEach){
   function next(){
     if(my!==seqId || k>=list.length) return;
     const idx=k, it=list[k++]; if(onEach) onEach(idx);
-    if(it.a){ audioEl.src='audio/'+it.a; audioEl.onended=function(){ setTimeout(next,500); }; audioEl.play().catch(next); return; }
+    const f=fileOf(it);
+    if(f){ audioEl.src='audio/'+f; audioEl.onended=function(){ setTimeout(next,500); }; audioEl.play().catch(function(e){ if(e.name!=='AbortError') next(); }); return; }
     if(!('speechSynthesis' in window)) return;
     const u=new SpeechSynthesisUtterance(it.hz); u.lang='zh-CN'; u.rate=0.75; if(zhVoice) u.voice=zhVoice;
     u.onend=function(){ setTimeout(next,700); }; speechSynthesis.speak(u);
