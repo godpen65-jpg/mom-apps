@@ -114,6 +114,9 @@
 
   .empty { text-align: center; color: #a99fb5; font-size: 18px; padding: 30px 0; }
   footer { text-align: center; margin-top: 30px; font-size: 13px; color: #b5abbf; line-height: 1.7; }
+  #visits { margin-top: 10px; font-family: 'Jua', sans-serif; }
+  #visits b { color: #e8698f; font-weight: normal; }
+  @media print { #visits { display: none; } }
   footer a { color: #b5abbf; }
 </style>
 </head>
@@ -139,6 +142,7 @@
   <footer>
     캐릭터 그림과 이름의 저작권은 SAMG 엔터테인먼트에 있어요.<br>
     그림 출처: <a href="https://catchteenieping.fandom.com/wiki/List_of_Teeniepings" target="_blank" rel="noopener">Catch! Teenieping 팬 위키</a>
+    <div id="visits">💝 지금까지 <b id="visit-count">…</b>번 찾아왔어요</div>
   </footer>
 </div>
 
@@ -497,6 +501,13 @@ function show() {
     </div>`).join('');
 }
 })();
+</script>
+<script>
+// 누적 방문 수 (놀이터 첫 화면과 같은 카운터 서비스, 이 페이지 몫은 teenieping)
+fetch('https://abacus.jasoncameron.dev/hit/godpen65-sites/teenieping')
+  .then(r => r.json())
+  .then(d => { document.getElementById('visit-count').textContent = d && d.value != null ? Number(d.value).toLocaleString() : '-'; })
+  .catch(() => { document.getElementById('visit-count').textContent = '-'; });
 </script>
 </body>
 </html>
