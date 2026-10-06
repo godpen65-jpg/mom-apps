@@ -142,7 +142,7 @@
   <footer>
     캐릭터 그림과 이름의 저작권은 SAMG 엔터테인먼트에 있어요.<br>
     그림 출처: <a href="https://catchteenieping.fandom.com/wiki/List_of_Teeniepings" target="_blank" rel="noopener">Catch! Teenieping 팬 위키</a>
-    <div id="visits">💝 지금까지 <b id="visit-count">…</b>번 찾아왔어요</div>
+    <div id="visits">💝 지금까지 <b id="visit-count">…</b>명이 찾아왔어요</div>
   </footer>
 </div>
 
@@ -503,11 +503,21 @@ function show() {
 })();
 </script>
 <script>
-// 누적 방문 수 (놀이터 첫 화면과 같은 카운터 서비스, 이 페이지 몫은 teenieping)
-fetch('https://abacus.jasoncameron.dev/hit/godpen65-sites/teenieping')
-  .then(r => r.json())
-  .then(d => { document.getElementById('visit-count').textContent = d && d.value != null ? Number(d.value).toLocaleString() : '-'; })
-  .catch(() => { document.getElementById('visit-count').textContent = '-'; });
+// 누적 방문자 수: 한 휴대폰(브라우저)은 처음 한 번만 센다. 다음부터는 숫자만 읽어 온다.
+(() => {
+  const el = document.getElementById('visit-count');
+  let seen = false;
+  try { seen = localStorage.getItem('tp-counted') === '1'; } catch (e) {}
+  fetch('https://abacus.jasoncameron.dev/' + (seen ? 'get' : 'hit') + '/godpen65-sites/teenieping-people')
+    .then(r => r.json())
+    .then(d => {
+      if (d && d.value != null) {
+        el.textContent = Number(d.value).toLocaleString();
+        if (!seen) try { localStorage.setItem('tp-counted', '1'); } catch (e) {}
+      } else el.textContent = '-';
+    })
+    .catch(() => { el.textContent = '-'; });
+})();
 </script>
 </body>
 </html>
