@@ -71,6 +71,10 @@
   .week td.lb{text-align:left;padding-left:6px;white-space:nowrap;color:var(--muted);}
   .week td{word-break:keep-all;}
   .week td.tot{color:var(--pink);}
+  .week td.dash{outline:2px dashed #f0a5c0;outline-offset:-4px;border-radius:8px;color:var(--pink);}
+  .week tr.off td{color:#cfc6d6;}
+  .week tr.off td.dash{outline-color:#ead9e2;}
+  .week td.lb small{font-size:10px;color:#cfc6d6;}
 
   .note{font-family:'Gaegu',sans-serif;font-size:14.5px;color:var(--muted);line-height:1.6;margin-top:12px;}
   .btns{display:flex;gap:8px;margin-top:14px;}
@@ -273,30 +277,36 @@ function tick(name){ var k=doneKey(sel), d=get(k)||{}; d[name]=!d[name]; put(k,d
 function clearToday(){ put(doneKey(sel),{}); renderDay(); }
 
 function renderWeek(){
+  /* 이름이 같은 칸의 분을 요일별로 더해요. 켜기단추 칸은 점선으로 */
   var rows=[
-    ['웅진 문해력', function(i){ return 15; }],
-    ['빨간펜', function(i){ return [15,0,30,30,0,0,0][i]; }],
-    ['밀크티', function(i){ return [10,10,30,30,30,10,40][i]; }],
-    ['만점왕 등 3개', function(i){ return 15; }],
-    ['랭콘 숙제', function(i){ return (i===1||i===5)?30:0; }],
+    ['웅진 문해력',['웅진 문해력']],
+    ['빨간펜',['빨간펜 문해력']],
+    ['밀크티',['밀크티']],
+    ['만점왕 등 3개',['만점왕 · 초끝 구구단 · 토그놀 숙제']],
+    ['랭콘 숙제',['랭콘 숙제']],
+    ['그림일기',['그림일기 쓰기']],
+    ['학교 영어 숙제',['학교 영어 숙제'],'eng'],
+    ['받아쓰기 연습',['받아쓰기 연습'],'dict'],
+    ['단원평가 준비',['단원평가 준비'],'test'],
   ];
-  var extra = function(i){ return studyMin(i) - rows.reduce(function(s,r){return s+r[1](i);},0); };
+  function mins(i,names){
+    return D[i].items.reduce(function(s,it){ return s + (names.indexOf(it[1])>=0 ? it[3] : 0); },0);
+  }
   var h='<tr><th></th>'+NAMES.map(function(n){return '<th>'+n+'</th>';}).join('')+'</tr>';
   rows.forEach(function(r){
-    h+='<tr><td class="lb">'+r[0]+'</td>';
-    for(var i=0;i<7;i++){ var v=r[1](i); h+='<td>'+(v||'')+'</td>'; }
+    var opt=r[2], off=opt && !opts[opt];
+    h+='<tr'+(opt?' class="opt'+(off?' off':'')+'"':'')+'><td class="lb">'+r[0]+(off?' <small>꺼짐</small>':'')+'</td>';
+    for(var i=0;i<7;i++){ var v=mins(i,r[1]); h+='<td'+(opt&&v?' class="dash"':'')+'>'+(v||'')+'</td>'; }
     h+='</tr>';
   });
-  h+='<tr><td class="lb">그 밖의 숙제</td>';
-  for(var i=0;i<7;i++){ var v=extra(i); h+='<td>'+(v||'')+'</td>'; }
-  h+='</tr><tr><td class="lb">합계</td>';
+  h+='<tr><td class="lb">합계</td>';
   var all=0;
   for(var i=0;i<7;i++){ var v=studyMin(i); all+=v; h+='<td class="tot">'+v+'</td>'; }
   h+='</tr><tr><td class="lb">학원</td><td></td><td>랭콘<br>5~7</td><td></td><td>토그놀<br>6:50~8</td><td></td><td>랭콘<br>5~7</td><td></td></tr>';
   h+='<tr><td class="lb">선생님</td><td></td><td></td><td>밀크티<br>9:00</td><td></td><td>빨간펜<br>8:20</td><td></td><td></td></tr>';
   document.getElementById('week').innerHTML=h;
-  document.getElementById('weeknote').textContent='이번 주 집 공부 합계 '+hm(all)+' (켜 둔 것 포함). '+
-    '"그 밖의 숙제"는 학교 영어 숙제·그림일기·받아쓰기·단원평가 준비예요.';
+  document.getElementById('weeknote').textContent='이번 주 집 공부 합계 '+hm(all)+'. '+
+    '점선 칸은 있는 주만 하는 숙제예요. 위에서 꺼 둔 줄은 흐리게 나오고 합계에 안 들어가요.';
 }
 
 function render(){ renderDays(); renderOpts(); renderDay(); renderWeek(); }
