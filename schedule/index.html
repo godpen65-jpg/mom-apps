@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>우리 아이 주간 일정</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  :root{
+    --bg:#fff7fa; --card:#fff; --ink:#4a3f55; --muted:#8a7f95; --line:#f3dfe8;
+    --pink:#e8698f;
+    --school:#eef1f5; --academy:#e3f0ff; --study:#fff1d6; --teacher:#e9f7e6; --rest:#f6f2fa; --submit:#ffe1ec;
+  }
+  body{font-family:'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);
+       min-height:100vh;padding:26px 16px 70px;}
+  .wrap{max-width:560px;margin:0 auto;}
+  header{text-align:center;margin-bottom:16px;}
+  h1{font-size:26px;color:var(--pink);}
+  .sub{font-family:'Gaegu',sans-serif;font-size:16px;color:var(--muted);margin-top:2px;}
+
+  /* 요일 단추 */
+  .days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:14px 0 12px;}
+  .days button{font-family:'Jua',sans-serif;font-size:17px;border:2px solid var(--line);background:#fff;color:var(--ink);
+       border-radius:14px;padding:8px 0 6px;cursor:pointer;line-height:1.15;}
+  .days button small{display:block;font-size:11px;color:var(--muted);}
+  .days button.today{border-color:#f0a5c0;}
+  .days button.on{background:var(--pink);border-color:var(--pink);color:#fff;}
+  .days button.on small{color:#ffe1ec;}
+
+  /* 이번 주 있는 것 */
+  .opts{background:#fff;border:2px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:14px;}
+  .opts-t{font-size:15px;color:var(--pink);margin-bottom:8px;}
+  .opts-row{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{font-family:'Jua',sans-serif;font-size:14px;border:2px solid var(--line);background:#fff;color:var(--muted);
+        border-radius:999px;padding:5px 11px;cursor:pointer;}
+  .chip.on{background:#ffe1ec;border-color:#f0a5c0;color:var(--pink);}
+  .opts-n{font-family:'Gaegu',sans-serif;font-size:14px;color:var(--muted);margin-top:7px;}
+
+  /* 하루 요약 */
+  .sum{display:flex;gap:8px;margin-bottom:10px;}
+  .sum div{flex:1;background:#fff;border:2px solid var(--line);border-radius:14px;padding:8px 6px;text-align:center;}
+  .sum b{display:block;font-size:20px;color:var(--pink);font-weight:normal;}
+  .sum span{font-size:12px;color:var(--muted);}
+
+  .submit{background:var(--submit);border-radius:14px;padding:9px 12px;margin-bottom:10px;font-size:15px;line-height:1.5;}
+  .submit:empty{display:none;}
+
+  /* 시간표 */
+  .item{display:flex;align-items:center;gap:10px;border-radius:14px;padding:10px 12px;margin-bottom:6px;}
+  .item .tm{width:52px;flex:none;font-size:15px;color:var(--muted);}
+  .item .tm small{display:block;font-size:11px;}
+  .item .nm{flex:1;font-size:16.5px;line-height:1.3;}
+  .item .nm small{display:block;font-family:'Gaegu',sans-serif;font-size:14px;color:var(--muted);}
+  .item .mn{font-size:13px;color:var(--muted);flex:none;}
+  .item .ck{width:28px;height:28px;flex:none;border-radius:50%;border:2px solid #d9cbe0;background:#fff;cursor:pointer;
+            font-size:15px;color:#fff;display:flex;align-items:center;justify-content:center;}
+  .item.done .ck{background:#7cc47f;border-color:#7cc47f;}
+  .item.done .nm{text-decoration:line-through;color:var(--muted);}
+  .k-school{background:var(--school);} .k-academy{background:var(--academy);} .k-study{background:var(--study);}
+  .k-teacher{background:var(--teacher);} .k-rest{background:var(--rest);}
+  .item.opt{border:2px dashed #f0a5c0;}
+
+  .sec{font-size:17px;color:var(--pink);margin:24px 2px 10px;}
+
+  /* 한 주 표 */
+  .week{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;font-size:13px;}
+  .week th,.week td{border:1px solid var(--line);padding:6px 3px;text-align:center;vertical-align:top;}
+  .week th{background:#ffe1ec;color:var(--pink);font-weight:normal;}
+  .week td.lb{text-align:left;padding-left:6px;white-space:nowrap;color:var(--muted);}
+  .week td{word-break:keep-all;}
+  .week td.tot{color:var(--pink);}
+
+  .note{font-family:'Gaegu',sans-serif;font-size:14.5px;color:var(--muted);line-height:1.6;margin-top:12px;}
+  .btns{display:flex;gap:8px;margin-top:14px;}
+  .btns button{flex:1;font-family:'Jua',sans-serif;font-size:15px;border:2px solid var(--line);background:#fff;color:var(--ink);
+               border-radius:14px;padding:9px;cursor:pointer;}
+
+  @media print{
+    body{background:#fff;padding:0;}
+    .days,.opts,.btns,.today-only,.ck{display:none !important;}
+    .week{font-size:11px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🗓️ 우리 아이 주간 일정</h1>
+    <div class="sub">하교부터 잘 때까지, 요일별로 한눈에</div>
+  </header>
+
+  <div class="today-only">
+    <div class="days" id="days"></div>
+
+    <div class="opts">
+      <div class="opts-t">📌 이번 주에 있는 것 (눌러서 켜기)</div>
+      <div class="opts-row" id="opts"></div>
+      <div class="opts-n">켜 둔 것만 시간표에 점선 칸으로 나와요. 다음 주가 되면 다시 꺼져요.</div>
+    </div>
+
+    <div class="sum" id="sum"></div>
+    <div class="submit" id="submit"></div>
+    <div id="list"></div>
+  </div>
+
+  <div class="sec">📋 한 주 공부 시간 (분)</div>
+  <table class="week" id="week"></table>
+  <div class="note" id="weeknote"></div>
+
+  <div class="note">
+    · 집에서 하는 시간은 추천 순서예요. 아이 컨디션 따라 바꿔도 돼요.<br>
+    · 도보 하교 30분을 넣어서 월·수·금은 3시, 화·목은 4시 40분에 집 도착으로 잡았어요.<br>
+    · 그림일기·받아쓰기 연습·단원평가 준비 시간은 정해진 게 없어서 대략 20분으로 잡았어요.
+  </div>
+  <div class="btns">
+    <button onclick="window.print()">🖨️ 한 주 표 인쇄</button>
+    <button onclick="clearToday()">↺ 오늘 체크 지우기</button>
+  </div>
+</div>
+
+<script>
+/* 종류: school 학교 · academy 학원 · study 집공부 · teacher 선생님 통화 · rest 쉬기/이동
+   opt: 이번 주에 켜야 나오는 칸 (eng 학교 영어 숙제 · dict 받아쓰기 · test 단원평가) */
+var DAILY = '웅진 문해력 15 · 만점왕·초끝 구구단·토그놀 숙제 각 5';
+var D = [
+  { // 일
+    submit:['내일(월) 책나무 꿈나무 제출 — 오늘 챙기기'],
+    items:[
+      ['10:00','웅진 문해력','study',15],
+      ['10:15','빨간펜 문해력','study',15],
+      ['10:30','밀크티','study',10],
+      ['10:40','만점왕 · 초끝 구구단 · 토그놀 숙제','study',15,'각 5분'],
+      ['16:00','책나무 꿈나무 챙기기','study',0,'내일 제출'],
+    ]},
+  { // 월
+    submit:['책나무 꿈나무 제출','학교 영어 시험 (있을 수도)'],
+    items:[
+      ['14:30','하교 (걸어서 30분)','school',0],
+      ['15:00','간식 · 쉬기','rest',0],
+      ['15:30','웅진 문해력','study',15],
+      ['15:45','밀크티','study',10],
+      ['15:55','만점왕 · 초끝 구구단 · 토그놀 숙제','study',15,'각 5분'],
+      ['16:10','학교 영어 숙제','study',30,'있는 날만','eng'],
+      ['16:40','학원 갈 준비','rest',0],
+      ['17:00','랭콘 어학원','academy',120,'~ 7시'],
+      ['19:00','저녁','rest',0],
+      ['20:00','랭콘 숙제','study',30],
+      ['20:30','받아쓰기 연습','study',20,'내일 받아쓰기 있으면','dict'],
+    ]},
+  { // 화
+    submit:['받아쓰기 (있는 주만)'],
+    items:[
+      ['16:10','하교 (걸어서 30분)','school',0],
+      ['16:40','간식 · 쉬기','rest',0],
+      ['17:00','빨간펜 문해력','study',30],
+      ['17:30','밀크티','study',30],
+      ['18:00','저녁','rest',0],
+      ['19:00','웅진 문해력','study',15],
+      ['19:15','만점왕 · 초끝 구구단 · 토그놀 숙제','study',15,'각 5분'],
+      ['19:30','그림일기 쓰기','study',20,'내일 제출'],
+      ['19:50','단원평가 준비','study',20,'목요일 시험이면','test'],
+      ['21:00','📞 밀크티 선생님','teacher',5,'5분'],
+    ]},
+  { // 수
+    submit:['그림일기 제출','학교 영어 시험 (있을 수도)'],
+    items:[
+      ['14:30','하교 (걸어서 30분)','school',0],
+      ['15:00','간식 · 쉬기','rest',0],
+      ['15:30','빨간펜 문해력','study',30],
+      ['16:00','밀크티','study',30],
+      ['16:30','쉬기','rest',0],
+      ['16:40','학교 영어 숙제','study',30,'있는 날만','eng'],
+      ['17:10','웅진 문해력','study',15],
+      ['17:25','만점왕 · 초끝 구구단 · 토그놀 숙제','study',15,'각 5분'],
+      ['17:40','이른 저녁','rest',0],
+      ['18:50','토그놀','academy',70,'~ 8시'],
+    ]},
+  { // 목
+    submit:['학교 영어 시험 (있을 수도)','단원평가 (2~3주에 한 번, 목 또는 금)'],
+    items:[
+      ['16:10','하교 (걸어서 30분)','school',0],
+      ['16:40','간식 · 쉬기','rest',0],
+      ['17:00','밀크티','study',30],
+      ['17:30','학교 영어 숙제','study',30,'있는 날만','eng'],
+      ['18:00','저녁','rest',0],
+      ['19:00','웅진 문해력','study',15],
+      ['19:15','만점왕 · 초끝 구구단 · 토그놀 숙제','study',15,'각 5분'],
+      ['19:30','단원평가 준비','study',20,'금요일 시험이면','test'],
+      ['20:20','📞 빨간펜 선생님','teacher',10,'10분'],
+    ]},
+  { // 금
+    submit:['단원평가 (2~3주에 한 번, 목 또는 금)'],
+    items:[
+      ['14:30','하교 (걸어서 30분)','school',0],
+      ['15:00','간식 · 쉬기','rest',0],
+      ['15:30','웅진 문해력','study',15],
+      ['15:45','밀크티','study',10],
+      ['15:55','만점왕 · 초끝 구구단 · 토그놀 숙제','study',15,'각 5분'],
+      ['16:10','쉬기','rest',0],
+      ['16:40','학원 갈 준비','rest',0],
+      ['17:00','랭콘 어학원','academy',120,'~ 7시'],
+      ['19:00','저녁','rest',0],
+      ['20:00','랭콘 숙제','study',30],
+    ]},
+  { // 토
+    submit:[],
+    items:[
+      ['10:00','웅진 문해력','study',15],
+      ['10:15','밀크티','study',40],
+      ['10:55','만점왕 · 초끝 구구단 · 토그놀 숙제','study',15,'각 5분'],
+    ]},
+];
+var NAMES = ['일','월','화','수','목','금','토'];
+var OPTS = [['eng','✏️ 학교 영어 숙제'],['dict','📝 받아쓰기'],['test','💯 단원평가']];
+
+/* 저장 (안 되는 브라우저면 그냥 안 남아요) */
+function get(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } }
+function put(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+
+var now = new Date();
+function ymd(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+var sunday = new Date(now.getFullYear(), now.getMonth(), now.getDate()-now.getDay());
+var WEEK_KEY = 'sched-opts-'+ymd(sunday);
+var opts = get(WEEK_KEY) || {eng:true, dict:false, test:false};
+var sel = now.getDay();
+
+function dateOf(i){ return new Date(sunday.getFullYear(), sunday.getMonth(), sunday.getDate()+i); }
+function doneKey(i){ return 'sched-done-'+ymd(dateOf(i)); }
+function shown(i){ return D[i].items.filter(function(it){ return !it[5] || opts[it[5]]; }); }
+function studyMin(i){ return shown(i).reduce(function(s,it){ return s + (it[2]==='study'?it[3]:0); },0); }
+function endTime(t,m){ var p=t.split(':'), x=+p[0]*60+ +p[1]+m; return Math.floor(x/60)+':'+('0'+x%60).slice(-2); }
+function hm(m){ return m>=60 ? Math.floor(m/60)+'시간'+(m%60?' '+m%60+'분':'') : m+'분'; }
+
+function renderDays(){
+  var h='';
+  for(var i=0;i<7;i++){
+    var d=dateOf(i);
+    h+='<button class="'+(i===sel?'on ':'')+(i===now.getDay()?'today':'')+'" onclick="sel='+i+';render()">'
+      +NAMES[i]+'<small>'+(d.getMonth()+1)+'/'+d.getDate()+'</small></button>';
+  }
+  document.getElementById('days').innerHTML=h;
+}
+function renderOpts(){
+  document.getElementById('opts').innerHTML = OPTS.map(function(o){
+    return '<button class="chip'+(opts[o[0]]?' on':'')+'" onclick="toggleOpt(\''+o[0]+'\')">'+o[1]+'</button>';
+  }).join('');
+}
+function toggleOpt(k){ opts[k]=!opts[k]; put(WEEK_KEY,opts); render(); }
+
+function renderDay(){
+  var items=shown(sel), done=get(doneKey(sel))||{};
+  var nStudy=items.filter(function(it){return it[2]==='study'||it[2]==='teacher';}).length;
+  var nDone=items.filter(function(it){return (it[2]==='study'||it[2]==='teacher') && done[it[1]];}).length;
+  document.getElementById('sum').innerHTML =
+    '<div><b>'+hm(studyMin(sel))+'</b><span>집 공부</span></div>'+
+    '<div><b>'+nDone+' / '+nStudy+'</b><span>오늘 한 것</span></div>';
+  document.getElementById('submit').innerHTML = D[sel].submit.length
+    ? '🎒 <b>'+NAMES[sel]+'요일 챙길 것</b><br>· '+D[sel].submit.join('<br>· ') : '';
+  document.getElementById('list').innerHTML = items.map(function(it){
+    var canCheck = it[2]==='study'||it[2]==='teacher';
+    var end = (it[2]==='academy') ? '<small>'+endTime(it[0],it[3])+'</small>' : '';
+    return '<div class="item k-'+it[2]+(it[5]?' opt':'')+(done[it[1]]?' done':'')+'">'
+      +'<div class="tm">'+it[0]+end+'</div>'
+      +'<div class="nm">'+it[1]+(it[4]?'<small>'+it[4]+'</small>':'')+'</div>'
+      +(it[3]&&it[2]==='study'?'<div class="mn">'+it[3]+'분</div>':'')
+      +(canCheck?'<button class="ck" onclick="tick(\''+it[1].replace(/'/g,"\\'")+'\')">✓</button>':'')
+      +'</div>';
+  }).join('');
+}
+function tick(name){ var k=doneKey(sel), d=get(k)||{}; d[name]=!d[name]; put(k,d); renderDay(); }
+function clearToday(){ put(doneKey(sel),{}); renderDay(); }
+
+function renderWeek(){
+  var rows=[
+    ['웅진 문해력', function(i){ return 15; }],
+    ['빨간펜', function(i){ return [15,0,30,30,0,0,0][i]; }],
+    ['밀크티', function(i){ return [10,10,30,30,30,10,40][i]; }],
+    ['만점왕 등 3개', function(i){ return 15; }],
+    ['랭콘 숙제', function(i){ return (i===1||i===5)?30:0; }],
+  ];
+  var extra = function(i){ return studyMin(i) - rows.reduce(function(s,r){return s+r[1](i);},0); };
+  var h='<tr><th></th>'+NAMES.map(function(n){return '<th>'+n+'</th>';}).join('')+'</tr>';
+  rows.forEach(function(r){
+    h+='<tr><td class="lb">'+r[0]+'</td>';
+    for(var i=0;i<7;i++){ var v=r[1](i); h+='<td>'+(v||'')+'</td>'; }
+    h+='</tr>';
+  });
+  h+='<tr><td class="lb">그 밖의 숙제</td>';
+  for(var i=0;i<7;i++){ var v=extra(i); h+='<td>'+(v||'')+'</td>'; }
+  h+='</tr><tr><td class="lb">합계</td>';
+  var all=0;
+  for(var i=0;i<7;i++){ var v=studyMin(i); all+=v; h+='<td class="tot">'+v+'</td>'; }
+  h+='</tr><tr><td class="lb">학원</td><td></td><td>랭콘<br>5~7</td><td></td><td>토그놀<br>6:50~8</td><td></td><td>랭콘<br>5~7</td><td></td></tr>';
+  h+='<tr><td class="lb">선생님</td><td></td><td></td><td>밀크티<br>9:00</td><td></td><td>빨간펜<br>8:20</td><td></td><td></td></tr>';
+  document.getElementById('week').innerHTML=h;
+  document.getElementById('weeknote').textContent='이번 주 집 공부 합계 '+hm(all)+' (켜 둔 것 포함). '+
+    '"그 밖의 숙제"는 학교 영어 숙제·그림일기·받아쓰기·단원평가 준비예요.';
+}
+
+function render(){ renderDays(); renderOpts(); renderDay(); renderWeek(); }
+render();
+</script>
+</body>
+</html>
