@@ -71,13 +71,13 @@
   .book{width:100%;flex:1;min-height:0;}
   .side{overflow-y:auto;}
   .main{min-width:0;min-height:0;}
-  .txt{min-height:0;overflow-y:auto;}
+  .txt{min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
   .actions{flex:none;}
   /* 낮은 화면(태블릿 가로 등)에서는 글씨와 여백을 조금 줄입니다 */
   @media (max-height:780px){
     .art{width:118px;height:118px;}
     .art span{font-size:54px;} .art span.n2{font-size:35px;} .art span.n3{font-size:26px;}
-    .txt{--fs:18px;}
+    .txt{--fs:19px;}
     .tile{font-size:19px;padding:9px 16px;}
     .btn{font-size:17px;padding:10px 18px;}
     .unit{font-size:14px;margin-bottom:6px;}
@@ -92,9 +92,8 @@
     .art{width:86px;height:86px;}
     .art span{font-size:40px;} .art span.n2{font-size:27px;} .art span.n3{font-size:20px;}
     .label{font-size:13px;padding:4px 11px;}
-    .txt{--fs:16px;}
+    .txt{--fs:18px;}
     .ln .kohint{font-size:12.5px;}
-    .spk{width:29px;height:29px;font-size:13px;margin-top:2px;}
     .tile{font-size:17px;padding:8px 13px;border-radius:11px;}
     .tiles{gap:7px;}
     .btn{font-size:16px;padding:8px 15px;}
@@ -150,8 +149,9 @@
   .ln p{margin:0;font-size:var(--fs);line-height:1.55;
         font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;}
   .spk{
-    background:#e8f3fb;border:none;border-radius:50%;width:36px;height:36px;
-    font-size:15px;cursor:pointer;flex:none;margin-top:5px;color:#1f6491;
+    background:#e8f3fb;border:none;border-radius:50%;width:34px;height:34px;
+    font-size:14px;cursor:pointer;flex:none;
+    margin-top:calc((var(--fs) * 1.55 - 34px) / 2);color:#1f6491;
     box-shadow:0 3px 0 #c3ddef;
   }
   .spk:active{transform:translateY(2px);box-shadow:0 1px 0 #c3ddef;}
@@ -714,13 +714,9 @@ function renderPage(){
 
 /* 글이 칸보다 길면 스크롤 대신 글자를 조금씩 줄여 한 화면에 담습니다 */
 function fitText(){
+  /* 글씨 크기는 쪽마다 바뀌지 않습니다. 아래 CSS 의 --fs 하나로 정해집니다.
+     글이 길면 글자를 줄이는 대신 글 칸 안에서 조금 넘겨 봅니다. */
   txtEl.style.removeProperty('--fs');
-  const base = parseFloat(getComputedStyle(txtEl).getPropertyValue('--fs')) || 20;
-  let s = base;
-  while(txtEl.scrollHeight > txtEl.clientHeight + 1 && s > 12){
-    s -= 0.5;
-    txtEl.style.setProperty('--fs', s + 'px');
-  }
 }
 window.addEventListener('resize', function(){ if(!$('readView').hidden) fitText(); });
 
