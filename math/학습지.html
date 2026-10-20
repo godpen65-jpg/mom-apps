@@ -213,7 +213,7 @@ function qHTML(q, i) {
       <div class="row">${lbl('식')} ${box('wide')} ${q.op === '+' ? '+' : '−'} ${q.n} = ${q.result} <span class="sub">(□가 어떤 수)</span>
       <span class="gap"></span> ${lbl('답')} ${box()}</div>`;
   } else if (q.type === 'cards') {
-    body = `<div class="text">숫자 카드 중에서 2장을 골라 한 번씩 사용하여 ‘몇십몇’을 만들려고 합니다.</div>
+    body = `<div class="text">숫자 카드 중에서 2장을 골라 한 번씩 사용하여 ‘몇십몇’을 만들려고 합니다. 가장 큰 수와 가장 작은 수를 구하세요.</div>
       <div class="row"><span class="cards">${q.cards.map(c => `<span class="card">${c}</span>`).join('')}</span>
       <span class="gap"></span> ${lbl('가장 큰 수')} ${box()} <span class="gap"></span> ${lbl('가장 작은 수')} ${box()}</div>`;
   } else {
