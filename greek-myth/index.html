@@ -104,6 +104,16 @@
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
+  .book-text { flex: 1; min-width: 0; }
+  .pic {
+    width: 58px; height: 58px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    background: #fff;
+    border: 2px solid var(--line);
+    object-fit: cover;
+  }
+  .book.missing .pic { opacity: .55; }
   .book-title { font-family: 'Jua', sans-serif; font-size: 18px; line-height: 1.3; }
   .book-eps { font-size: 15.5px; color: #8a8298; line-height: 1.35; margin-top: 1px; }
 
@@ -216,6 +226,41 @@ const WORLDS = [
   ]},
 ];
 
+// 권별 캐릭터 그림 (Higgsfield AI로 만든 것, 2026-10-21). 저장소에 안 넣고 Higgsfield 서버 주소를 바로 씀
+const PIC_BASE = 'https://d8j0ntlcm91z4.cloudfront.net/user_3GqZcHoywjFz5HqKOvMDvy8580Y/hf_20261021_';
+const PIC = {
+  1:  '012419_bf7b5493-58f7-4acf-af64-5284d808cbcc', // 구름 위 아기 제우스
+  2:  '011225_45d88e78-64cb-4405-84da-1c52e95bec83', // 번개 든 제우스
+  3:  '011224_58f790c5-21be-4609-87c0-25265b357a3b', // 삼지창 포세이돈
+  4:  '012417_5995893d-d6e4-489d-a4d9-81bbc2f630d5', // 밀 이삭 데메테르
+  5:  '012417_0639ff34-8cf6-4339-aa3d-02aada4f74c6', // 망치 헤파이스토스
+  6:  '012419_4f6d1dff-b42f-4640-8e07-287c2b724230', // 해·달 쌍둥이
+  7:  '012418_82969abb-58b7-40a4-bae4-c22f931819d1', // 날개 모자 헤르메스
+  8:  '012419_6191c985-52b4-4734-9c83-51e0d8c86adc', // 아기 에로스
+  9:  '012420_83fdfc37-faaa-4346-a78c-3bd1339ae008', // 리라 든 아폴론
+  10: '012417_fbdaae33-f048-43ec-8aa8-0540f76d3017', // 부엉이와 아테나
+  11: '012418_5ba354e4-b323-4ac1-8d0b-876988e105a1', // 횃불 프로메테우스
+  12: '012417_56641f63-cc69-43bf-b34e-64439a19e7c3', // 하얀 소 이오
+  13: '012419_962f737a-b057-4e6b-83c0-dc827febec47', // 두루미와 시인 이비코스
+  14: '012418_5c15e3b4-8159-44a5-95d8-c7b81ed627f8', // 리라 켜는 오르페우스
+  15: '012421_a7cc4e62-3112-45c6-b72e-1ad1bf5e2b80', // 황금사과 아탈란타
+  16: '012424_eca4eea0-8fa5-45ae-b7ad-a3cea6f15078', // 스핑크스
+  17: '012423_fac1d84d-6452-4446-96a9-0c2908f63294', // 미다스왕
+  18: '012422_11cc9f4a-365e-4c4f-aa65-157898539161', // 연못 보는 나르키소스
+  19: '012423_a1393ab4-a19c-4b6b-8a2b-ddd1735085a6', // 조각상과 피그말리온
+  20: '012422_c89f79cc-8c9a-4e89-9481-609556820e20', // 바우키스와 필레몬
+  21: '011224_fe01badf-9458-4e3a-9ef5-bd0fc791e237', // 방패 든 페르세우스
+  22: '012424_11ea2ec3-ead0-4610-9781-b6ea9a9d9b59', // 카드모스와 용
+  23: '012423_fea3c80a-3114-4097-a15e-d7bf18dab9f7', // 사자 망토 헤라클레스
+  24: '012422_986e6583-925f-45a5-af3d-05bd62565fe9', // 황금 양털 이아손
+  25: '012423_96111a36-4edb-4587-b321-2033daddee58', // 날개 단 이카로스
+  26: '012422_79555566-4ad6-4723-bbf0-6f1472928198', // 트로이 목마
+  27: '012424_1f798e34-fed5-43c0-9344-d870bc6b8f9f', // 아킬레우스
+  28: '012426_f87deb80-a2d3-42a5-83f1-15c6a5e0ffbf', // 배 타는 오디세우스
+  29: '012426_77dc9c9d-66be-45dd-960a-4f363521ee26', // 활과 강아지 오디세우스
+  30: '012426_276f82ee-c600-4642-ac3d-2fcbc2fc1acc', // 아이네이아스
+};
+
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const tabs = document.getElementById('tabs');
 const list = document.getElementById('list');
@@ -244,8 +289,9 @@ for (const w of WORLDS) {
   sec.id = w.id;
   let html = `<div class="world-head"><span class="world-name">${esc(w.name)}</span><span class="world-sub">${esc(w.sub)}</span></div>`;
   for (const [vol, title, eps, video, audio] of w.books) {
-    const top = `<div class="book-top"><div class="vol">${vol}</div><div>
-        <div class="book-title">${esc(title)}</div>${eps ? `<div class="book-eps">${esc(eps)}</div>` : ''}</div></div>`;
+    const pic = PIC[vol] ? `<img class="pic" src="${PIC_BASE + PIC[vol]}_min.webp" alt="" loading="lazy" onerror="this.remove()">` : '';
+    const top = `<div class="book-top"><div class="vol">${vol}</div><div class="book-text">
+        <div class="book-title">${esc(title)}</div>${eps ? `<div class="book-eps">${esc(eps)}</div>` : ''}</div>${pic}</div>`;
     if (!video) {
       html += `<div class="book missing">${top}<div class="missing-note">📷 아직 QR 사진이 없어요</div></div>`;
       continue;
