@@ -108,7 +108,7 @@ function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&
 function letsKo(w){ return '같이 '+(w[3] ? w[1].slice(0,-1) : w[1])+'자!'; }
 function letsEn(w){ return "Let's "+w[2]+'!'; }
 const CIRCLE='①②③④⑤⑥⑦⑧⑨⑩⑪⑫';
-const TARGETS=['v','n','v','a','v','d'];   // 앱과 같이 움직임 말을 더 자주
+const TARGETS=['v','n','v','a','v','d'];   // 앱과 같이 동사(움직씨)을 더 자주
 
 function head(no, title){
   return '<div class="head"><h1>🧺 품사 놀이터 <small>'+title+' · 문제지 '+no+'번</small></h1>'+
@@ -117,7 +117,7 @@ function head(no, title){
 function legend(){
   return '<div class="legend">'+ORDER.map(function(p){
     const x=P[p];
-    return '<div class="lg c-'+p+'"><span class="em">'+x.em+'</span><b class="t-'+p+'">'+x.kid+'</b><i>'+x.ko+' · '+x.en+'<br>'+x.q+'</i></div>';
+    return '<div class="lg c-'+p+'"><span class="em">'+x.em+'</span><b class="t-'+p+'">'+x.kid+'</b><i>'+x.en+'<br>'+x.q+'</i></div>';
   }).join('')+'</div>';
 }
 function wordCells(toks, withBox){
@@ -145,9 +145,9 @@ function build(seed){
 
   let h='';
   // 1쪽: 같이 하자
-  h+='<section class="page">'+head(seed,'움직임 말 찾기')+legend()+
+  h+='<section class="page">'+head(seed,'동사(움직씨) 찾기')+legend()+
      '<h2><span class="no">1</span>같이 하자! · Let\'s!</h2>'+
-     '<div class="secret">🔑 <b class="t-v">비법</b> — "같이 ○○자!"가 말이 되면 <b class="t-v">움직임 말(동사)</b>이에요. &nbsp;⭕ 같이 달리자! Let\'s run! &nbsp;❌ 같이 크자? Let\'s big?</div>'+
+     '<div class="secret">🔑 <b class="t-v">비법</b> — "같이 ○○자!"가 말이 되면 <b class="t-v">동사(움직씨)</b>이에요. &nbsp;⭕ 같이 달리자! Let\'s run! &nbsp;❌ 같이 크자? Let\'s big?</div>'+
      '<p class="how">소리 내어 읽어 보고, 말이 되면 ⭕, 이상하면 ❌에 동그라미 하세요.</p>'+
      '<div class="lets">'+lets.map(function(q,i){
        return '<div class="li"><span class="k">'+CIRCLE[i]+'</span><span class="em">'+q.w[0]+'</span><span class="tx"><b>'+esc(letsKo(q.w))+'</b><i>'+esc(letsEn(q.w))+'</i></span><span class="ox">⭕ ❌</span></div>';
@@ -164,7 +164,7 @@ function build(seed){
   h+='<section class="page">'+head(seed,'문장 탐정')+
      '<h2><span class="no">3</span>문장 탐정 · Find</h2>'+
      '<p class="how">찾으라는 가족 낱말을 <b>모두</b> 찾아 동그라미 하세요. 한국어 문장과 영어 문장 <b>둘 다</b> 찾아요!<br>'+
-     '💡 한국어 움직임 말은 문장 <b>맨 끝</b>, 영어 움직임 말은 이름 말 <b>바로 뒤</b>에 있어요.</p>'+
+     '💡 한국어 동사(움직씨)은 문장 <b>맨 끝</b>, 영어 동사(움직씨)은 명사(이름씨) <b>바로 뒤</b>에 있어요.</p>'+
      find.map(function(f,i){
        const x=P[f.tg];
        return '<div class="sb"><div class="q"><span class="k">'+CIRCLE[i]+'</span>'+f.s.em+' <span class="pill c-'+f.tg+' t-'+f.tg+'">'+x.em+' '+x.kid+' · '+x.en+'</span> 을(를) 찾아요</div>'+
@@ -174,7 +174,7 @@ function build(seed){
   // 4쪽: 색칠하기
   h+='<section class="page">'+head(seed,'색칠하기')+legend()+
      '<h2><span class="no">4</span>가족 색칠하기 · Color</h2>'+
-     '<p class="how">낱말 아래 네모를 가족 색깔로 칠하세요. <b class="t-n">이름 말 파랑</b> · <b class="t-v">움직임 말 빨강</b> · <b class="t-a">어떤지 말 노랑</b> · <b class="t-d">어떻게 말 초록</b><br>'+
+     '<p class="how">낱말 아래 네모를 가족 색깔로 칠하세요. <b class="t-n">명사(이름씨) 파랑</b> · <b class="t-v">동사(움직씨) 빨강</b> · <b class="t-a">형용사(그림씨) 노랑</b> · <b class="t-d">부사(어찌씨) 초록</b><br>'+
      '빗금 칸은 도우미 말(the, a, my)이라 안 칠해도 돼요. 같은 색끼리 짝이 맞는지 봐요!</p>'+
      color.map(function(s,i){
        return '<div class="sb"><div class="q"><span class="k">'+CIRCLE[i]+'</span>'+s.em+'</div>'+
@@ -199,7 +199,7 @@ function build(seed){
          const one=function(str){ return parse(str).map(function(t){ return t.p==='x' ? '<span style="color:#aaa">'+esc(t.w)+'</span>' : '<span class="t-'+t.p+'">'+esc(t.w)+'</span>'; }).join(' '); };
          return CIRCLE[i]+' '+one(s.ko)+'<br>&nbsp;&nbsp;&nbsp;'+one(s.en);
        }).join('<br>')+
-       '<p style="font-size:13px;color:var(--muted)">파랑=이름 말 · 빨강=움직임 말 · 노랑=어떤지 말 · 초록=어떻게 말 · 회색=도우미 말</p></div>'+
+       '<p style="font-size:13px;color:var(--muted)">파랑=명사(이름씨) · 빨강=동사(움직씨) · 노랑=형용사(그림씨) · 초록=부사(어찌씨) · 회색=도우미 말</p></div>'+
        '</div></section>';
   }
   document.getElementById('pages').innerHTML=h;

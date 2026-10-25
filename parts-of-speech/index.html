@@ -183,7 +183,7 @@
     <div class="family" id="family"></div>
     <div class="menu">
       <button id="go-learn"><span class="em">📚</span><span>배우기 · Learn<small>낱말 가족 넷을 하나씩 만나요</small></span></button>
-      <button id="go-lets" class="hot"><span class="em">🙌</span><span>같이 하자! · Let's!<small>움직임 말(동사)을 찾는 비법 놀이</small></span></button>
+      <button id="go-lets" class="hot"><span class="em">🙌</span><span>같이 하자! · Let's!<small>동사(움직씨)을 찾는 비법 놀이</small></span></button>
       <button id="go-sort"><span class="em">🧺</span><span>바구니에 넣기 · Sort<small>낱말을 알맞은 바구니에 쏙!</small></span></button>
       <button id="go-sent"><span class="em">🔍</span><span>문장 탐정 · Find<small>한국어·영어 문장 속에 숨은 친구 찾기</small></span></button>
     </div>
@@ -282,7 +282,7 @@ const VIEWS=['v-home','v-learn','v-lets','v-sort','v-sent','v-result'];
 function show(id){ VIEWS.forEach(function(v){ $(v).classList.toggle('hide', v!==id); }); window.scrollTo(0,0); }
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
-function nameOf(p){ const x=P[p]; return x.kid+'('+x.ko+') · '+x.en; }
+function nameOf(p){ const x=P[p]; return x.kid+' · '+x.en; }
 function eunNeun(w){ // 받침 따라 은/는
   const c=w.charCodeAt(w.length-1);
   if(c<0xAC00||c>0xD7A3) return w+'은(는)';
@@ -302,10 +302,10 @@ function renderHome(){
   $('title').textContent='품사 놀이터';
   $('family').innerHTML = ORDER.map(function(p){
     const x=P[p];
-    return '<button class="fam c-'+p+'" data-p="'+p+'"><span class="em">'+x.em+'</span><b class="t-'+p+'">'+x.kid+'</b><i>'+x.ko+' · '+x.en+'</i></button>';
+    return '<button class="fam c-'+p+'" data-p="'+p+'"><span class="em">'+x.em+'</span><b class="t-'+p+'">'+x.kid+'</b><i>'+x.en+'</i></button>';
   }).join('');
   document.querySelectorAll('#family .fam').forEach(function(b){
-    b.onclick=function(){ const x=P[b.dataset.p]; speak([[x.kid+', '+x.ko,'ko'],[x.en,'en']]); };
+    b.onclick=function(){ const x=P[b.dataset.p]; speak([[x.ko+', '+x.old,'ko'],[x.en,'en']]); };
   });
   $('focus').innerHTML = '문장 탐정 하나만 연습: '+ORDER.map(function(p){
     return '<button class="c-'+p+' t-'+p+'" data-p="'+p+'">'+P[p].em+' '+P[p].kid+'</button>';
@@ -333,13 +333,13 @@ function secretHtml(p){
   if(p==='v') return '<div class="secret t-v">🔑 <b>비법!</b> "같이 ○○자!" 하고 말해 봐요.'+
     '<div><span class="ok">⭕ 같이 달리자!</span> <span class="en">Let\'s run!</span></div>'+
     '<div><span class="no">❌ 같이 크자?</span> <span class="en">Let\'s big?</span></div>'+
-    '<div style="color:var(--ink);font-size:16px">말이 되면 움직임 말! 문장에서는 모양이 바뀌어요:<br>달리다 → 달<b>려요</b> · run → run<b>s</b></div></div>';
-  if(p==='a') return '<div class="secret t-a">🔑 "같이 ○○자!"가 <b>이상하면</b> 어떤지 말일 수 있어요.<br>'+
+    '<div style="color:var(--ink);font-size:16px">말이 되면 동사(움직씨)! 문장에서는 모양이 바뀌어요:<br>달리다 → 달<b>려요</b> · run → run<b>s</b></div></div>';
+  if(p==='a') return '<div class="secret t-a">🔑 "같이 ○○자!"가 <b>이상하면</b> 형용사(그림씨)일 수 있어요.<br>'+
     '<span class="no">❌ 같이 예쁘자?</span> <span class="en">Let\'s pretty?</span><br>'+
     '<span style="color:var(--ink);font-size:16px">문장에서는: 크다 → <b>큰</b> 코끼리 · <b>big</b> elephant</span></div>';
-  if(p==='n') return '<div class="secret t-n">🔑 이름 말 뒤에는 꼬리가 붙어요: 강아지<b>가</b>, 사과<b>를</b><br>'+
+  if(p==='n') return '<div class="secret t-n">🔑 명사(이름씨) 뒤에는 <b>토씨(조사)</b>가 붙어요: 강아지<b>가</b>, 사과<b>를</b><br>'+
     '<span class="en">영어는 앞에 the, a 가 와요: <b>the</b> dog, <b>an</b> apple</span></div>';
-  return '<div class="secret t-d">🔑 움직임 말 앞에 붙여 봐요: <b>빨리</b> 달려요, <b>천천히</b> 걸어요<br>'+
+  return '<div class="secret t-d">🔑 동사(움직씨) 앞에 붙여 봐요: <b>빨리</b> 달려요, <b>천천히</b> 걸어요<br>'+
     '<span class="en">영어는 뒤에 와요: runs <b>quickly</b>, walks <b>slowly</b></span></div>';
 }
 function renderLearn(){
@@ -355,7 +355,7 @@ function renderLearn(){
   } else if(learnIdx<=4){
     const p=ORDER[learnIdx-1], x=P[p];
     h = '<div class="friend c-'+p+'"><div class="em">'+x.em+'</div>'+
-        '<h2 class="t-'+p+'">'+x.ko+' · '+x.en+'</h2><div class="kid t-'+p+'">"'+x.kid+'"</div>'+
+        '<h2 class="t-'+p+'">'+x.ko+' · '+x.en+'</h2><div class="kid t-'+p+'">우리말로 "'+x.old+'"라고도 해요</div>'+
         '<p class="desc">'+x.desc+'</p><p class="desc-en">'+x.descEn+'</p>'+
         '<div class="magic">🔮 <b class="t-'+p+'">'+x.q+'</b> <span>'+x.qen+'</span></div>'+
         secretHtml(p)+'</div>'+
@@ -368,9 +368,10 @@ function renderLearn(){
     h = '<div class="friend" style="background:#fff"><div class="em">🎉</div><h2>네 친구를 다 만났어요!</h2>'+
         '<div class="family" style="margin-top:14px">'+ORDER.map(function(p){
           const x=P[p];
-          return '<div class="fam c-'+p+'"><span class="em">'+x.em+'</span><b class="t-'+p+'">'+x.kid+'</b><i>'+x.ko+' · '+x.en+'<br>'+x.q+'</i></div>';
+          return '<div class="fam c-'+p+'"><span class="em">'+x.em+'</span><b class="t-'+p+'">'+x.kid+'</b><i>'+x.en+'<br>'+x.q+'</i></div>';
         }).join('')+'</div>'+
-        '<p class="desc">헷갈리면 <b>마법 질문</b>과 <b>"같이 ○○자!"</b> 비법을 써 봐요!</p></div>'+
+        '<p class="desc">헷갈리면 <b>마법 질문</b>과 <b>"같이 ○○자!"</b> 비법을 써 봐요!</p>'+
+        '<p class="tip">낱말 가족은 더 있어요: <b>토씨(조사)</b> 가·를·은 · <b>이음씨(접속사)</b> 그리고·그래서 · and</p></div>'+
         '<div class="btns"><button class="btn red" id="l-lets">🙌 같이 하자! 놀이 하러 가기</button></div>';
   }
   $('l-body').innerHTML=h;
@@ -383,7 +384,7 @@ function renderLearn(){
   if($('l-lets')) $('l-lets').onclick=startLets;
   $('l-prev').style.visibility = learnIdx===0 ? 'hidden' : 'visible';
   $('l-next').classList.toggle('hide', learnIdx===LEARN_N-1);
-  if(learnIdx>=1 && learnIdx<=4){ const x=P[ORDER[learnIdx-1]]; speak([[x.ko+', '+x.kid,'ko'],[x.en,'en']]); }
+  if(learnIdx>=1 && learnIdx<=4){ const x=P[ORDER[learnIdx-1]]; speak([[x.ko+', '+x.old,'ko'],[x.en,'en']]); }
 }
 $('l-prev').onclick=function(){ if(learnIdx>0){ learnIdx--; renderLearn(); } };
 $('l-next').onclick=function(){ if(learnIdx<LEARN_N-1){ learnIdx++; renderLearn(); } };
@@ -392,7 +393,7 @@ $('l-next').onclick=function(){ if(learnIdx<LEARN_N-1){ learnIdx++; renderLearn(
 const LETS_N=10;
 let gQ=[], gIdx=0, gScore=0, gDone=false, gStats=null;
 function startLets(){
-  // 움직임 말 5개 + 다른 말 5개 (이름 말·어떤지 말)
+  // 동사(움직씨) 5개 + 다른 말 5개 (명사(이름씨)·형용사(그림씨))
   const verbs=shuffle(WORDS.v).slice(0,5).map(function(w){ return {p:'v',w:w}; });
   const others=shuffle(WORDS.n.map(function(w){return {p:'n',w:w};}).concat(WORDS.a.map(function(w){return {p:'a',w:w};}))).slice(0,5);
   gQ=shuffle(verbs.concat(others)); gIdx=0; gScore=0; gStats=newStats();
@@ -418,7 +419,7 @@ function pickLets(sayYes){
   $(isVerb?'g-x':'g-o').classList.add('no');
   const head = right ? '<span class="good">딩동댕! 🎉</span> ' : '<span class="hint">아쉬워요! 다시 들어 봐요.</span><br>';
   const body = isVerb
-    ? '"'+esc(letsKo(q.w))+'"는 말이 돼요. 같이 할 수 있으니까 <b class="t-v">'+esc(eunNeun(q.w[1]))+' 움직임 말(동사) · Verb</b>!'
+    ? '"'+esc(letsKo(q.w))+'"는 말이 돼요. 같이 할 수 있으니까 <b class="t-v">'+esc(eunNeun(q.w[1]))+' 동사(움직씨) · Verb</b>!'
     : '"'+esc(letsKo(q.w))+'"는 이상하죠? <b class="t-'+q.p+'">'+esc(eunNeun(q.w[1]))+' '+esc(nameOf(q.p))+'</b>이라서 같이 할 수 없어요.';
   $('g-fb').innerHTML = head+body;
   $('g-nextwrap').classList.remove('hide');
@@ -442,7 +443,7 @@ function startSort(){
   sQ=shuffle(pool); sIdx=0; sScore=0; sStats=newStats();
   $('baskets').innerHTML = ORDER.map(function(p){
     const x=P[p];
-    return '<button class="basket c-'+p+'" data-p="'+p+'"><span class="em">'+x.em+'</span><b class="t-'+p+'">'+x.kid+'</b><i>'+x.ko+' · '+x.en+'</i></button>';
+    return '<button class="basket c-'+p+'" data-p="'+p+'"><span class="em">'+x.em+'</span><b class="t-'+p+'">'+x.kid+'</b><i>'+x.en+'</i></button>';
   }).join('');
   document.querySelectorAll('#baskets .basket').forEach(function(b){ b.onclick=function(){ pickBasket(b); }; });
   $('title').textContent='바구니에 넣기 · Sort';
@@ -485,7 +486,7 @@ $('s-next').onclick=function(){
 
 // ── 문장 탐정: 한국어 문장에서 찾고 → 영어 문장에서 찾기 ──
 const SENT_N=6;
-const SENT_CYCLE=['v','n','v','a','v','d'];   // 움직임 말을 더 자주
+const SENT_CYCLE=['v','n','v','a','v','d'];   // 동사(움직씨)을 더 자주
 let tFocus=null, tPool=[], tRound=0, tScore=0, tTotal=0, tStats=null;
 let tCur=null, tTarget='v', tStep='ko', tTries=0;
 function startSent(focus){
@@ -593,7 +594,7 @@ function showResult(game, score, n, stats){
   btns.push(['한 번 더 하기','btn',function(){
     if(game==='lets') startLets(); else if(game==='sort') startSort(); else startSent(tFocus);
   }]);
-  if(game==='lets' && r>=0.7) btns.push(['🔍 문장에서 움직임 말 찾기','btn red',function(){ startSent('v'); }]);
+  if(game==='lets' && r>=0.7) btns.push(['🔍 문장에서 동사(움직씨) 찾기','btn red',function(){ startSent('v'); }]);
   else if(weak==='v' && game!=='lets') btns.push(['🙌 같이 하자! 비법 연습','btn red',startLets]);
   else if(weak && game==='sent') btns.push([P[weak].em+' '+P[weak].kid+'만 연습','btn red',function(){ startSent(weak); }]);
   btns.push(['처음으로','btn gray',renderHome]);
@@ -652,20 +653,20 @@ renderStars(); renderHome();
 <h3>2. 동사를 어려워하면</h3>
 <ul>
   <li>사전에서 본 <b>달리다</b>가 문장에서는 <b>달려요</b>로 바뀌어서 못 알아보는 경우가 많아요. 배우기 카드에 ‘달리다 → 달려요’를 같이 보여 줘요.</li>
-  <li>한국어 동사는 보통 <b>문장 맨 끝</b>, 영어 동사는 <b>이름 말 바로 뒤</b>(dog → runs)에 와요. 틀리면 이 힌트가 나오고, 두 번 틀리면 정답이 반짝여요.</li>
-  <li>처음 화면 아래 <b>“문장 탐정 하나만 연습”</b>에서 움직임 말만 골라 연습할 수 있어요.</li>
+  <li>한국어 동사는 보통 <b>문장 맨 끝</b>, 영어 동사는 <b>명사(이름씨) 바로 뒤</b>(dog → runs)에 와요. 틀리면 이 힌트가 나오고, 두 번 틀리면 정답이 반짝여요.</li>
+  <li>처음 화면 아래 <b>“문장 탐정 하나만 연습”</b>에서 동사(움직씨)만 골라 연습할 수 있어요.</li>
   <li>결과 화면에 <b>가족별 점수</b>가 나와요. 약한 가족이 있으면 그 연습 버튼이 생겨요.</li>
 </ul>
 
 <h3>3. 아이 눈높이 이름</h3>
 <table>
 <tr><th>품사</th><th>아이용 이름</th><th>마법 질문</th></tr>
-<tr><td>명사 Noun</td><td>이름 말</td><td>무엇? 누구?</td></tr>
-<tr><td>동사 Verb</td><td>움직임 말</td><td>무엇을 해요? / 같이 ○○자!</td></tr>
-<tr><td>형용사 Adjective</td><td>어떤지 말</td><td>어때요?</td></tr>
-<tr><td>부사 Adverb</td><td>어떻게 말</td><td>어떻게? 얼마나?</td></tr>
+<tr><td>명사 Noun</td><td>명사(이름씨)</td><td>무엇? 누구?</td></tr>
+<tr><td>동사 Verb</td><td>동사(움직씨)</td><td>무엇을 해요? / 같이 ○○자!</td></tr>
+<tr><td>형용사 Adjective</td><td>형용사(그림씨)</td><td>어때요?</td></tr>
+<tr><td>부사 Adverb</td><td>부사(어찌씨)</td><td>어떻게? 얼마나?</td></tr>
 </table>
-<p>‘강아지<b>가</b>’의 ‘가’ 같은 조사는 흐리게, 영어의 the·a·my는 회색 ‘도우미 말’로 보여요. 별 기록은 이 기기에만 저장돼요.</p>
+<p>‘강아지<b>가</b>’의 ‘가’ 같은 토씨(조사)는 흐리게, 영어의 the·a·my는 회색 ‘도우미 말’로 보여요. 별 기록은 이 기기에만 저장돼요.</p>
 </div></div>
 <script>
 function hlpOpen(){document.getElementById('hlpOv').classList.add('on');}

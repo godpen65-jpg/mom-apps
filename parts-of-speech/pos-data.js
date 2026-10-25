@@ -1,20 +1,20 @@
 // 품사 놀이터 낱말·문장 데이터 (parts-of-speech.html, parts-of-speech-print.html 같이 씀)
 // ── 낱말 가족 넷 ──────────────────────────────
 const P = {
-  n:{ko:'명사', en:'Noun',      kid:'이름 말',   old:'이름씨', em:'🏷️',
+  n:{ko:'명사', en:'Noun',      kid:'명사(이름씨)',   old:'이름씨', em:'🏷️',
      desc:'사람, 동물, 물건, 장소의 <b>이름</b>이에요.', descEn:'A noun is a name of a person, animal, thing or place.',
      q:'무엇? 누구?', qen:'What? Who?',
      tip:'"이게 뭐야?" 하고 물었을 때 대답이 되는 말이에요.'},
-  v:{ko:'동사', en:'Verb',      kid:'움직임 말', old:'움직씨', em:'🏃',
+  v:{ko:'동사', en:'Verb',      kid:'동사(움직씨)', old:'움직씨', em:'🏃',
      desc:'몸을 움직이거나 <b>무엇을 하는지</b> 알려줘요.', descEn:'A verb is an action word.',
      q:'무엇을 해요?', qen:'What does it do?',
-     tip:'"같이 ○○자!" 가 말이 되면 움직임 말이에요!'},
-  a:{ko:'형용사', en:'Adjective', kid:'어떤지 말', old:'그림씨', em:'🎨',
+     tip:'"같이 ○○자!" 가 말이 되면 동사(움직씨)이에요!'},
+  a:{ko:'형용사', en:'Adjective', kid:'형용사(그림씨)', old:'그림씨', em:'🎨',
      desc:'모양, 색깔, 크기, 맛, 기분이 <b>어떤지</b> 알려줘요.', descEn:'An adjective tells what something is like.',
      q:'어때요? 어떤?', qen:'What is it like?',
      tip:'"어때?"에 대답하는 말. "같이 ○○자!"는 이상해요.'},
-  d:{ko:'부사', en:'Adverb',    kid:'어떻게 말', old:'어찌씨', em:'💨',
-     desc:'움직임 말 앞에서 <b>어떻게, 얼마나</b> 하는지 알려줘요.', descEn:'An adverb tells how we do something.',
+  d:{ko:'부사', en:'Adverb',    kid:'부사(어찌씨)', old:'어찌씨', em:'💨',
+     desc:'동사(움직씨) 앞에서 <b>어떻게, 얼마나</b> 하는지 알려줘요.', descEn:'An adverb tells how we do something.',
      q:'어떻게? 얼마나?', qen:'How?',
      tip:'"어떻게 달려?" → "빨리!" 처럼 대답하는 말이에요.'}
 };
@@ -22,10 +22,10 @@ const ORDER = ['n','v','a','d'];
 
 // 문장 속 위치 힌트 (아이가 막혔을 때)
 const WHERE = {
-  n:{ko:'"가, 이, 을, 를" 꼬리가 붙은 말을 찾아 봐요.', en:'the, a, my 바로 뒤에 있을 때가 많아요. (the → dog)'},
-  v:{ko:'한국어 움직임 말은 문장 <b>맨 끝</b>에 있어요! "-요"로 끝나요.', en:'영어 움직임 말은 이름 말 <b>바로 뒤</b>에 와요. (dog → runs)'},
-  a:{ko:'이름 말 <b>바로 앞</b>에서 "어떤?"을 알려줘요. (귀여운 → 고양이)', en:'이름 말 <b>바로 앞</b>에 와요. (cute → cat)'},
-  d:{ko:'움직임 말 <b>바로 앞</b>에 있어요. (빨리 → 달려요)', en:'영어에서는 문장 <b>맨 끝</b>에 올 때가 많아요. (runs → quickly)'}
+  n:{ko:'"가, 이, 을, 를" 같은 토씨(조사)가 붙은 말을 찾아 봐요.', en:'the, a, my 바로 뒤에 있을 때가 많아요. (the → dog)'},
+  v:{ko:'한국어 동사(움직씨)은 문장 <b>맨 끝</b>에 있어요! "-요"로 끝나요.', en:'영어 동사(움직씨)은 명사(이름씨) <b>바로 뒤</b>에 와요. (dog → runs)'},
+  a:{ko:'명사(이름씨) <b>바로 앞</b>에서 "어떤?"을 알려줘요. (귀여운 → 고양이)', en:'명사(이름씨) <b>바로 앞</b>에 와요. (cute → cat)'},
+  d:{ko:'동사(움직씨) <b>바로 앞</b>에 있어요. (빨리 → 달려요)', en:'영어에서는 문장 <b>맨 끝</b>에 올 때가 많아요. (runs → quickly)'}
 };
 
 // ── 낱말 바구니 [그림, 한국어, 영어, 문장 속 모양] ──
