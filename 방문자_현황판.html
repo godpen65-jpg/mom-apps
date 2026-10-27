@@ -58,9 +58,6 @@
   <div class="sec">🌸 공유용 앱</div>
   <div id="grp-share"></div>
 
-  <div class="sec">🔒 개인용 (공유 안 함)</div>
-  <div id="grp-private"></div>
-
   <div class="sec">🏠 모아보기 허브</div>
   <div id="grp-hub"></div>
 
@@ -80,8 +77,6 @@ var SITES=[
   {g:"share",  e:"🔤", nm:"파닉스 로드맵",  key:"phonics",     url:"https://godpen65-jpg.github.io/phonics-roadmap/"},
   {g:"share",  e:"📖", nm:"다국어 동화",    key:"donghwa",     url:"https://godpen65-jpg.github.io/donghwa-multilang/"},
   {g:"share",  e:"🗓️", nm:"방학 일정표",    key:"vacation",    url:"https://godpen65-jpg.github.io/vacation-schedule-maker/"},
-  {g:"private",e:"🧸", nm:"리틀헬로",       key:"littlehello", url:"https://godpen65-jpg.github.io/littlehello-lessons/"},
-  {g:"private",e:"🤖", nm:"마미AI",         key:"mommyai",     url:"https://godpen65-jpg.github.io/mommyai-lessons/"},
   {g:"share",  e:"💖", nm:"티니핑 도감",    key:"teenieping",  url:"https://godpen65-jpg.github.io/mom-apps/teenieping/"},
   {g:"hub",    e:"🏠", nm:"엄마표앱 모음",  key:"momapps",     url:"https://godpen65-jpg.github.io/mom-apps/"}
 ];
@@ -94,7 +89,7 @@ function cardHTML(s){
 }
 
 function render(){
-  ["share","private","hub"].forEach(function(g){
+  ["share","hub"].forEach(function(g){
     var box=document.getElementById("grp-"+(g==="share"?"share":g==="private"?"private":"hub"));
     box.innerHTML=SITES.filter(function(s){return s.g===g;}).map(cardHTML).join("");
   });
