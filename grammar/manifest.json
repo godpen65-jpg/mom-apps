@@ -1,7 +1,7 @@
 {
   "id": "/mom-apps/grammar/",
-  "name": "서현이와 에스",
-  "short_name": "서현이와에스",
+  "name": "영문법 만화",
+  "short_name": "영문법 만화",
   "lang": "ko",
   "start_url": "./",
   "scope": "./",
