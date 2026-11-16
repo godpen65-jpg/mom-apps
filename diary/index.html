@@ -294,7 +294,7 @@
   var DONE = LAST + 1;
   var screen = 0;   // 0 시작, 1~4 문장, 5 완성
   var active = null; // 지금 고르는 네모
-  var emoTab = 1, showMoments = false, browsePlace = null;
+  var emoTab = 1, showMoments = false, showAllMoments = false, browsePlace = null;
 
   function emo() { return S.emo == null ? null : D.emotions[S.emo]; }
   function row() { return (S.placeIdx == null || S.rowIdx == null) ? null : D.places[S.placeIdx].rows[S.rowIdx]; }
@@ -404,12 +404,13 @@
     delete S.over.s1; save();
     active = firstEmpty(1); render();
   }
-  function pickEmotion(i) {
+  function pickEmotion(i, reason) {
     S.emo = i; S.feel = D.emotions[i].past;
+    if (reason) { S.reason = reason; S.skip.reason = false; }
     // 감정이 바뀌면 몸 표현 재료도 새로
     S.mat = ''; S.sl = ''; S.move = '';
     delete S.over.s3; delete S.over.s4; delete S.over.emoBox; delete S.over.matBox;
-    save(); active = firstEmpty(2); render();
+    save(); active = firstEmpty(screen); render();
   }
 
   /* ---------- 그리기 도우미 ---------- */
@@ -672,10 +673,14 @@
       }
       b.appendChild(h('div', { style: 'margin-top:12px' }, [h('button', { class: 'btn ghost', type: 'button', on: { click: function () { showMoments = !showMoments; render(); } } }, [showMoments ? '힌트 닫기' : '🤔 감정이 안 떠올라요'])]));
       if (showMoments) {
+        b.appendChild(h('div', { class: 'board-hint', style: 'margin-top:10px' }, ['오늘과 비슷한 순간을 누르면 감정과 까닭이 함께 들어가요.']));
         D.emotions.forEach(function (em, i) {
           if (em.part !== emoTab) return;
+          var rs = X.moment_reasons[em.name] || [];
           b.appendChild(h('div', { class: 'group-label' }, [EM_EMO[i] + ' ' + em.name + ' — 이런 순간']));
-          b.appendChild(h('ul', { class: 'moments' }, em.moments.map(function (m) { return h('li', null, [m]); })));
+          b.appendChild(h('div', { class: 'chips' }, em.moments.map(function (m, j) {
+            return chip(m, function () { showMoments = false; pickEmotion(i, rs[j]); }, { on: S.emo === i && S.reason === rs[j] });
+          })));
         });
       }
       b.appendChild(writeBox('feel', '감정 말 직접 쓰기', '예: 두근두근했다'));
@@ -690,6 +695,12 @@
       title('왜 그런 감정이 들었어요?', '"…해서", "…어서"로 끝나는 말이에요.');
       var mine = reasonsFromScene();
       if (mine.length) { label('📍 1번에서 고른 일로'); b.appendChild(chipList(mine, 'reason')); }
+      if (e && X.moment_reasons[e.name]) { label('💡 ' + EM_EMO[S.emo] + ' ' + e.name + ' — 이런 순간'); b.appendChild(chipList(X.moment_reasons[e.name], 'reason')); }
+      b.appendChild(h('div', { style: 'margin-top:12px' }, [h('button', { class: 'btn ghost', type: 'button', on: { click: function () { showAllMoments = !showAllMoments; render(); } } }, [showAllMoments ? '다른 감정의 순간 닫기' : '💡 다른 감정의 순간도 보기'])]));
+      if (showAllMoments) D.emotions.forEach(function (em, i) {
+        if (e && i === S.emo) return;
+        label(EM_EMO[i] + ' ' + em.name); b.appendChild(chipList(X.moment_reasons[em.name] || [], 'reason'));
+      });
       X.reasons.forEach(function (g) { label(g.label); b.appendChild(chipList(g.words, 'reason')); });
       b.appendChild(writeBox('reason', '까닭 직접 쓰기', '예: 친구가 내 그림을 칭찬해 주어서'));
     }
@@ -841,7 +852,7 @@
 
   /* ---------- 전체 그리기 ---------- */
   function go(n) {
-    screen = Math.max(0, Math.min(DONE, n)); showMoments = false; browsePlace = null;
+    screen = Math.max(0, Math.min(DONE, n)); showMoments = false; showAllMoments = false; browsePlace = null;
     active = (screen >= 1 && screen <= LAST) ? firstEmpty(screen) : null;
     render(); window.scrollTo(0, 0);
   }
