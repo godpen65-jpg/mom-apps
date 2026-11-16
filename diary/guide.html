@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>일기 5문장으로 쓰기 정리본</title>
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #c8195e; --ink: #222; --sub: #555; --rule: #d9d2d6;
+    --c1: #d6336c; --c2: #e8890c; --c3: #8a5cc7; --c4: #2f9e6e; --c5: #3a7fc4;
+    --p1: #e0457b; --p2: #8a5cc7; --p3: #e08a1e; --p4: #3a7fc4; --p5: #2f9e6e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: #e9e4e7; }
+  body { font-family: 'Noto Sans KR', sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .bar { position: sticky; top: 0; z-index: 5; background: #fff; border-bottom: 2px solid #f3c6d6; padding: 10px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .bar b { color: var(--pink); font-size: 16px; flex: 1; }
+  .bar a, .bar button { font: inherit; font-size: 15px; padding: 8px 14px; border-radius: 10px; border: 0; background: var(--pink); color: #fff; text-decoration: none; cursor: pointer; }
+  .bar a.ghost { background: #fff; color: var(--pink); border: 2px solid #f3b4cb; }
+  .pages { padding: 16px 0 40px; }
+  .page {
+    width: 210mm; height: 297mm; margin: 0 auto 14px; background: #fff; position: relative; overflow: hidden;
+    padding: 12mm 13mm 14mm; box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  }
+  .foot { position: absolute; left: 13mm; right: 13mm; bottom: 6mm; font-size: 6.5pt; color: #888; display: flex; justify-content: space-between; }
+  .kicker { color: var(--pink); font-weight: 700; font-size: 9pt; }
+  h1 { font-size: 23pt; font-weight: 900; margin: 1mm 0 3mm; letter-spacing: -0.5px; }
+  .lead { font-size: 10pt; line-height: 1.6; margin-bottom: 4mm; }
+  .lead b { font-weight: 700; }
+  .b { display: inline-block; border: 1px solid #999; border-radius: 1.6mm; padding: 0 1.3mm; margin: 0 .4mm; line-height: 1.35; font-size: .92em; background: #fff; }
+  .tag { display: inline-block; background: var(--pink); color: #fff; border-radius: 1mm; padding: 0 1.2mm; font-weight: 700; font-size: .85em; margin-right: 1mm; }
+
+  /* 1쪽 */
+  .steps3 { display: flex; gap: 4mm; margin-bottom: 5mm; }
+  .steps3 div { flex: 1; background: #fdeef3; border-radius: 3mm; padding: 3mm 4mm; font-size: 9.5pt; line-height: 1.5; display: flex; gap: 2.5mm; align-items: flex-start; }
+  .steps3 i { font-style: normal; flex: none; width: 6mm; height: 6mm; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 9pt; }
+  h2 { font-size: 13pt; font-weight: 900; border-left: 1.6mm solid var(--pink); padding-left: 2.5mm; margin: 4mm 0 2.5mm; }
+  table.frame { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  table.frame th { text-align: left; font-weight: 500; color: var(--sub); font-size: 8pt; padding: 1.5mm 2mm; border-bottom: 1.4px solid var(--pink); }
+  table.frame td { padding: 2.6mm 2mm; border-bottom: 1px solid #e6dfe3; vertical-align: top; line-height: 1.55; }
+  table.frame td.n { font-size: 15pt; font-weight: 900; color: var(--pink); width: 8mm; }
+  table.frame td.s { font-size: 8pt; color: var(--sub); width: 15mm; }
+  table.frame .fr { font-size: 10.5pt; font-weight: 700; margin-bottom: 1mm; }
+  table.frame .nt { font-size: 8pt; color: var(--sub); }
+  table.frame .nt b { color: #333; }
+  table.frame td.ex { background: #fdeef3; width: 50mm; font-size: 8.8pt; }
+  .rules { background: #f7f4f6; border-radius: 2.5mm; padding: 2.5mm 4mm; font-size: 8.5pt; line-height: 1.7; margin-top: 3mm; }
+  .rules b { color: var(--pink); }
+  table.toc { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  table.toc td { padding: 2.2mm 2mm; border-bottom: 1px solid #e6dfe3; }
+  table.toc td:first-child { color: var(--pink); font-weight: 700; width: 20mm; }
+  table.toc b { font-weight: 700; }
+
+  /* 네모 메꾸기 */
+  .box { border: 1.4px solid var(--c); border-radius: 3mm; padding: 2.5mm 4mm 2mm; margin-bottom: 3.2mm; }
+  .box-h { display: flex; align-items: center; gap: 2.5mm; margin-bottom: 1.2mm; }
+  .box-h .num { width: 7mm; height: 7mm; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 10pt; flex: none; }
+  .box-h .t { font-size: 12pt; font-weight: 900; flex: 1; }
+  .box-h .f { font-size: 8pt; color: #444; }
+  .row { display: flex; gap: 3mm; padding: 1.1mm 0; border-top: 1px dotted #e0d6dc; }
+  .row .l { width: 24mm; flex: none; color: var(--c); font-weight: 700; font-size: 8.3pt; padding-top: .6mm; }
+  .chips { display: flex; flex-wrap: wrap; gap: 1.2mm; flex: 1; }
+  .chip { background: #f3eff1; border-radius: 1.4mm; padding: .4mm 1.6mm; font-size: 8.4pt; line-height: 1.45; }
+  .chip.say::before { content: '“'; } .chip.say::after { content: '”'; }
+  .hint { font-size: 8.4pt; color: #444; background: #f3eff1; border-radius: 1.4mm; padding: .6mm 2mm; line-height: 1.45; }
+  .sub { font-size: 7.4pt; color: #fff; background: var(--c); border-radius: 1.4mm; padding: .5mm 1.6mm; line-height: 1.45; font-weight: 700; }
+  .grp { display: flex; flex-wrap: wrap; gap: 1.2mm; width: 100%; }
+
+  /* 장소 카드 */
+  .place { border: 1.4px solid #e8a33a; border-radius: 3mm; padding: 2mm 3.5mm 2.2mm; margin-bottom: 2.6mm; }
+  .place h3 { font-size: 13pt; font-weight: 900; margin-bottom: .6mm; }
+  table.pt { width: 100%; border-collapse: collapse; font-size: 8.8pt; table-layout: fixed; }
+  table.pt th { font-weight: 700; font-size: 7.6pt; text-align: left; padding: .8mm 1.5mm; color: #b5650b; }
+  table.pt th.act { color: #2d64a8; border-bottom: 1px solid #9db8dc; }
+  table.pt th small { font-weight: 400; color: #777; }
+  table.pt td { padding: 1mm 1.5mm; border-top: 1px dotted #d8cfc4; line-height: 1.35; }
+  table.pt td.w { background: #fff2df; }
+  table.pt td.h { background: #e9f5ec; }
+  table.pt td.a { background: #e8eff9; font-weight: 700; }
+  table.pt td.a2 { background: #f0f5fb; }
+
+  /* 감정 사전 */
+  .ph { display: flex; align-items: center; gap: 3mm; border-bottom: 1.4px solid var(--pc); padding-bottom: 1.5mm; margin-bottom: 2mm; }
+  .ph .pt { background: var(--pc); color: #fff; font-weight: 900; font-size: 9pt; padding: .8mm 2.5mm; border-radius: 1.5mm; }
+  .ph .pn { font-size: 15pt; font-weight: 900; flex: 1; }
+  .ph .pd { font-size: 8pt; color: #888; }
+  .says { font-size: 8.2pt; line-height: 1.5; background: #f7f4f6; border-radius: 2mm; padding: 1.4mm 3mm; margin-bottom: 2.6mm; }
+  .says b { color: var(--pc); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.6mm; }
+  .ec { border: 1.3px solid var(--pc); border-radius: 3mm; padding: 2.4mm 3mm 2mm; }
+  .ec-h { display: flex; align-items: baseline; gap: 1.6mm; margin-bottom: 1mm; }
+  .ec-h .no { background: var(--pc); color: #fff; font-size: 7.5pt; font-weight: 700; border-radius: 1mm; padding: 0 1.2mm; }
+  .ec-h .nm { font-size: 13.5pt; font-weight: 900; }
+  .ec-h .ps { font-size: 13.5pt; font-weight: 900; color: var(--pc); flex: 1; }
+  .ec-h .lb { font-size: 6.8pt; color: #888; }
+  .mean { background: #f5f2f4; border-radius: 1.4mm; padding: .7mm 2mm; font-size: 8.2pt; margin-bottom: 1mm; }
+  .kv { font-size: 8pt; line-height: 1.45; margin-bottom: .5mm; display: flex; gap: 1.4mm; }
+  .kv .k { flex: none; background: #777; color: #fff; border-radius: 1mm; padding: 0 1.2mm; font-size: 7pt; font-weight: 700; height: 4.2mm; line-height: 4.2mm; }
+  .kv .k.feel { background: var(--pc); }
+  .bt { font-size: 6.8pt; color: #888; margin: .8mm 0 .2mm; }
+  .br { display: flex; gap: 2mm; font-size: 8pt; padding: .45mm 0; border-bottom: 1px dotted #e3dce0; }
+  .br .k { width: 8mm; flex: none; color: var(--pc); font-weight: 700; }
+  .mv { font-size: 8pt; line-height: 1.45; margin-top: 1mm; }
+  .mv .k { background: var(--pc); color: #fff; border-radius: 1mm; padding: 0 1.2mm; font-size: 7pt; font-weight: 700; margin-right: 1mm; }
+
+  /* 오늘의 일기 */
+  .sh-meta { display: flex; gap: 6mm; align-items: flex-end; font-size: 12pt; margin-bottom: 6mm; }
+  .sh-meta .f { display: flex; align-items: flex-end; gap: 3mm; }
+  .sh-meta .v { border-bottom: 1px solid #333; height: 7mm; }
+  .sh-boxes { display: flex; gap: 5mm; margin-bottom: 6mm; }
+  .sh-box { flex: 1; border: 1.3px dashed var(--pink); border-radius: 3mm; height: 26mm; padding: 2.5mm 3.5mm; }
+  .sh-box .t { color: var(--pink); font-weight: 700; font-size: 9pt; }
+  .sh-s { display: flex; gap: 4mm; margin-bottom: 3mm; }
+  .sh-n { width: 9.5mm; height: 9.5mm; border-radius: 50%; background: var(--pink); color: #fff; font-weight: 700; font-size: 13pt; display: grid; place-items: center; flex: none; margin-top: -1mm; }
+  .sh-body { flex: 1; min-width: 0; }
+  .sh-frame { font-size: 9pt; color: #444; height: 5.5mm; white-space: nowrap; }
+  .sh-frame .b { font-size: 8.5pt; }
+  .sh-lines { height: 30mm; background-image: linear-gradient(to bottom, transparent calc(15mm - 1px), #9a9a9a calc(15mm - 1px), #9a9a9a 15mm); background-size: 100% 15mm; }
+
+  /* 부록 */
+  .mo { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; }
+  .mb { border-top: 1.4px solid var(--pc); padding: 1.6mm 0 2.6mm; }
+  .mb h4 { font-size: 11pt; font-weight: 900; margin-bottom: .6mm; }
+  .mb h4 .no { color: var(--pc); font-size: 9pt; margin-right: 1mm; }
+  .mb h4 .ps { color: var(--pc); }
+  .mb ul { list-style: none; display: grid; grid-template-columns: 1fr 1fr; column-gap: 3mm; }
+  .mb li { font-size: 7.8pt; line-height: 1.5; padding-left: 3.4mm; text-indent: -3.4mm; }
+  .mb li::before { content: '☐ '; color: #666; }
+
+  @page { size: A4; margin: 0; }
+  @media print {
+    html, body { background: #fff; }
+    .bar { display: none; }
+    .pages { padding: 0; }
+    .page { margin: 0; box-shadow: none; break-after: page; }
+  }
+</style>
+</head>
+<body>
+<div class="bar"><b>일기 5문장으로 쓰기 · 정리본</b><a class="ghost" href="./">← 일기 쓰기 앱</a><button type="button" onclick="window.print()">🖨️ 인쇄 / PDF로 저장</button></div>
+<div class="pages" id="pages"></div>
+
+<script src="data.js"></script>
+<script src="extra.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.DIARY_DATA, X = window.DIARY_EXTRA;
+  var FOOT = '일기 5문장으로 쓰기 · 감정 카드와 장소 카드의 낱말은 새로 쓴 것입니다 · 참고: 아이블 미래교육연구소 「첫 일기쓰기 표현 가이드」, 하루 10분 문해력 『일기 쓰기 길잡이』';
+  var PC = { 1: 'var(--p1)', 2: 'var(--p2)', 3: 'var(--p3)', 4: 'var(--p4)', 5: 'var(--p5)' };
+  var NUMS = ['', '①', '②', '③', '④', '⑤'];
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function B(t) { return '<span class="b">' + t + '</span>'; }
+  function chips(ws, cls) { return '<div class="chips">' + ws.map(function (w) { return '<span class="chip' + (cls ? ' ' + cls : '') + '">' + esc(w) + '</span>'; }).join('') + '</div>'; }
+  function hasB(w) { var c = w.charCodeAt(w.length - 1); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 !== 0; }
+  function eul(w) { return w + (hasB(w) ? '을' : '를'); }
+  // 앱과 같은 활용 규칙
+  var DAGA = { '했다': '하다가', '먹었다': '먹다가', '그렸다': '그리다가', '보았다': '보다가', '들었다': '듣다가', '쌓았다': '쌓다가', '읽었다': '읽다가', '탔다': '타다가', '불었다': '불다가', '빌렸다': '빌리다가', '골랐다': '고르다가', '밀었다': '밀다가', '찍었다': '찍다가', '주웠다': '줍다가', '쳤다': '치다가' };
+  var SEO = { '했다': '해서', '먹었다': '먹어서', '그렸다': '그려서', '보았다': '보아서', '들었다': '들어서', '쌓았다': '쌓아서', '읽었다': '읽어서', '탔다': '타서', '불었다': '불어서', '빌렸다': '빌려서', '골랐다': '골라서', '밀었다': '밀어서', '찍었다': '찍어서', '주웠다': '주워서', '쳤다': '쳐서' };
+
+  var out = [], pageNo = 0;
+  function page(inner) { pageNo++; out.push('<section class="page">' + inner + '<div class="foot"><span>' + FOOT + '</span><span>' + pageNo + '</span></div></section>'); }
+
+  var FR = {
+    1: '오늘 나는 ' + B('누구') + '와(과) ' + B('어디') + '에서 ' + B('무엇') + '을(를) ' + B('어떻게') + ' ' + B('행동') + '.',
+    2: B('하다가') + ' ' + B('누가') + '이(가) "' + B('한 말') + '" 하고 ' + B('말했다') + '.',
+    3: B('까닭 (~해서)') + ' ' + B('얼마나') + ' ' + B('감정 말') + '.',
+    5: B('다음에도·앞으로는') + ' ' + B('누구') + '와(과) ' + B('행동') + '.'
+  };
+  var FR4a = '<span class="tag">가</span>그때 내 ' + B('몸 부위') + '은(는) 마치 ' + B('비유 재료') + '처럼 ' + B('움직임') + '.';
+  var FR4b = '<span class="tag">나</span>그때 내 ' + B('몸 부위') + '은(는) ' + B('소리 말·모습 말') + ' ' + B('움직임') + '.';
+
+  /* ===== 1쪽: 공통 틀 ===== */
+  page(
+    '<div class="kicker">초등 1학년 일기 쓰기</div><h1>일기 5문장으로 쓰기</h1>' +
+    '<p class="lead">어떤 날이든 <b>같은 5문장 틀</b>에 재료만 넣어 써요. 재료는 <b>네모 메꾸기</b>(2~3쪽), <b>장소 카드</b>(4~6쪽), <b>감정 카드</b>(7~11쪽)에서 골라요.</p>' +
+    '<div class="steps3"><div><i>1</i>오늘 있었던 일 하나를 떠올려요</div><div><i>2</i>네모 메꾸기 · 장소 카드 · 감정 카드에서 재료를 골라요</div><div><i>3</i>아래 5문장 틀에 넣어 일기를 써요</div></div>' +
+    '<h2>공통 일기 틀 — 5문장</h2>' +
+    '<table class="frame"><tr><th></th><th>단계</th><th>문장 틀 ' + B('네모') + ' 안만 바꿔 써요</th><th>예시 (뿌듯하다)</th></tr>' +
+    '<tr><td class="n">1</td><td class="s">장면</td><td><div class="fr">' + FR[1] + '</div><div class="nt"><b>누구 · 어디</b>는 네모 메꾸기, <b>무엇 · 어떻게 · 행동(지난 일)</b>은 장소 카드에서 골라요. 어떻게는 빼도 돼요.</div></td><td class="ex">오늘 나는 아빠와 공원에서 자전거를 신나게 탔다.</td></tr>' +
+    '<tr><td class="n">2</td><td class="s">대화</td><td><div class="fr">' + FR[2] + '</div><div class="nt"><b>하다가</b>는 장소 카드의 하다가 칸, <b>한 말</b>은 네모 메꾸기나 감정 사전 PART 맨 위에서 골라요. "나"가 말했으면 "나는"이 돼요. 하다가는 빼도 돼요.</div></td><td class="ex">자전거를 타다가 아빠가 "와, 혼자서도 잘 탄다!" 하고 말했다.</td></tr>' +
+    '<tr><td class="n">3</td><td class="s">감정 · 까닭</td><td><div class="fr">' + FR[3] + '</div><div class="nt"><b>까닭</b>은 장소 카드의 해서 칸이나 네모 메꾸기, <b>감정 말</b>은 감정 카드에서 골라요. 얼마나는 빼도 돼요.</div></td><td class="ex">보조 바퀴 없이 끝까지 해내서 정말 뿌듯했다.</td></tr>' +
+    '<tr><td class="n">4</td><td class="s">몸 표현</td><td><div class="fr">' + FR4a + '</div><div class="nt" style="margin:.6mm 0">또는</div><div class="fr">' + FR4b + '</div><div class="nt"><b>가, 나 중 하나만</b> 골라 써요. 가는 감정 카드의 <b>비유 재료</b>, 나는 <b>소리 말 · 모습 말</b>에서 골라요. <b>움직임</b>도 감정 카드에 있어요.</div></td><td class="ex"><span class="tag">가</span>그때 내 가슴은 마치 가득 찬 바구니처럼 꽉 찼다.<br><span class="tag">나</span>그때 내 가슴은 당당히 쫙 펴졌다.</td></tr>' +
+    '<tr><td class="n">5</td><td class="s">마무리</td><td><div class="fr">' + FR[5] + '</div><div class="nt">장소 카드의 <b>다음에</b> 칸이나 네모 메꾸기에서 골라요.</div></td><td class="ex">다음에도 아빠와 더 멀리 타고 싶다.</td></tr></table>' +
+    '<div class="rules"><b>받침에 맞게</b> 와/과 · 을/를 · 은/는 · 이/가를 골라요 (친구<b>와</b> / 동생<b>과</b>, 엄마<b>가</b> / 동생<b>이</b>). "혼자서"는 와(과)를 빼요.<br><b>모든 네모</b>에는 여기에 없는 말을 직접 써도 돼요.</div>' +
+    '<h2>이 정리본 구성</h2><table class="toc">' +
+    '<tr><td>2~3쪽</td><td><b>네모 메꾸기</b> — 누구 · 어디 · 어떻게 · 하다가 · 한 말 · 얼마나 · 까닭 · 마무리 행동</td></tr>' +
+    '<tr><td>4~6쪽</td><td><b>장소 카드</b> — 장소 12곳의 무엇 · 어떻게 · 행동 (지난 일 · 하다가 · 해서 · 다음에)</td></tr>' +
+    '<tr><td>7~11쪽</td><td><b>감정 사전</b> — 감정 카드 30장: 감정 말 · 뜻 · 소리 말 · 모습 말 · 비유 재료 · 움직임</td></tr>' +
+    '<tr><td>12쪽</td><td><b>일기 쓰기 칸</b> — 필요한 만큼 여러 장 인쇄해서 써요</td></tr>' +
+    '<tr><td>13~14쪽</td><td><b>부록: 이런 순간에 이 감정을 느껴요</b> — 감정별 순간 예시 (일기 소재가 안 떠오를 때)</td></tr></table>'
+  );
+
+  /* ===== 2~3쪽: 네모 메꾸기 ===== */
+  function g(no, label) { var f = D.fillers.filter(function (x) { return x.sentence === no; })[0]; return ((f && f.groups) || []).filter(function (x) { return x.label.indexOf(label) === 0; })[0]; }
+  function row(l, inner) { return '<div class="row"><div class="l">' + l + '</div>' + inner + '</div>'; }
+  function box(c, n, t, f, rows) { return '<div class="box" style="--c:var(--c' + c + ')"><div class="box-h"><div class="num">' + n + '</div><div class="t">' + t + '</div><div class="f">' + f + '</div></div>' + rows + '</div>'; }
+  var nemoHead = '<div class="kicker">네모 메꾸기 · 5문장 틀에 넣을 재료</div><h1>네모 메꾸기</h1><p class="lead">문장 번호에 맞는 칸에서 재료를 골라 ' + B('네모') + '에 넣어요. 여기에 없는 말을 써도 돼요.</p>';
+  function grp(label, ws, cls) { return '<div class="grp"><span class="sub">' + label + '</span>' + ws.map(function (w) { return '<span class="chip' + (cls ? ' ' + cls : '') + '">' + esc(w) + '</span>'; }).join('') + '</div>'; }
+  var say = X.says.map(function (s) { return grp(s.label, s.words, 'say'); }).join('');
+  page(nemoHead +
+    box(1, 1, '장면', FR[1],
+      row('누구', chips(g(1, '누구').words)) +
+      row('어디', chips(g(1, '어디').words)) +
+      row('무엇 · 어떻게 · 행동', '<div class="hint">장소 카드(4~6쪽)에서 한 줄을 골라요 → 그네를 신나게 탔다 · 노을을 가만히 보았다 …</div>') +
+      row('어떻게 (더 고르기)', chips(g(1, '어떻게').words)) +
+      row('소리 말', chips(g(1, '소리 말').words)) +
+      row('모습 말', chips(g(1, '모습 말').words)) +
+      row('언제 (넣어도 돼요)', chips(g(1, '언제').words))) +
+    box(2, 2, '대화', FR[2],
+      row('하다가', '<div class="chips"><div class="hint" style="width:100%;margin-bottom:1mm">장소 카드의 <b>무엇</b> + <b>하다가</b> 칸 → 그네를 타다가 · 책을 읽다가 · 급식을 먹다가 …</div>' + chips(X.openers).replace(/^<div class="chips">|<\/div>$/g, '') + '</div>') +
+      row('누가', chips(['나 (→ 나는)'].concat(g(1, '누구').words.filter(function (w) { return w !== '혼자서'; })))) +
+      row('한 말', '<div class="chips">' + say + '</div>') +
+      row('말했다', chips(X.said)))
+  );
+  var reasons = X.reasons.map(function (r) { return grp(r.label, r.words); }).join('');
+  var wants = X.wants.map(function (r) { return grp(r.label, r.words); }).join('');
+  page('<div class="kicker">네모 메꾸기 · 5문장 틀에 넣을 재료 (이어서)</div><h1>네모 메꾸기</h1><p class="lead">감정이 안 떠오르면 13~14쪽 <b>부록</b>을 보세요.</p>' +
+    box(3, 3, '감정 · 까닭', FR[3],
+      row('까닭 (~해서)', '<div class="chips"><div class="hint" style="width:100%">장소 카드의 <b>무엇</b> + <b>해서</b> 칸 → 그네를 타서 · 같이 소꿉놀이를 해서 · 친구와 같이 놀아서 …</div>' + reasons + '</div>') +
+      row('얼마나', chips(X.much)) +
+      row('감정 말', '<div class="hint">감정 카드(7~11쪽)에서 골라요 → 기뻤다 · 날아갈 것 같았다 · 마음이 따뜻해졌다 · 속상했다 · 화가 났다 …</div>')) +
+    box(4, 4, '몸 표현', '감정 카드의 ' + B('비유 재료') + ' 또는 ' + B('소리 말·모습 말'),
+      row('몸 부위', chips(['얼굴', '가슴', '손', '발', '온몸'])) +
+      row('나머지', '<div class="hint">고른 감정 카드에서 몸 부위의 <b>비유 재료</b>(가) 또는 <b>소리 말 · 모습 말</b>(나), 그리고 <b>움직임</b>을 골라요.</div>')) +
+    box(5, 5, '마무리', FR[5],
+      row('다음에도 · 앞으로는', chips(['다음에도', '앞으로는'])) +
+      row('행동 · 다음에', '<div class="chips"><div class="hint" style="width:100%">장소 카드의 <b>다음에</b> 칸 → 또 그네를 타고 싶다 · 책을 더 읽고 싶다 …</div>' + wants + '</div>'))
+  );
+
+  /* ===== 4~6쪽: 장소 카드 ===== */
+  var pHead = function (cont) {
+    return '<div class="kicker" style="color:#c26a07">장소 카드 · ①②③⑤번 문장 재료' + (cont ? ' (이어서)' : '') + '</div><h1>장소 카드</h1>' +
+      '<p class="lead" style="font-size:9.3pt">오늘 있었던 장소의 카드를 찾아요. <b>한 줄</b>을 골라 ①번 문장에 넣어요 … ' + B('무엇') + '을(를) ' + B('어떻게') + ' ' + B('행동') + '.<br>같은 줄에서 ②번 대화는 <b>하다가</b>, ③번 까닭은 <b>해서</b>, ⑤번 마무리는 <b>다음에</b> 칸을 넣어요.</p>';
+  };
+  function placeCard(p) {
+    var h = '<div class="place"><h3>' + esc(p.place) + '</h3><table class="pt"><colgroup><col style="width:35%"><col style="width:17%"><col style="width:12%"><col style="width:12%"><col style="width:11%"><col style="width:13%"></colgroup>' +
+      '<tr><th rowspan="2">무엇</th><th rowspan="2">어떻게</th><th class="act" colspan="4">행동</th></tr>' +
+      '<tr><th class="act">지난 일 <small>①번</small></th><th class="act">하다가 <small>②번</small></th><th class="act">해서 <small>③번</small></th><th class="act">다음에 <small>⑤번</small></th></tr>';
+    p.rows.forEach(function (r) {
+      var pa = r.action.past;
+      h += '<tr><td class="w">' + r.what.map(esc).join(' · ') + '</td><td class="h">' + r.how.map(esc).join(' · ') + '</td><td class="a">' + pa + '</td><td class="a2">' + (DAGA[pa] || '') + '</td><td class="a2">' + (SEO[pa] || '') + '</td><td class="a">' + r.action.want + '</td></tr>';
+    });
+    return h + '</table></div>';
+  }
+  for (var i = 0; i < D.places.length; i += 4) page(pHead(i > 0) + D.places.slice(i, i + 4).map(placeCard).join(''));
+
+  /* ===== 7~11쪽: 감정 사전 ===== */
+  var BODY = ['얼굴', '가슴', '손', '발', '온몸'];
+  D.emotion_groups.forEach(function (eg) {
+    var pc = PC[eg.part];
+    var sy = X.says.filter(function (s) { return s.part === eg.part; })[0];
+    var cards = D.emotions.filter(function (e) { return e.part === eg.part; }).map(function (e) {
+      var more = (X.feel_more[e.name] || []).filter(function (w) { return w !== e.past; });
+      var body = BODY.map(function (bp) {
+        var b = e.body.filter(function (x) { return x.part === bp; })[0];
+        return '<div class="br"><span class="k">' + bp + '</span><span>' + (b ? b.materials.map(esc).join(', ') : '') + '</span></div>';
+      }).join('');
+      return '<div class="ec"><div class="ec-h"><span class="no">' + String(e.no).padStart(2, '0') + '</span><span class="nm">' + e.name + ' →</span><span class="ps">' + e.past + '</span><span class="lb">감정 카드</span></div>' +
+        '<div class="mean">' + esc(e.meaning) + '</div>' +
+        '<div class="kv"><span class="k feel">감정 말 더</span><span>' + more.map(esc).join(' · ') + '</span></div>' +
+        '<div class="kv"><span class="k">소리 말</span><span>' + e.sound_words.map(esc).join(' · ') + '</span></div>' +
+        '<div class="kv"><span class="k">모습 말</span><span>' + e.look_words.map(esc).join(' · ') + '</span></div>' +
+        '<div class="bt">몸 부위 · 비유 재료</div>' + body +
+        '<div class="mv"><span class="k">움직임</span>' + e.movements.map(esc).join(', ') + '</div></div>';
+    }).join('');
+    page('<div style="--pc:' + pc + '"><div class="ph"><span class="pt">PART ' + eg.part + '</span><span class="pn">' + eg.name + '</span><span class="pd">감정 사전</span></div>' +
+      (sy ? '<div class="says"><b>②번 대화에 넣을 한 말</b> · ' + sy.words.map(function (w) { return '“' + esc(w) + '”'; }).join('  ') + '</div>' : '') +
+      '<div class="grid">' + cards + '</div></div>');
+  });
+
+  /* ===== 12쪽: 오늘의 일기 ===== */
+  var sh = '<div class="kicker">일기 쓰기 칸 · 필요한 만큼 인쇄해요</div><h1 style="font-size:25pt;margin-bottom:5mm">오늘의 일기</h1>' +
+    '<div class="sh-meta"><div class="f">날짜<div class="v" style="width:45mm"></div></div><div class="f">날씨<div class="v" style="width:30mm"></div></div><div class="f" style="flex:1">제목<div class="v" style="flex:1"></div></div></div>' +
+    '<div class="sh-boxes"><div class="sh-box"><div class="t">오늘의 감정 · 감정 말</div></div><div class="sh-box"><div class="t">내가 고른 재료 (소리 말 · 모습 말 · 비유 재료)</div></div></div>';
+  [FR[1], FR[2], FR[3], FR4a + ' &nbsp;또는 &nbsp;' + FR4b, FR[5]].forEach(function (f, i) {
+    sh += '<div class="sh-s"><div class="sh-n">' + (i + 1) + '</div><div class="sh-body"><div class="sh-frame">' + f + '</div><div class="sh-lines"></div></div></div>';
+  });
+  page(sh);
+
+  /* ===== 13~14쪽: 부록 ===== */
+  function moBlock(e) {
+    return '<div class="mb" style="--pc:' + PC[e.part] + '"><h4><span class="no">' + String(e.no).padStart(2, '0') + '</span>' + e.name + ' <span class="ps">→ ' + e.past + '</span></h4><ul>' +
+      e.moments.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul></div>';
+  }
+  var aHead = function (cont) {
+    return cont ? '<div class="kicker">부록 · 이런 순간에 이 감정을 느껴요 (이어서)</div><div style="height:3mm"></div>'
+      : '<div class="kicker">부록 · 일기 소재가 안 떠오를 때</div><h1>이런 순간에 이 감정을 느껴요</h1><p class="lead">떠오르는 순간에 표시하고, 그날 있었던 일을 일기로 써 보세요. 고른 순간은 ①번 장면 문장이 되고, 감정은 ③번 감정 말이 돼요.</p>';
+  };
+  page(aHead(false) + '<div class="mo">' + D.emotions.slice(0, 16).map(moBlock).join('') + '</div>');
+  page(aHead(true) + '<div class="mo">' + D.emotions.slice(16).map(moBlock).join('') + '</div>');
+
+  document.getElementById('pages').innerHTML = out.join('');
+})();
+</script>
+</body>
+</html>

@@ -499,8 +499,12 @@
     app.appendChild(st);
 
     var ex = h('div', { class: 'board' }, [
-      h('div', { class: 'board-title' }, ['📖 예시 일기 (' + D.example.emotion + ')']),
-      h('ol', { class: 'moments' }, D.example.sentences.map(function (s) { return h('li', null, [s]); }))
+      h('div', { class: 'board-title' }, ['📖 예시 일기 (' + X.example.emotion + ')']),
+      h('ol', { class: 'moments' }, X.example.sentences.map(function (s) { return h('li', null, [s]); })),
+      h('div', { style: 'display:flex;gap:10px;flex-wrap:wrap;margin-top:14px' }, [
+        h('a', { class: 'btn ghost', href: 'guide.html', style: 'text-decoration:none;display:inline-flex;align-items:center' }, ['📄 정리본 보기 · 인쇄']),
+        h('a', { class: 'btn ghost', href: 'guide.pdf', download: '일기5문장_정리본.pdf', style: 'text-decoration:none;display:inline-flex;align-items:center' }, ['⬇️ 정리본 PDF 받기'])
+      ])
     ]);
     app.appendChild(ex);
 
