@@ -182,20 +182,20 @@
   .sh-box { flex: 1; border: 1.3px dashed var(--pink); border-radius: 3mm; height: 26mm; padding: 2.5mm 3.5mm; overflow: hidden; }
   .sh-box .t { color: var(--pink); font-weight: 700; font-size: 9pt; margin-bottom: 1.5mm; }
   .sh-box .c { font-size: 13pt; line-height: 1.45; }
-  .sh-s { display: flex; gap: 4mm; margin-bottom: 3mm; }
+  .sh-s { display: flex; gap: 4mm; margin-bottom: 4mm; }
   .sh-n { width: 9.5mm; height: 9.5mm; border-radius: 50%; background: var(--pink); color: #fff; font-weight: 700; font-size: 13pt; display: grid; place-items: center; flex: none; margin-top: -1mm; }
   .sh-body { flex: 1; min-width: 0; }
   .sh-frame { font-size: 9pt; color: #444; height: 5.5mm; white-space: nowrap; }
   .sh-frame .b { display: inline-block; border: 1px solid #999; border-radius: 1.6mm; padding: 0 1.4mm; margin: 0 .6mm; line-height: 1.35; font-size: 8.5pt; }
   .sh-frame .tag { display: inline-block; background: var(--pink); color: #fff; border-radius: 1mm; padding: 0 1.2mm; font-weight: 700; font-size: 8pt; margin-right: 1mm; }
   .sh-lines {
-    height: 30mm; position: relative;
-    background-image: linear-gradient(to bottom, transparent calc(15mm - 1px), #9a9a9a calc(15mm - 1px), #9a9a9a 15mm);
-    background-size: 100% 15mm;
+    height: 42mm; position: relative;
+    background-image: linear-gradient(to bottom, transparent calc(14mm - 1px), #9a9a9a calc(14mm - 1px), #9a9a9a 14mm);
+    background-size: 100% 14mm;
   }
   .sh-text {
     position: absolute; left: 0; right: 0; top: 0;
-    font-size: 17pt; line-height: 15mm; padding-top: 2.6mm; word-break: keep-all; overflow-wrap: anywhere;
+    font-size: 16.5pt; line-height: 14mm; padding-top: 2.4mm; word-break: keep-all; overflow-wrap: anywhere;
   }
   .sheet.trace .sh-text { color: #b9b9b9; font-weight: 400; }
   .sheet.solid .sh-text { color: #222; font-weight: 500; }
@@ -217,10 +217,11 @@
 <div class="print-only" id="printArea"></div>
 
 <script src="data.js"></script>
+<script src="extra.js"></script>
 <script>
 (function () {
   'use strict';
-  var D = window.DIARY_DATA;
+  var D = window.DIARY_DATA, X = window.DIARY_EXTRA;
 
   /* ---------- 그림(이모지) ---------- */
   var EM_PLACE = { '학교':'🏫','집':'🏠','놀이터':'🛝','공원':'🌳','키즈카페':'🧸','도서관':'📚','마트':'🛒','수영장':'🏊','할머니 댁':'👵','놀이공원':'🎡','바닷가':'🏖️','학원':'🎹','체육관':'🥋' };
@@ -255,7 +256,7 @@
   function endDot(s) { s = strip(s); return /[.!?~]$/.test(s) ? s : s + '.'; }
 
   /* ---------- 상태 ---------- */
-  var KEY = 'diary5.current', HKEY = 'diary5.history';
+  var KEY = 'diary5.v2.current';
   function blank() {
     var t = new Date();
     return {
@@ -263,8 +264,8 @@
       date: t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'),
       weather: '', title: '',
       who: '', where: '', placeIdx: null, rowIdx: null, what: '', how: '', act: '',
-      much: '', emo: null, feel: '',
-      reason: '',
+      much: '', emo: null, feel: '', reason: '',
+      skip: {},
       kind: '가', part: '', mat: '', sl: '', move: '',
       next: '', who5: '', want: '',
       over: {}, // 완성 화면에서 고친 문장/칸
@@ -272,20 +273,15 @@
     };
   }
   function load(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
-  function save() {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(S));
-      var h = load(HKEY, []).filter(function (x) { return x.id !== S.id; });
-      if (anyFilled()) h.unshift(S);
-      localStorage.setItem(HKEY, JSON.stringify(h.slice(0, 40)));
-    } catch (e) {}
-  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   var S = Object.assign(blank(), load(KEY, {}));
-  var screen = 0;   // 0 시작, 1~5 문장, 6 완성
+  if (!S.skip) S.skip = {};
+  var LAST = 4;      // 문장 수
+  var DONE = LAST + 1;
+  var screen = 0;   // 0 시작, 1~4 문장, 5 완성
   var active = null; // 지금 고르는 네모
   var emoTab = 1, showMoments = false, browsePlace = null;
 
-  function anyFilled() { return !!(S.who || S.where || S.what || S.feel || S.reason || S.part || S.want); }
   function emo() { return S.emo == null ? null : D.emotions[S.emo]; }
   function row() { return (S.placeIdx == null || S.rowIdx == null) ? null : D.places[S.placeIdx].rows[S.rowIdx]; }
 
@@ -297,27 +293,24 @@
     if (n === 1) {
       x = ['오늘 나는', whoPart(S.who), wherePart(S.where), S.what ? strip(S.what) + josa(S.what, '을', '를') : '', strip(S.how), strip(S.act)];
     } else if (n === 2) {
-      x = ['그래서 나는', strip(S.much), strip(S.feel)];
+      x = [strip(S.reason), strip(S.much), strip(S.feel)];
     } else if (n === 3) {
-      if (!strip(S.reason)) return '';
-      var r = strip(S.reason);
-      return /때문이다\.?$/.test(r) ? endDot(r) : '왜냐하면 ' + r.replace(/^왜냐하면\s*/, '') + ' 때문이다.';
-    } else if (n === 4) {
       var p = strip(S.part) ? '그때 내 ' + strip(S.part) + josa(S.part, '은', '는') : '';
       if (S.kind === '가') x = [p, S.mat ? '마치 ' + strip(S.mat) + '처럼' : '', strip(S.move)];
       else x = [p, strip(S.sl), strip(S.move)];
-    } else if (n === 5) {
+    } else if (n === 4) {
       x = [strip(S.next), whoPart(S.who5), strip(S.want)];
     }
     var body = x.filter(Boolean);
-    if (body.length <= (n <= 2 ? 1 : 0)) return '';
+    if (body.length <= (n === 1 ? 1 : 0)) return '';
     return endDot(body.join(' '));
   }
   function finalSentence(n) { return S.over['s' + n] != null ? S.over['s' + n] : built(n); }
   function emoBox() {
     if (S.over.emoBox != null) return S.over.emoBox;
     var e = emo();
-    if (e && S.feel === e.past) return EM_EMO[S.emo] + ' ' + e.name + ' → ' + e.past;
+    var fm = e ? [e.past].concat(X.feel_more[e.name] || []) : [];
+    if (e && fm.indexOf(S.feel) >= 0) return EM_EMO[S.emo] + ' ' + e.name + ' → ' + S.feel;
     return strip(S.feel);
   }
   function matBox() {
@@ -339,20 +332,19 @@
       { k: 'how', label: '어떻게', opt: true },
       { k: 'act', label: '행동' }, '.'
     ];
-    if (n === 2) return ['그래서 나는', { k: 'much', label: '얼마나' }, { k: 'feel', label: '감정 말' }, '.'];
-    if (n === 3) return ['왜냐하면', { k: 'reason', label: '까닭' }, '때문이다.'];
-    if (n === 4) return S.kind === '가'
+    if (n === 2) return [{ k: 'reason', label: '까닭 (~해서)' }, { k: 'much', label: '얼마나', opt: true }, { k: 'feel', label: '감정 말' }, '.'];
+    if (n === 3) return S.kind === '가'
       ? ['그때 내', { k: 'part', label: '몸 부위', after: function (v) { return josa(v, '은', '는'); }, fallback: '은(는)' }, '마치', { k: 'mat', label: '비유 재료', after: function () { return '처럼'; }, fallback: '처럼' }, { k: 'move', label: '움직임' }, '.']
       : ['그때 내', { k: 'part', label: '몸 부위', after: function (v) { return josa(v, '은', '는'); }, fallback: '은(는)' }, { k: 'sl', label: '소리 말·모습 말' }, { k: 'move', label: '움직임' }, '.'];
-    if (n === 5) return [{ k: 'next', label: '다음에도·앞으로는' }, { k: 'who5', label: '누구', after: function (v) { return noJosaWho(v) ? '' : josa(v, '과', '와'); }, fallback: '와(과)' }, { k: 'want', label: '행동' }, '.'];
+    if (n === 4) return [{ k: 'next', label: '다음에도·앞으로는' }, { k: 'who5', label: '누구', after: function (v) { return noJosaWho(v) ? '' : josa(v, '과', '와'); }, fallback: '와(과)' }, { k: 'want', label: '행동' }, '.'];
   }
   // 처음 고를 차례 (문장 순서와 다를 수 있음)
-  var ORDER = { 1: ['where', 'what', 'how', 'act', 'who'], 2: ['feel', 'much'], 3: ['reason'], 4: ['part', 'mat', 'sl', 'move'], 5: ['next', 'who5', 'want'] };
+  var ORDER = { 1: ['where', 'what', 'how', 'act', 'who'], 2: ['feel', 'reason', 'much'], 3: ['part', 'mat', 'sl', 'move'], 4: ['next', 'who5', 'want'] };
   function slotKeys(n) { return parts(n).filter(function (p) { return typeof p === 'object'; }).map(function (p) { return p.k; }); }
   function firstEmpty(n) {
     var keys = slotKeys(n);
     var o = ORDER[n].filter(function (k) { return keys.indexOf(k) >= 0; });
-    for (var i = 0; i < o.length; i++) if (!strip(S[o[i]]) && !(o[i] === 'how' && S._howSkipped)) return o[i];
+    for (var i = 0; i < o.length; i++) if (!strip(S[o[i]]) && !S.skip[o[i]]) return o[i];
     return null;
   }
 
@@ -360,7 +352,7 @@
   function set(k, v) {
     S[k] = v;
     delete S.over['s' + screen];
-    if (k === 'how') S._howSkipped = false;
+    S.skip[k] = false;
     if (k === 'want') S._wantTouched = true;
     if (k === 'who' && !S.who5) S.who5 = v;
     if (k === 'feel') delete S.over.emoBox;
@@ -381,7 +373,7 @@
     var rowChanged = S.placeIdx !== pi || S.rowIdx !== ri;
     S.placeIdx = pi; S.rowIdx = ri; S.what = w; S.act = r.action.past;
     if (rowChanged && S.how && r.how.indexOf(S.how) < 0) S.how = '';
-    if (!S._wantTouched) S.want = r.action.want;
+    if (!S._wantTouched) S.want = '또 ' + w + josa(w, '을', '를') + ' ' + r.action.want;
     delete S.over.s1; save();
     active = firstEmpty(1); render();
   }
@@ -389,7 +381,7 @@
     S.emo = i; S.feel = D.emotions[i].past;
     // 감정이 바뀌면 몸 표현 재료도 새로
     S.mat = ''; S.sl = ''; S.move = '';
-    delete S.over.s2; delete S.over.s4; delete S.over.emoBox; delete S.over.matBox;
+    delete S.over.s2; delete S.over.s3; delete S.over.emoBox; delete S.over.matBox;
     save(); active = firstEmpty(2); render();
   }
 
@@ -432,6 +424,40 @@
     ]);
   }
 
+  function skipBtn(k, text) {
+    return h('div', { style: 'margin-top:12px' }, [h('button', { class: 'btn gray', type: 'button', on: { click: function () {
+      S[k] = ''; S.skip[k] = true; delete S.over['s' + screen]; save(); active = firstEmpty(screen); render();
+    } } }, [text])]);
+  }
+  // 했다 → 해서, 먹었다 → 먹어서 ...
+  function toSeo(past) {
+    past = strip(past).replace(/\.$/, '');
+    var rules = [[/했다$/, '해서'], [/였다$/, '여서'], [/었다$/, '어서'], [/았다$/, '아서'], [/렸다$/, '려서'], [/쳤다$/, '쳐서'], [/졌다$/, '져서'],
+      [/웠다$/, '워서'], [/랐다$/, '라서'], [/갔다$/, '가서'], [/왔다$/, '와서'], [/났다$/, '나서'], [/탔다$/, '타서'], [/샀다$/, '사서'], [/섰다$/, '서서'], [/봤다$/, '봐서']];
+    for (var i = 0; i < rules.length; i++) if (rules[i][0].test(past)) return past.replace(rules[i][0], rules[i][1]);
+    return '';
+  }
+  function reasonsFromScene() {
+    var out = [], v = toSeo(S.act), w = strip(S.what);
+    if (!v) return out;
+    var obj = w ? w + josa(w, '을', '를') + ' ' : '';
+    var full = [whoPart(S.who), wherePart(S.where), obj + v].filter(Boolean).join(' ');
+    out.push(full);
+    if (S.who && !noJosaWho(S.who)) out.push('같이 ' + obj + v);
+    out.push(obj + v);
+    if (S.who && !noJosaWho(S.who)) out.push(whoPart(S.who) + ' 같이 놀아서');
+    return out.filter(function (x, i) { return out.indexOf(x) === i; });
+  }
+  function wantsFromScene() {
+    var out = [], r = row(), w = strip(S.what);
+    if (r) {
+      out.push(r.action.want);
+      if (w) { out.push('또 ' + w + josa(w, '을', '를') + ' ' + r.action.want); out.push(w + josa(w, '을', '를') + ' 더 ' + r.action.want); }
+    }
+    if (strip(S.where)) out.push(strip(S.where) + '에 또 가고 싶다');
+    return out.filter(function (x, i) { return out.indexOf(x) === i; });
+  }
+
   /* ---------- 화면: 시작 ---------- */
   function renderStart(app) {
     var st = h('div', { class: 'stage' });
@@ -459,43 +485,17 @@
     ]);
     app.appendChild(ex);
 
-    var hist = load(HKEY, []).filter(function (x) { return x.id !== S.id; });
-    var hb = h('div', { class: 'board', style: 'margin-top:16px' }, [
-      h('div', { class: 'board-title' }, ['🗂️ 일기 장']),
-      h('div', { style: 'display:flex;gap:10px;flex-wrap:wrap;margin:8px 0' }, [
-        h('button', { class: 'btn ghost', type: 'button', on: { click: function () {
-          if (anyFilled() && !confirm('지금 쓰던 일기는 일기 장에 남겨 두고 새로 시작할까요?')) return;
-          save(); S = blank(); save(); screen = 0; render();
-        } } }, ['＋ 새 일기 쓰기'])
-      ])
-    ]);
-    if (hist.length) {
-      hb.appendChild(h('div', { class: 'note' }, ['지난 일기를 누르면 다시 열려요.']));
-      hb.appendChild(h('div', { class: 'history' }, hist.map(function (d) {
-        var e = d.emo != null ? EM_EMO[d.emo] + ' ' : '';
-        return h('button', { type: 'button', on: { click: function () { save(); S = Object.assign(blank(), d); save(); screen = 6; render(); } } }, [
-          h('span', null, [e + (d.date || '') + '  ' + (d.title || d.where || '')]),
-          h('span', { class: 'x', on: { click: function (ev) {
-            ev.stopPropagation();
-            if (!confirm('이 일기를 지울까요?')) return;
-            try { localStorage.setItem(HKEY, JSON.stringify(load(HKEY, []).filter(function (x) { return x.id !== d.id; }))); } catch (er) {}
-            render();
-          } } }, ['✕'])
-        ]);
-      })));
-    }
-    app.appendChild(hb);
   }
 
   /* ---------- 화면: 문장 ---------- */
-  var STEP_NAMES = ['시작', '장면', '감정', '까닭', '몸 표현', '마무리', '완성'];
+  var STEP_NAMES = ['시작', '장면', '감정·까닭', '몸 표현', '마무리', '완성'];
   function renderSentence(app, n) {
     var st = h('div', { class: 'stage' });
     st.appendChild(h('div', { class: 'stage-head' }, [h('div', { class: 'num' }, [String(n)]), h('div', { class: 'stage-name' }, [STEP_NAMES[n]])]));
-    if (n === 4) {
+    if (n === 3) {
       st.appendChild(h('div', { class: 'choose' }, [
-        h('button', { type: 'button', class: S.kind === '가' ? 'on' : '', on: { click: function () { S.kind = '가'; delete S.over.s4; delete S.over.matBox; save(); active = firstEmpty(4); render(); } }, html: '<b>가</b> 마치 ○○처럼 (비유 재료)' }),
-        h('button', { type: 'button', class: S.kind === '나' ? 'on' : '', on: { click: function () { S.kind = '나'; delete S.over.s4; delete S.over.matBox; save(); active = firstEmpty(4); render(); } }, html: '<b>나</b> 소리 말·모습 말로' })
+        h('button', { type: 'button', class: S.kind === '가' ? 'on' : '', on: { click: function () { S.kind = '가'; delete S.over.s4; delete S.over.matBox; save(); active = firstEmpty(3); render(); } }, html: '<b>가</b> 마치 ○○처럼 (비유 재료)' }),
+        h('button', { type: 'button', class: S.kind === '나' ? 'on' : '', on: { click: function () { S.kind = '나'; delete S.over.s4; delete S.over.matBox; save(); active = firstEmpty(3); render(); } }, html: '<b>나</b> 소리 말·모습 말로' })
       ]));
     }
     var sen = h('div', { class: 'sentence' });
@@ -565,7 +565,7 @@
       if (r) { label('이 줄의 어떻게'); b.appendChild(chipList(r.how, 'how')); }
       label('더 고르기');
       b.appendChild(chipList(group(1, '어떻게'), 'how'));
-      b.appendChild(h('div', { style: 'margin-top:12px' }, [h('button', { class: 'btn gray', type: 'button', on: { click: function () { S.how = ''; S._howSkipped = true; save(); active = firstEmpty(1); render(); } } }, ['어떻게는 빼기'])]));
+      b.appendChild(skipBtn('how', '어떻게는 빼기'));
       b.appendChild(writeBox('how', '어떻게 직접 쓰기', '예: 씽씽'));
     }
     else if (k === 'act') {
@@ -602,6 +602,10 @@
       b.appendChild(list);
       if (e) {
         b.appendChild(h('div', { class: 'meaning' }, [EM_EMO[S.emo] + ' ' + e.name + ': ' + e.meaning]));
+        label('💬 ' + e.name + ' — 감정 말을 더 풍성하게');
+        var fm = [e.past];
+        (X.feel_more[e.name] || []).forEach(function (w) { if (fm.indexOf(w) < 0) fm.push(w); });
+        b.appendChild(chipList(fm, 'feel'));
       }
       b.appendChild(h('div', { style: 'margin-top:12px' }, [h('button', { class: 'btn ghost', type: 'button', on: { click: function () { showMoments = !showMoments; render(); } } }, [showMoments ? '힌트 닫기' : '🤔 감정이 안 떠올라요'])]));
       if (showMoments) {
@@ -614,14 +618,17 @@
       b.appendChild(writeBox('feel', '감정 말 직접 쓰기', '예: 두근두근했다'));
     }
     else if (k === 'much') {
-      title('얼마나?');
-      b.appendChild(chipList(group(2, '얼마나'), 'much'));
+      title('얼마나?', '안 골라도 돼요.');
+      b.appendChild(chipList(X.much, 'much'));
+      b.appendChild(skipBtn('much', '얼마나는 빼기'));
       b.appendChild(writeBox('much', '얼마나 직접 쓰기', '예: 엄청'));
     }
     else if (k === 'reason') {
-      title('왜 그런 감정이 들었어요?', '"…때문이다" 앞에 들어갈 말이에요.');
-      fillers(3).forEach(function (g) { label(g.label); b.appendChild(chipList(g.words, 'reason')); });
-      b.appendChild(writeBox('reason', '까닭 직접 쓰기', '예: 친구가 내 그림을 칭찬했기'));
+      title('왜 그런 감정이 들었어요?', '"…해서", "…어서"로 끝나는 말이에요.');
+      var mine = reasonsFromScene();
+      if (mine.length) { label('📍 1번에서 고른 일로'); b.appendChild(chipList(mine, 'reason')); }
+      X.reasons.forEach(function (g) { label(g.label); b.appendChild(chipList(g.words, 'reason')); });
+      b.appendChild(writeBox('reason', '까닭 직접 쓰기', '예: 친구가 내 그림을 칭찬해 주어서'));
     }
     else if (k === 'part') {
       title('몸 부위', '그때 몸의 어디가 어땠어요?');
@@ -662,14 +669,16 @@
       b.appendChild(writeBox('next', '직접 쓰기', '예: 내일은'));
     }
     else if (k === 'want') {
-      title('하고 싶은 행동', r ? '1번에서 고른 줄의 "다음에" 말이 들어가 있어요.' : '');
-      var wants = [];
-      if (r) wants.push(r.action.want);
-      D.places.forEach(function (p) { p.rows.forEach(function (x) { if (wants.indexOf(x.action.want) < 0) wants.push(x.action.want); }); });
+      title('하고 싶은 행동', r ? '1번에서 고른 줄의 "다음에" 말이 들어가 있어요. 바꿔도 돼요.' : '');
+      var mineW = wantsFromScene();
+      if (mineW.length) { label('📍 1번에서 고른 일로'); b.appendChild(chipList(mineW, 'want')); }
+      var wg = X.wants.slice();
+      if (e && e.part >= 4) wg.unshift(wg.pop()); // 속상한·불편한 감정이면 '앞으로는 이렇게'를 먼저
+      wg.forEach(function (g) { label(g.label); b.appendChild(chipList(g.words, 'want')); });
+      var other = [];
+      D.places.forEach(function (p) { p.rows.forEach(function (x) { if (other.indexOf(x.action.want) < 0 && mineW.indexOf(x.action.want) < 0) other.push(x.action.want); }); });
       label('장소 카드의 다음에');
-      b.appendChild(chipList(wants, 'want'));
-      label('더 고르기');
-      b.appendChild(chipList(group(5, '더 고르기'), 'want'));
+      b.appendChild(chipList(other, 'want'));
       b.appendChild(writeBox('want', '행동 직접 쓰기', '예: 더 멀리 타고 싶다'));
     }
     return b;
@@ -699,7 +708,7 @@
     list.appendChild(ed('제목', S.title, function (v) { S.title = v; }));
     list.appendChild(ed('오늘의 감정 · 감정 말', emoBox(), function (v) { S.over.emoBox = v; }, function () { delete S.over.emoBox; }, 2));
     list.appendChild(ed('내가 고른 재료 (소리 말 · 모습 말 · 비유 재료)', matBox(), function (v) { S.over.matBox = v; }, function () { delete S.over.matBox; }, 2));
-    for (var n = 1; n <= 5; n++) (function (n) {
+    for (var n = 1; n <= LAST; n++) (function (n) {
       list.appendChild(ed(n + '. ' + STEP_NAMES[n], finalSentence(n), function (v) { S.over['s' + n] = v; }, S.over['s' + n] != null ? function () { delete S.over['s' + n]; } : null, 2));
     })(n);
     st.appendChild(list);
@@ -730,8 +739,7 @@
   function B(t) { return '<span class="b">' + t + '</span>'; }
   var FRAMES = [
     '오늘 나는 ' + B('누구') + '와(과) ' + B('어디') + '에서 ' + B('무엇') + '을(를) ' + B('어떻게') + ' ' + B('행동') + '.',
-    '그래서 나는 ' + B('얼마나') + ' ' + B('감정 말') + '.',
-    '왜냐하면 ' + B('까닭') + ' 때문이다.',
+    B('까닭 (~해서)') + ' ' + B('얼마나') + ' ' + B('감정 말') + '.',
     '<span class="tag">가</span>그때 내 ' + B('몸 부위') + '은(는) 마치 ' + B('비유 재료') + '처럼 ' + B('움직임') + '. &nbsp;또는 &nbsp;<span class="tag">나</span>그때 내 ' + B('몸 부위') + '은(는) ' + B('소리 말·모습 말') + ' ' + B('움직임') + '.',
     B('다음에도·앞으로는') + ' ' + B('누구') + '와(과) ' + B('행동') + '.'
   ];
@@ -743,7 +751,7 @@
       '<div class="f" style="flex:1">제목<div class="v" style="flex:1">' + esc(S.title) + '</div></div></div>';
     s += '<div class="sh-boxes"><div class="sh-box"><div class="t">오늘의 감정 · 감정 말</div><div class="c">' + esc(emoBox()).replace(/\n/g, '<br>') + '</div></div>' +
       '<div class="sh-box"><div class="t">내가 고른 재료 (소리 말 · 모습 말 · 비유 재료)</div><div class="c" style="font-size:11.5pt">' + esc(matBox()).replace(/\n/g, '<br>') + '</div></div></div>';
-    for (var n = 1; n <= 5; n++) {
+    for (var n = 1; n <= LAST; n++) {
       s += '<div class="sh-s"><div class="sh-n">' + n + '</div><div class="sh-body"><div class="sh-frame">' + FRAMES[n - 1] + '</div>' +
         '<div class="sh-lines"><div class="sh-text">' + esc(finalSentence(n)) + '</div></div></div></div>';
     }
@@ -769,13 +777,13 @@
 
   /* ---------- 전체 그리기 ---------- */
   function go(n) {
-    screen = Math.max(0, Math.min(6, n)); showMoments = false; browsePlace = null;
-    active = (screen >= 1 && screen <= 5) ? firstEmpty(screen) : null;
+    screen = Math.max(0, Math.min(DONE, n)); showMoments = false; browsePlace = null;
+    active = (screen >= 1 && screen <= LAST) ? firstEmpty(screen) : null;
     render(); window.scrollTo(0, 0);
   }
   function stepDone(i) {
     if (i === 0) return !!S.date;
-    if (i >= 1 && i <= 5) {
+    if (i >= 1 && i <= LAST) {
       if (S.over['s' + i] != null) return !!strip(S.over['s' + i]);
       return parts(i).every(function (p) { return typeof p !== 'object' || p.opt || !!strip(S[p.k]); });
     }
@@ -789,16 +797,16 @@
       h('div', { class: 'apptitle' }, ['일기 5문장으로 쓰기'])
     ]));
     app.appendChild(h('div', { class: 'steps' }, STEP_NAMES.map(function (nm, i) {
-      return h('button', { type: 'button', class: 'step' + (i === screen ? ' on' : stepDone(i) ? ' done' : ''), on: { click: function () { go(i); } } }, [(i >= 1 && i <= 5 ? i + ' ' : '') + nm]);
+      return h('button', { type: 'button', class: 'step' + (i === screen ? ' on' : stepDone(i) ? ' done' : ''), on: { click: function () { go(i); } } }, [(i >= 1 && i <= LAST ? i + ' ' : '') + nm]);
     })));
     if (screen === 0) renderStart(app);
-    else if (screen === 6) renderDone(app);
+    else if (screen === DONE) renderDone(app);
     else renderSentence(app, screen);
 
     var nav = document.getElementById('nav');
     nav.innerHTML = '';
     if (screen > 0) nav.appendChild(h('button', { class: 'btn ghost', type: 'button', on: { click: function () { go(screen - 1); } } }, ['← 이전']));
-    if (screen < 6) nav.appendChild(h('button', { class: 'btn', type: 'button', on: { click: function () { go(screen + 1); } } }, [screen === 0 ? '쓰기 시작 →' : screen === 5 ? '완성 보기 →' : '다음 →']));
+    if (screen < DONE) nav.appendChild(h('button', { class: 'btn', type: 'button', on: { click: function () { go(screen + 1); } } }, [screen === 0 ? '쓰기 시작 →' : screen === LAST ? '완성 보기 →' : '다음 →']));
     else nav.appendChild(h('button', { class: 'btn', type: 'button', on: { click: doPrint } }, ['🖨️ 인쇄 / PDF']));
   }
 
