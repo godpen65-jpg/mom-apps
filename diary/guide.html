@@ -65,6 +65,11 @@
   .row .l { width: 24mm; flex: none; color: var(--c); font-weight: 700; font-size: 8.3pt; padding-top: .6mm; }
   .chips { display: flex; flex-wrap: wrap; gap: 1.2mm; flex: 1; }
   .chip { background: #f3eff1; border-radius: 1.4mm; padding: .4mm 1.6mm; font-size: 8.4pt; line-height: 1.45; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; padding: 1.4mm 0 .6mm; border-top: 1px dotted #e0d6dc; }
+  .two .col { min-width: 0; }
+  .two .col + .col { border-left: 1px dotted #e0d6dc; padding-left: 3mm; }
+  .two .ch { color: var(--c); font-weight: 700; font-size: 8.3pt; margin-bottom: 1.2mm; }
+  .two .chip { font-size: 7.9pt; }
   .chip.say::before { content: '“'; } .chip.say::after { content: '”'; }
   .hint { font-size: 8.4pt; color: #444; background: #f3eff1; border-radius: 1.4mm; padding: .6mm 2mm; line-height: 1.45; }
   .sub { font-size: 7.4pt; color: #fff; background: var(--c); border-radius: 1.4mm; padding: .5mm 1.6mm; line-height: 1.45; font-weight: 700; }
@@ -212,8 +217,8 @@
     box(2, 2, '말 · 행동', FR[2],
       row('하다가', '<div class="chips"><div class="hint" style="width:100%;margin-bottom:1mm">장소 카드의 <b>무엇</b> + <b>하다가</b> 칸 → 그네를 타다가 · 책을 읽다가 · 급식을 먹다가 …</div>' + chips(X.openers).replace(/^<div class="chips">|<\/div>$/g, '') + '</div>') +
       row('누가', chips(['나 (→ 나는)'].concat(g(1, '누구').words.filter(function (w) { return w !== '혼자서'; })))) +
-      row('<span class="tag">말</span>한 말 · 말했다', '<div class="chips">' + say + '<div class="grp" style="--c:var(--c5)"><span class="sub">말했다</span>' + X.said.map(function (w) { return '<span class="chip">' + esc(w) + '</span>'; }).join('') + '</div></div>') +
-      row('<span class="tag">행동</span>무엇을 · 행동', '<div class="chips">' + X.acts.map(function (a) { return grp(a.label, a.pairs.map(function (p) { return (p[0] ? p[0] + ' ' : '') + p[1]; })); }).join('') + '</div>'))
+      '<div class="two"><div class="col"><div class="ch"><span class="tag">말</span>한 말 · 말했다</div><div class="chips">' + say + '<div class="grp" style="--c:var(--c5)"><span class="sub">말했다</span>' + X.said.map(function (w) { return '<span class="chip">' + esc(w) + '</span>'; }).join('') + '</div></div></div>' +
+      '<div class="col"><div class="ch"><span class="tag">행동</span>무엇을 · 행동</div><div class="chips">' + X.acts.map(function (a) { return grp(a.label, a.pairs.map(function (p) { return (p[0] ? p[0] + ' ' : '') + p[1]; })); }).join('') + '</div></div></div>')
   );
   var verbs = X.reason_parts.verb.map(function (r) { return grp(r.label, r.words); }).join('');
   var wants = X.wants.map(function (r) { return grp(r.label, r.words); }).join('');
