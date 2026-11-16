@@ -276,7 +276,7 @@
       date: t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'),
       weather: '', title: '',
       who: '', where: '', placeIdx: null, rowIdx: null, what: '', how: '', act: '',
-      when2: '', spk: '', say: '', said: '말했다',
+      kind2: '말', when2: '', spk: '', say: '', said: '말했다', obj2: '', act2: '',
       much: '', emo: null, feel: '', r1: '', r2: '', r3: '',
       skip: {},
       kind: '가', part: '', mat: '', sl: '', move: '',
@@ -289,6 +289,7 @@
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   var S = Object.assign(blank(), load(KEY, {}));
   if (!S.skip) S.skip = {};
+  if (!S.kind2) S.kind2 = '말';
   if (S.reason && !S.r3) { S.r3 = S.reason; delete S.reason; } // 예전 한 칸 까닭 옮기기
   if (S.modeV !== 2) { S.mode = 'solid'; S.modeV = 2; } // 인쇄 기본값을 완성본으로
   var LAST = 5;      // 문장 수
@@ -313,8 +314,13 @@
     if (n === 1) {
       x = ['오늘 나는', whoPart(S.who), wherePart(S.where), S.what ? strip(S.what) + josa(S.what, '을', '를') : '', strip(S.how), strip(S.act)];
     } else if (n === 2) {
-      if (!strip(S.say)) return '';
-      x = [strip(S.when2), spkPart(S.spk), '"' + cleanSay(S.say) + '" 하고', strip(S.said) || '말했다'];
+      if (S.kind2 === '행동') {
+        if (!strip(S.act2)) return '';
+        x = [strip(S.when2), spkPart(S.spk), strip(S.obj2), strip(S.act2)];
+      } else {
+        if (!strip(S.say)) return '';
+        x = [strip(S.when2), spkPart(S.spk), '"' + cleanSay(S.say) + '" 하고', strip(S.said) || '말했다'];
+      }
     } else if (n === 3) {
       x = [strip(S.r1), strip(S.r2), strip(S.r3), strip(S.much), strip(S.feel)];
     } else if (n === 4) {
@@ -356,9 +362,10 @@
       { k: 'act', label: '행동' }, '.'
     ];
     if (n === 2) return [{ k: 'when2', label: '하다가', opt: true },
-      { k: 'spk', label: '누가', after: function (v) { var x = spkPart(v); return x.slice(strip(v).length); }, fallback: '이(가)' },
-      { k: 'say', label: '한 말', before: '"', after: function () { return '" 하고'; }, fallback: '" 하고' },
-      { k: 'said', label: '말했다' }, '.'];
+      { k: 'spk', label: '누가', after: function (v) { var x = spkPart(v); return x.slice(strip(v).length); }, fallback: '이(가)' }
+    ].concat(S.kind2 === '행동'
+      ? [{ k: 'obj2', label: '무엇을', opt: true }, { k: 'act2', label: '행동' }, '.']
+      : [{ k: 'say', label: '한 말', before: '"', after: function () { return '" 하고'; }, fallback: '" 하고' }, { k: 'said', label: '말했다' }, '.']);
     if (n === 3) return [{ k: 'r1', label: '누가', opt: true }, { k: 'r2', label: '무엇을', opt: true }, { k: 'r3', label: '~해서' }, { k: 'much', label: '얼마나', opt: true }, { k: 'feel', label: '감정 말' }, '.'];
     if (n === 4) return S.kind === '가'
       ? ['그때 내', { k: 'part', label: '몸 부위', after: function (v) { return josa(v, '은', '는'); }, fallback: '은(는)' }, '마치', { k: 'mat', label: '비유 재료', after: function () { return '처럼'; }, fallback: '처럼' }, { k: 'move', label: '움직임' }, '.']
@@ -366,7 +373,7 @@
     if (n === 5) return [{ k: 'next', label: '다음에도·앞으로는' }, { k: 'who5', label: '누구', after: function (v) { return noJosaWho(v) ? '' : josa(v, '과', '와'); }, fallback: '와(과)' }, { k: 'want', label: '행동' }, '.'];
   }
   // 처음 고를 차례 (문장 순서와 다를 수 있음)
-  var ORDER = { 1: ['where', 'what', 'how', 'act', 'who'], 2: ['spk', 'say', 'when2', 'said'], 3: ['feel', 'r1', 'r2', 'r3', 'much'], 4: ['part', 'mat', 'sl', 'move'], 5: ['next', 'who5', 'want'] };
+  var ORDER = { 1: ['where', 'what', 'how', 'act', 'who'], 2: ['spk', 'say', 'obj2', 'act2', 'when2', 'said'], 3: ['feel', 'r1', 'r2', 'r3', 'much'], 4: ['part', 'mat', 'sl', 'move'], 5: ['next', 'who5', 'want'] };
   function slotKeys(n) { return parts(n).filter(function (p) { return typeof p === 'object'; }).map(function (p) { return p.k; }); }
   function firstEmpty(n) {
     var keys = slotKeys(n);
@@ -518,10 +525,17 @@
   }
 
   /* ---------- 화면: 문장 ---------- */
-  var STEP_NAMES = ['시작', '장면', '대화', '감정·까닭', '몸 표현', '마무리', '완성'];
+  var STEP_NAMES = ['시작', '장면', '말·행동', '감정·까닭', '몸 표현', '마무리', '완성'];
   function renderSentence(app, n) {
     var st = h('div', { class: 'stage' });
     st.appendChild(h('div', { class: 'stage-head' }, [h('div', { class: 'num' }, [String(n)]), h('div', { class: 'stage-name' }, [STEP_NAMES[n]])]));
+    if (n === 2) {
+      var k2 = function (v) { return function () { S.kind2 = v; delete S.over.s2; save(); active = firstEmpty(2); render(); }; };
+      st.appendChild(h('div', { class: 'choose' }, [
+        h('button', { type: 'button', class: S.kind2 === '말' ? 'on' : '', on: { click: k2('말') }, html: '<b>말</b> 누가 "○○" 하고 말했어요' }),
+        h('button', { type: 'button', class: S.kind2 === '행동' ? 'on' : '', on: { click: k2('행동') }, html: '<b>행동</b> 누가 ○○을 했어요' })
+      ]));
+    }
     if (n === 4) {
       st.appendChild(h('div', { class: 'choose' }, [
         h('button', { type: 'button', class: S.kind === '가' ? 'on' : '', on: { click: function () { S.kind = '가'; delete S.over.s4; delete S.over.matBox; save(); active = firstEmpty(4); render(); } }, html: '<b>가</b> 마치 ○○처럼 (비유 재료)' }),
@@ -639,11 +653,27 @@
       b.appendChild(writeBox('spk', '누가 직접 쓰기', '예: 짝꿍'));
     }
     else if (k === 'say') {
-      title('뭐라고 말했어요?', '따옴표 안에 들어갈 말이에요.');
+      title('뭐라고 말했어요?', '큰따옴표 안에 들어갈 말이에요.');
       var sg = X.says.slice();
       if (e) sg.sort(function (a, c) { return (a.part === e.part ? 0 : 1) - (c.part === e.part ? 0 : 1); });
       sg.forEach(function (g) { label(g.label); b.appendChild(chipList(g.words, 'say')); });
       b.appendChild(writeBox('say', '한 말 직접 쓰기', '예: 내 차례 언제야?'));
+    }
+    else if (k === 'obj2' || k === 'act2') {
+      var ia = k === 'obj2' ? 0 : 1;
+      title(k === 'obj2' ? '무엇을? 누구를?' : '무엇을 했어요?', k === 'obj2' ? '빼도 돼요.' : '"…했다"로 끝나는 행동이에요.');
+      var ag = X.acts.slice();
+      if (e) ag.sort(function (a, c) { return (a.part === e.part ? 0 : 1) - (c.part === e.part ? 0 : 1); });
+      var sw = strip(S.what), sa = strip(S.act);
+      var mineA = ia === 0 ? (sw ? [sw + josa(sw, '을', '를')] : []) : (sa ? ['같이 ' + sa] : []);
+      if (mineA.length) { label('📍 1번에서 고른 일로'); b.appendChild(chipList(mineA, k)); }
+      ag.forEach(function (g) {
+        var ws = [];
+        g.pairs.forEach(function (pr) { if (pr[ia] && ws.indexOf(pr[ia]) < 0) ws.push(pr[ia]); });
+        label(g.label); b.appendChild(chipList(ws, k));
+      });
+      if (k === 'obj2') b.appendChild(skipBtn('obj2', '빼기'));
+      b.appendChild(writeBox(k, '직접 쓰기', k === 'obj2' ? '예: 내 그림을' : '예: 칭찬해 주었다'));
     }
     else if (k === 'said') {
       title('어떻게 말했어요?');
@@ -822,7 +852,7 @@
   function B(t) { return '<span class="b">' + t + '</span>'; }
   var FRAMES = [
     '오늘 나는 ' + B('누구') + '와(과) ' + B('어디') + '에서 ' + B('무엇') + '을(를) ' + B('어떻게') + ' ' + B('행동') + '.',
-    B('하다가') + ' ' + B('누가') + '이(가) "' + B('한 말') + '" 하고 ' + B('말했다') + '.',
+    B('하다가') + ' ' + B('누가') + '이(가) &nbsp;<span class="tag">말</span>"' + B('한 말') + '" 하고 ' + B('말했다') + '. &nbsp;또는 &nbsp;<span class="tag">행동</span>' + B('무엇을') + ' ' + B('행동') + '.',
     B('누가') + ' ' + B('무엇을') + ' ' + B('~해서') + ' ' + B('얼마나') + ' ' + B('감정 말') + '.',
     '<span class="tag">가</span>그때 내 ' + B('몸 부위') + '은(는) 마치 ' + B('비유 재료') + '처럼 ' + B('움직임') + '. &nbsp;또는 &nbsp;<span class="tag">나</span>그때 내 ' + B('몸 부위') + '은(는) ' + B('소리 말·모습 말') + ' ' + B('움직임') + '.',
     B('다음에도·앞으로는') + ' ' + B('누구') + '와(과) ' + B('행동') + '.'
