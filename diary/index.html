@@ -322,10 +322,11 @@
   // 4번: 움직임이 몸 부위와 어울리는지 (어울리면 true, 모든 부위에 되는 말은 늘 true)
   var MOVE_RULES = [
     [/따뜻해|포근해|가벼워|무거워|뜨거워|힘이|굳|얼어붙|떨렸|스르르 풀렸|작아졌/, ['얼굴', '가슴', '손', '발', '온몸']],
-    [/손뼉|쥐었|잡았|붙잡|만지|쓰다듬|내밀|가리켰|손을|두 손|건드렸|맞잡|세었|번쩍 들었|높이 들었|흔들었|가렸|꼼지락|안았/, ['손', '온몸']],
+    [/손뼉|쥐었|잡았|붙잡|만지|만져|쓰다듬|내밀|가리켰|손을|두 손|건드렸|맞잡|세었|번쩍 들었|높이 들었|가렸/, ['손']],
+    [/흔들었|꼼지락|안았/, ['손', '온몸']],
     [/뛰었|걸었|달려|굴렀|나섰|내디뎠|다가갔|섰다|버텼|돌아섰|뒷걸음|서성|주저앉|돌아앉|동동/, ['발', '온몸']],
     [/환해|웃음|미소|빨개|발그레|눈|입|고개|일그러|화끈|휘둥그레|벌어졌|반짝였|말똥|또렷|찌푸|질렸|숙였|쳐다보|들여다보|내다보|먼 곳을 보|뒤돌아보|멍하니 보|한숨|말이 안|힐끔|빼꼼|갸웃|쫑긋|뾰로통|삐죽|두리번|울먹|뾰족|소리를|기울었|빛났|끄덕|다물/, ['얼굴']],
-    [/두근|콩닥|쿵쾅|쿵쿵 뛰|찼다|답답|뭉클|찡해|벅|부풀|서늘|허전|부글부글|말랑|간질|풀렸|고요해|숨|조마조마|쓸쓸|텅 비|꺼졌|느긋|잔잔|끓었|펴졌/, ['가슴', '온몸']],
+    [/두근|콩닥|쿵쾅|쿵쿵 뛰|찼다|답답|뭉클|찡해|벅차|부풀|서늘|허전|부글부글|말랑|간질|풀렸|고요해|(^|[^한])숨[이을]|조마조마|쓸쓸|텅 비|꺼졌|느긋|잔잔|끓었|펴졌/, ['가슴', '온몸']],
     [/들썩|늘어졌|처졌|움츠|웅크|춤|빙글|느려|기댔|안겼|곧게|당당|으쓱|펴졌|통통|깡충|펄쩍|머뭇|숨고|꾸벅|안 왔/, ['온몸']]
   ];
   function moveFits(m, part) {
@@ -808,8 +809,8 @@
         var sa = e.sound_words.filter(function (w) { return X.sound_adverbs.indexOf(w) >= 0; });
         if (sa.length) { label(EM_EMO[S.emo] + ' ' + e.name + ' — 소리 말'); b.appendChild(chipList(sa, 'sl')); }
       } else b.appendChild(h('div', { class: 'board-hint' }, ['3번에서 감정 카드를 고르면 그 감정의 소리 말·모습 말이 나와요.']));
-      label('더 고르기 — 소리 말'); b.appendChild(chipList(group(1, '소리 말').filter(function (w) { return X.sound_adverbs.indexOf(w) >= 0; }), 'sl'));
-      label('더 고르기 — 모습 말'); b.appendChild(chipList(group(1, '모습 말'), 'sl'));
+      // 네모 메꾸기의 모습 말 중 몸 움직임에 붙일 수 있는 것만 (아삭아삭·오물오물 같은 먹는 말은 빼기)
+      label('더 고르기 — 모습 말'); b.appendChild(chipList(group(1, '모습 말').filter(function (w) { return ['아삭아삭', '오물오물', '동글동글'].indexOf(w) < 0; }), 'sl'));
       b.appendChild(writeBox('sl', '소리 말·모습 말 직접 쓰기', '예: 콩닥콩닥'));
     }
     else if (k === 'move') {
@@ -817,8 +818,11 @@
       if (e) {
         var fit = e.movements.filter(function (m) { return moveFits(m, strip(S.part)); });
         var rest = e.movements.filter(function (m) { return fit.indexOf(m) < 0; });
-        // 이 감정에 어울리는 게 적으면 다른 감정의 같은 부위 움직임도 보태기
-        if (fit.length < 3) D.emotions.forEach(function (em) { if (em.part === e.part) em.movements.forEach(function (m) { if (fit.length < 6 && fit.indexOf(m) < 0 && moveFits(m, strip(S.part)) && MOVE_RULES.some(function (r) { return r[0].test(m); })) fit.push(m); }); });
+        // 이 감정에 그 부위와 어울리는 움직임이 없으면 같은 묶음 감정에서 그 부위에 맞는 것만 가져오기
+        var mx = X.move_extra && X.move_extra[e.name] && X.move_extra[e.name][strip(S.part)];
+        if (!fit.length && mx) fit = mx.slice();
+        if (!fit.length) D.emotions.forEach(function (em) { if (em.part === e.part) em.movements.forEach(function (m) { if (fit.length < 6 && fit.indexOf(m) < 0 && moveFits(m, strip(S.part)) && MOVE_RULES.some(function (r) { return r[0].test(m); })) fit.push(m); }); });
+        if (!fit.length) { fit = rest; rest = []; }
         if (strip(S.part) && rest.length) label(EM_EMO[S.emo] + ' ' + e.name + ' — ' + strip(S.part) + '에 어울리는 움직임');
         b.appendChild(chipList(fit, 'move'));
         if (rest.length) {
