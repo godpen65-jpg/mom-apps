@@ -147,9 +147,17 @@
   .field { margin-bottom: 16px; }
   .field > label { display: block; font-size: 20px; margin-bottom: 8px; }
   .field input[type=text], .field input[type=date] {
-    width: 100%; font-size: 24px; padding: 10px 14px; border-radius: 14px; border: 3px solid var(--line);
-    font-family: 'Noto Sans KR', sans-serif; background: #fff;
+    display: block; width: 100%; min-width: 0; max-width: 100%; font-size: 24px; padding: 10px 14px; border-radius: 14px; border: 3px solid var(--line);
+    font-family: 'Noto Sans KR', sans-serif; background: #fff; color: var(--ink);
   }
+  /* 아이폰 사파리: 날짜 칸이 자체 최소 너비 때문에 밖으로 넘치는 것 막기 */
+  .field input[type=date] { -webkit-appearance: none; appearance: none; min-height: 58px; text-align: left; }
+  .field input[type=date]::-webkit-date-and-time-value { text-align: left; }
+  .app-top { max-width: 760px; margin: 0 auto; padding: 24px 16px 0; }
+  .app-top .top { margin-bottom: 0; }
+  .app { padding-top: 12px; }
+  #hs-slot { flex: none; }
+  @media print { .app-top { display: none !important; } }
   .history { margin-top: 10px; }
   .history button {
     display: flex; width: 100%; justify-content: space-between; gap: 8px; text-align: left; font-size: 18px;
@@ -215,6 +223,7 @@
 </style>
 </head>
 <body>
+<div class="app-top"><div class="top"><a class="home" href="../" title="처음으로">🏠</a><div class="apptitle">일기 5문장으로 쓰기</div><div id="hs-slot"></div></div></div>
 <div class="app" id="app"></div>
 <div class="nav"><div class="nav-in" id="nav"></div></div>
 <div class="print-only" id="printArea"></div>
@@ -488,7 +497,7 @@
     wf.appendChild(h('div', { class: 'chips' }, WEATHER.map(function (w) {
       return chip(w[1], function () { S.weather = w[1]; save(); render(); }, { em: w[0], on: S.weather === w[1] });
     })));
-    var winp = h('input', { type: 'text', value: S.weather, placeholder: '직접 써도 돼요 (예: 바람이 시원함)', style: 'margin-top:10px' });
+    var winp = h('input', { type: 'text', value: S.weather, placeholder: '직접 써도 돼요', style: 'margin-top:10px' });
     winp.addEventListener('input', function () { S.weather = winp.value; save(); });
     wf.appendChild(winp);
     st.appendChild(wf);
@@ -847,10 +856,6 @@
   function render() {
     var app = document.getElementById('app');
     app.innerHTML = '';
-    app.appendChild(h('div', { class: 'top' }, [
-      h('a', { class: 'home', href: '../', title: '처음으로' }, ['🏠']),
-      h('div', { class: 'apptitle' }, ['일기 5문장으로 쓰기'])
-    ]));
     app.appendChild(h('div', { class: 'steps' }, STEP_NAMES.map(function (nm, i) {
       return h('button', { type: 'button', class: 'step' + (i === screen ? ' on' : stepDone(i) ? ' done' : ''), on: { click: function () { go(i); } } }, [(i >= 1 && i <= LAST ? i + ' ' : '') + nm]);
     })));
