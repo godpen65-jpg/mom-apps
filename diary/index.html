@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>일기 5문장으로 쓰기</title>
+<!-- 홈 화면 앱 설치용 (📔 아이콘) -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="install.js" defer></script>
+<meta name="theme-color" content="#fde2ef">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #c8195e;
+    --pink-soft: #fde7ef;
+    --ink: #3d3446;
+    --sub: #7a6f85;
+    --line: #eadfe6;
+    --bg: #fff7fa;
+    --card: #ffffff;
+    --g1: #f08a24; --g2: #e8698f; --g3: #8c5bd6; --g4: #3b82c4; --g5: #2f9e6e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--bg); }
+  body {
+    font-family: 'Jua', 'Noto Sans KR', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button, input, textarea { font-family: inherit; color: inherit; }
+  .app { max-width: 760px; margin: 0 auto; padding: 14px 16px 120px; }
+
+  /* 위쪽 */
+  .top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .home { text-decoration: none; font-size: 26px; }
+  .apptitle { font-size: 22px; color: var(--pink); flex: 1; }
+  .steps { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .step {
+    border: 2px solid var(--line); background: #fff; border-radius: 999px;
+    padding: 6px 12px; font-size: 16px; cursor: pointer; color: var(--sub);
+  }
+  .step.on { background: var(--pink); border-color: var(--pink); color: #fff; }
+  .step.done { border-color: #f3b4cb; color: var(--pink); }
+
+  /* 문장 칸 */
+  .stage {
+    background: #fff; border-radius: 24px; padding: 20px 18px;
+    box-shadow: 0 6px 18px rgba(200,25,94,.08); border: 2px solid #ffe1ec;
+    margin-bottom: 16px;
+  }
+  .stage-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .num {
+    width: 38px; height: 38px; border-radius: 50%; background: var(--pink); color: #fff;
+    display: grid; place-items: center; font-size: 22px; flex: none;
+  }
+  .stage-name { font-size: 22px; }
+  .sentence { font-size: 28px; line-height: 2.0; word-break: keep-all; }
+  .slot {
+    display: inline-block; min-width: 72px; padding: 0 12px; margin: 2px 2px;
+    border: 3px dashed #d9c6d1; border-radius: 14px; background: #fbf6f9;
+    line-height: 1.5; cursor: pointer; color: #b4a6b0; text-align: center;
+    vertical-align: middle;
+  }
+  .slot.filled { border-style: solid; border-color: #f3b4cb; background: var(--pink-soft); color: var(--ink); }
+  .slot.active { border-color: var(--pink); box-shadow: 0 0 0 4px rgba(200,25,94,.18); animation: blink 1.2s ease-in-out infinite; }
+  .slot.opt::after { content: ' (빼도 돼요)'; font-size: 14px; color: #b4a6b0; }
+  .slot.opt.filled::after { content: ''; }
+  @keyframes blink { 50% { box-shadow: 0 0 0 7px rgba(200,25,94,.08); } }
+  .josa { color: var(--ink); }
+
+  .choose { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .choose button {
+    flex: 1; min-width: 200px; font-size: 18px; padding: 12px; border-radius: 16px;
+    border: 3px solid var(--line); background: #fff; cursor: pointer; text-align: left; line-height: 1.4;
+  }
+  .choose button.on { border-color: var(--pink); background: var(--pink-soft); }
+  .choose b { color: #fff; background: var(--pink); border-radius: 6px; padding: 0 6px; margin-right: 4px; }
+
+  /* 낱말 판 */
+  .board {
+    background: #fff; border-radius: 24px; padding: 18px 16px;
+    border: 2px solid #ffe1ec; box-shadow: 0 6px 18px rgba(200,25,94,.06);
+  }
+  .board-title { font-size: 22px; margin-bottom: 4px; }
+  .board-hint { font-size: 16px; color: var(--sub); margin-bottom: 12px; font-family: 'Noto Sans KR', sans-serif; }
+  .group-label { font-size: 17px; color: var(--pink); margin: 14px 0 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    min-height: 56px; padding: 8px 16px; font-size: 22px; border-radius: 16px;
+    border: 3px solid var(--line); background: #fff; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px; line-height: 1.25;
+  }
+  .chip .em { font-size: 26px; }
+  .chip:active { transform: scale(.96); }
+  .chip.on { border-color: var(--pink); background: var(--pink-soft); }
+  .chip.big { flex-direction: column; min-width: 96px; padding: 10px 12px; font-size: 20px; }
+  .chip.big .em { font-size: 38px; }
+  .chip .small { font-size: 14px; color: var(--sub); font-family: 'Noto Sans KR', sans-serif; }
+
+  .row-card {
+    display: block; width: 100%; text-align: left; border: 3px solid var(--line); background: #fff;
+    border-radius: 18px; padding: 10px 12px; margin-bottom: 10px;
+  }
+  .row-card.on { border-color: var(--pink); background: #fffafc; }
+  .row-act { font-size: 15px; color: var(--sub); margin-bottom: 6px; font-family: 'Noto Sans KR', sans-serif; }
+  .row-act b { color: var(--pink); }
+
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .tab { border: 3px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 14px; font-size: 18px; cursor: pointer; }
+  .tab.on { color: #fff; }
+
+  .meaning { font-family: 'Noto Sans KR', sans-serif; font-size: 17px; background: #fff7e8; border-radius: 12px; padding: 10px 12px; margin-top: 12px; }
+  .moments { font-family: 'Noto Sans KR', sans-serif; font-size: 17px; line-height: 1.8; margin-top: 8px; padding-left: 20px; }
+
+  .write {
+    display: flex; gap: 8px; margin-top: 18px; padding-top: 14px; border-top: 2px dashed var(--line); flex-wrap: wrap;
+  }
+  .write label { width: 100%; font-size: 18px; color: var(--pink); }
+  .write input {
+    flex: 1; min-width: 160px; font-size: 24px; padding: 10px 14px; border-radius: 14px;
+    border: 3px solid var(--line); background: #fffdfe; font-family: 'Noto Sans KR', sans-serif;
+  }
+  .write input:focus { outline: none; border-color: var(--pink); }
+  .btn {
+    font-size: 20px; padding: 10px 18px; border-radius: 14px; border: 0; cursor: pointer;
+    background: var(--pink); color: #fff; min-height: 52px;
+  }
+  .btn.ghost { background: #fff; color: var(--pink); border: 3px solid #f3b4cb; }
+  .btn.gray { background: #efe8ec; color: var(--sub); }
+  .btn:disabled { opacity: .4; }
+
+  .nav {
+    position: fixed; left: 0; right: 0; bottom: 0; background: rgba(255,247,250,.96);
+    border-top: 2px solid #ffe1ec; padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    backdrop-filter: blur(6px); z-index: 10;
+  }
+  .nav-in { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; }
+  .nav .btn { flex: 1; font-size: 22px; }
+
+  .note { font-family: 'Noto Sans KR', sans-serif; font-size: 15px; color: var(--sub); margin-top: 10px; }
+  .field { margin-bottom: 16px; }
+  .field > label { display: block; font-size: 20px; margin-bottom: 8px; }
+  .field input[type=text], .field input[type=date] {
+    width: 100%; font-size: 24px; padding: 10px 14px; border-radius: 14px; border: 3px solid var(--line);
+    font-family: 'Noto Sans KR', sans-serif; background: #fff;
+  }
+  .history { margin-top: 10px; }
+  .history button {
+    display: flex; width: 100%; justify-content: space-between; gap: 8px; text-align: left; font-size: 18px;
+    padding: 10px 12px; border-radius: 14px; border: 2px solid var(--line); background: #fff; margin-bottom: 8px; cursor: pointer;
+  }
+  .history .x { color: #b4a6b0; padding: 0 6px; }
+
+  /* 완성 화면 */
+  .edit-list .ed { margin-bottom: 12px; }
+  .edit-list label { font-size: 18px; color: var(--pink); display: block; margin-bottom: 4px; }
+  .edit-list textarea, .edit-list input {
+    width: 100%; font-size: 21px; line-height: 1.5; padding: 10px 12px; border-radius: 14px;
+    border: 3px solid var(--line); font-family: 'Noto Sans KR', sans-serif; resize: vertical; background: #fff;
+  }
+  .edit-list textarea:focus, .edit-list input:focus { outline: none; border-color: var(--pink); }
+  .edit-list .reset { font-size: 14px; border: 0; background: none; color: var(--sub); text-decoration: underline; cursor: pointer; margin-left: 6px; }
+  .modes { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 14px; }
+  .preview-wrap { overflow: hidden; border-radius: 10px; box-shadow: 0 6px 22px rgba(0,0,0,.12); background: #fff; margin: 14px 0; }
+  .preview-scale { transform-origin: top left; }
+
+  /* ===== 인쇄용 11쪽 ===== */
+  .sheet {
+    width: 210mm; height: 296mm; overflow: hidden; background: #fff; position: relative;
+    padding: 13mm 15mm 10mm; font-family: 'Noto Sans KR', sans-serif; color: #222;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .sh-kicker { color: var(--pink); font-weight: 700; font-size: 9.5pt; }
+  .sh-title { font-size: 25pt; font-weight: 900; margin: 1mm 0 5mm; letter-spacing: -0.5px; }
+  .sh-meta { display: flex; gap: 6mm; align-items: flex-end; font-size: 12pt; margin-bottom: 6mm; }
+  .sh-meta .f { display: flex; align-items: flex-end; gap: 3mm; }
+  .sh-meta .v { border-bottom: 1px solid #333; min-height: 7mm; padding: 0 1mm; font-size: 12.5pt; display: flex; align-items: flex-end; white-space: nowrap; overflow: hidden; }
+  .sh-boxes { display: flex; gap: 5mm; margin-bottom: 6mm; }
+  .sh-box { flex: 1; border: 1.3px dashed var(--pink); border-radius: 3mm; height: 26mm; padding: 2.5mm 3.5mm; overflow: hidden; }
+  .sh-box .t { color: var(--pink); font-weight: 700; font-size: 9pt; margin-bottom: 1.5mm; }
+  .sh-box .c { font-size: 13pt; line-height: 1.45; }
+  .sh-s { display: flex; gap: 4mm; margin-bottom: 3mm; }
+  .sh-n { width: 9.5mm; height: 9.5mm; border-radius: 50%; background: var(--pink); color: #fff; font-weight: 700; font-size: 13pt; display: grid; place-items: center; flex: none; margin-top: -1mm; }
+  .sh-body { flex: 1; min-width: 0; }
+  .sh-frame { font-size: 9pt; color: #444; height: 5.5mm; white-space: nowrap; }
+  .sh-frame .b { display: inline-block; border: 1px solid #999; border-radius: 1.6mm; padding: 0 1.4mm; margin: 0 .6mm; line-height: 1.35; font-size: 8.5pt; }
+  .sh-frame .tag { display: inline-block; background: var(--pink); color: #fff; border-radius: 1mm; padding: 0 1.2mm; font-weight: 700; font-size: 8pt; margin-right: 1mm; }
+  .sh-lines {
+    height: 30mm; position: relative;
+    background-image: linear-gradient(to bottom, transparent calc(15mm - 1px), #9a9a9a calc(15mm - 1px), #9a9a9a 15mm);
+    background-size: 100% 15mm;
+  }
+  .sh-text {
+    position: absolute; left: 0; right: 0; top: 0;
+    font-size: 16.5pt; line-height: 15mm; padding-top: 2.6mm; word-break: keep-all; overflow-wrap: anywhere;
+  }
+  .sheet.trace .sh-text { color: #b9b9b9; font-weight: 400; }
+  .sheet.solid .sh-text { color: #222; font-weight: 500; }
+  .sheet.blank .sh-text { display: none; }
+  .sh-foot { position: absolute; left: 15mm; right: 15mm; bottom: 7mm; font-size: 6.5pt; color: #888; display: flex; justify-content: space-between; }
+
+  .print-only { display: none; }
+  @page { size: A4; margin: 0; }
+  @media print {
+    html, body { background: #fff; }
+    .app, .nav { display: none !important; }
+    .print-only { display: block; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div class="nav"><div class="nav-in" id="nav"></div></div>
+<div class="print-only" id="printArea"></div>
+
+<script src="data.js"></script>
+<script src="extra.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.DIARY_DATA, X = window.DIARY_EXTRA;
+
+  /* ---------- 그림(이모지) ---------- */
+  var EM_PLACE = { '학교':'🏫','집':'🏠','놀이터':'🛝','공원':'🌳','키즈카페':'🧸','도서관':'📚','마트':'🛒','수영장':'🏊','할머니 댁':'👵','놀이공원':'🎡','바닷가':'🏖️','학원':'🎹','체육관':'🥋' };
+  var EM_WHO = { '엄마':'👩','아빠':'👨','동생':'👶','언니':'👧','오빠':'👦','누나':'👧','형':'👦','친구':'🧒','선생님':'🧑‍🏫','할머니':'👵','할아버지':'👴','가족':'👨‍👩‍👧','혼자서':'🙋' };
+  var EM_EMO = ['😄','😆','🥰','🤩','😊','🏅','🙏','❤️','😌','🥹','💭','🤝','💓','✨','🤔','😲','😎','🦁','😣','😢','😞','😕','🥺','😔','😠','😟','😳','😒','🙇','😱'];
+  var EM_BODY = { '얼굴':'🙂','가슴':'💗','손':'✋','발':'🦶','온몸':'🧍' };
+  var WEATHER = [['☀️','맑음'],['⛅','구름'],['🌧️','비'],['❄️','눈'],['🌬️','바람']];
+  var GROUP_COLOR = { 1:'var(--g1)', 2:'var(--g2)', 3:'var(--g3)', 4:'var(--g4)', 5:'var(--g5)' };
+
+  /* ---------- 데이터 정리 ---------- */
+  function fillers(no) { var f = D.fillers.filter(function (x) { return x.sentence === no; })[0]; return f ? f.groups : []; }
+  function group(no, label) { return (fillers(no).filter(function (g) { return g.label.indexOf(label) === 0; })[0] || { words: [] }).words; }
+  // "언니·오빠" 같은 낱말은 버튼 둘로 나눈다
+  var WHO = [];
+  group(1, '누구').forEach(function (w) { w.split('·').forEach(function (p) { WHO.push(p.trim()); }); });
+  // 장소 카드 ("학원 · 체육관"은 두 장으로)
+  var PLACE_CARDS = [];
+  D.places.forEach(function (p, i) { p.place.split('·').forEach(function (n) { PLACE_CARDS.push({ name: n.trim(), idx: i }); }); });
+
+  /* ---------- 조사 ---------- */
+  function hasBatchim(word) {
+    word = String(word || '').trim();
+    if (!word) return false;
+    var c = word.charCodeAt(word.length - 1);
+    if (c >= 0xAC00 && c <= 0xD7A3) return (c - 0xAC00) % 28 !== 0;
+    if (/[0-9]$/.test(word)) return /[013678]$/.test(word); // 일,삼,육,칠,팔,영(공)
+    return false;
+  }
+  function josa(word, withB, without) { return hasBatchim(word) ? withB : without; }
+  function noJosaWho(w) { return /^혼자/.test(String(w).trim()); }
+  function strip(s) { return String(s || '').trim(); }
+  function endDot(s) { s = strip(s); return /[.!?~]$/.test(s) ? s : s + '.'; }
+
+  /* ---------- 상태 ---------- */
+  var KEY = 'diary5.v3.current';
+  function blank() {
+    var t = new Date();
+    return {
+      id: Date.now(),
+      date: t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'),
+      weather: '', title: '',
+      who: '', where: '', placeIdx: null, rowIdx: null, what: '', how: '', act: '',
+      when2: '', spk: '', say: '', said: '말했다',
+      much: '', emo: null, feel: '', reason: '',
+      skip: {},
+      kind: '가', part: '', mat: '', sl: '', move: '',
+      next: '', who5: '', want: '',
+      over: {}, // 완성 화면에서 고친 문장/칸
+      mode: 'trace'
+    };
+  }
+  function load(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  var S = Object.assign(blank(), load(KEY, {}));
+  if (!S.skip) S.skip = {};
+  var LAST = 5;      // 문장 수
+  var DONE = LAST + 1;
+  var screen = 0;   // 0 시작, 1~4 문장, 5 완성
+  var active = null; // 지금 고르는 네모
+  var emoTab = 1, showMoments = false, browsePlace = null;
+
+  function emo() { return S.emo == null ? null : D.emotions[S.emo]; }
+  function row() { return (S.placeIdx == null || S.rowIdx == null) ? null : D.places[S.placeIdx].rows[S.rowIdx]; }
+
+  /* ---------- 문장 만들기 ---------- */
+  function spkPart(w) { w = strip(w); if (!w) return ''; if (w === '나') return '나는'; return /께서$/.test(w) ? w : w + josa(w, '이', '가'); }
+  function cleanSay(t) { return strip(t).replace(/^["“”']+|["“”']+$/g, ''); }
+  // 했다 → 하다가, 먹었다 → 먹다가 ...
+  var DAGA = { '했다': '하다가', '먹었다': '먹다가', '그렸다': '그리다가', '보았다': '보다가', '들었다': '듣다가', '쌓았다': '쌓다가', '읽었다': '읽다가', '탔다': '타다가', '불었다': '불다가', '빌렸다': '빌리다가', '골랐다': '고르다가', '밀었다': '밀다가', '찍었다': '찍다가', '주웠다': '줍다가', '쳤다': '치다가' };
+  function toDaga(past) { past = strip(past).replace(/\.$/, ''); if (DAGA[past]) return DAGA[past]; if (/했다$/.test(past)) return past.replace(/했다$/, '하다가'); return ''; }
+  function whoPart(w) { w = strip(w); if (!w) return ''; return noJosaWho(w) ? w : w + josa(w, '과', '와'); }
+  function wherePart(w) { w = strip(w); if (!w) return ''; return /에서$/.test(w) ? w : w + '에서'; }
+  function built(n) {
+    var x = [];
+    if (n === 1) {
+      x = ['오늘 나는', whoPart(S.who), wherePart(S.where), S.what ? strip(S.what) + josa(S.what, '을', '를') : '', strip(S.how), strip(S.act)];
+    } else if (n === 2) {
+      if (!strip(S.say)) return '';
+      x = [strip(S.when2), spkPart(S.spk), '"' + cleanSay(S.say) + '" 하고', strip(S.said) || '말했다'];
+    } else if (n === 3) {
+      x = [strip(S.reason), strip(S.much), strip(S.feel)];
+    } else if (n === 4) {
+      var p = strip(S.part) ? '그때 내 ' + strip(S.part) + josa(S.part, '은', '는') : '';
+      if (S.kind === '가') x = [p, S.mat ? '마치 ' + strip(S.mat) + '처럼' : '', strip(S.move)];
+      else x = [p, strip(S.sl), strip(S.move)];
+    } else if (n === 5) {
+      x = [strip(S.next), whoPart(S.who5), strip(S.want)];
+    }
+    var body = x.filter(Boolean);
+    if (body.length <= (n === 1 ? 1 : 0)) return '';
+    return endDot(body.join(' '));
+  }
+  function finalSentence(n) { return S.over['s' + n] != null ? S.over['s' + n] : built(n); }
+  function emoBox() {
+    if (S.over.emoBox != null) return S.over.emoBox;
+    var e = emo();
+    var fm = e ? [e.past].concat(X.feel_more[e.name] || []) : [];
+    if (e && fm.indexOf(S.feel) >= 0) return EM_EMO[S.emo] + ' ' + e.name + ' → ' + S.feel;
+    return strip(S.feel);
+  }
+  function matBox() {
+    if (S.over.matBox != null) return S.over.matBox;
+    var a = [];
+    if (S.kind === '가' && strip(S.mat)) a.push('비유 재료: ' + strip(S.mat));
+    if (S.kind === '나' && strip(S.sl)) a.push('소리 말·모습 말: ' + strip(S.sl));
+    if (strip(S.move)) a.push('움직임: ' + strip(S.move));
+    return a.join('\n');
+  }
+
+  /* ---------- 문장별 네모 ---------- */
+  // parts: 글자 조각 또는 {k: 상태 이름, label: 네모 이름, josa: 함수}
+  function parts(n) {
+    if (n === 1) return [
+      '오늘 나는', { k: 'who', label: '누구', after: function (v) { return noJosaWho(v) ? '' : josa(v, '과', '와'); }, fallback: '와(과)' },
+      { k: 'where', label: '어디', after: function (v) { return /에서$/.test(strip(v)) ? '' : '에서'; }, fallback: '에서' },
+      { k: 'what', label: '무엇', after: function (v) { return josa(v, '을', '를'); }, fallback: '을(를)' },
+      { k: 'how', label: '어떻게', opt: true },
+      { k: 'act', label: '행동' }, '.'
+    ];
+    if (n === 2) return [{ k: 'when2', label: '하다가', opt: true },
+      { k: 'spk', label: '누가', after: function (v) { var x = spkPart(v); return x.slice(strip(v).length); }, fallback: '이(가)' },
+      { k: 'say', label: '한 말', before: '"', after: function () { return '" 하고'; }, fallback: '" 하고' },
+      { k: 'said', label: '말했다' }, '.'];
+    if (n === 3) return [{ k: 'reason', label: '까닭 (~해서)' }, { k: 'much', label: '얼마나', opt: true }, { k: 'feel', label: '감정 말' }, '.'];
+    if (n === 4) return S.kind === '가'
+      ? ['그때 내', { k: 'part', label: '몸 부위', after: function (v) { return josa(v, '은', '는'); }, fallback: '은(는)' }, '마치', { k: 'mat', label: '비유 재료', after: function () { return '처럼'; }, fallback: '처럼' }, { k: 'move', label: '움직임' }, '.']
+      : ['그때 내', { k: 'part', label: '몸 부위', after: function (v) { return josa(v, '은', '는'); }, fallback: '은(는)' }, { k: 'sl', label: '소리 말·모습 말' }, { k: 'move', label: '움직임' }, '.'];
+    if (n === 5) return [{ k: 'next', label: '다음에도·앞으로는' }, { k: 'who5', label: '누구', after: function (v) { return noJosaWho(v) ? '' : josa(v, '과', '와'); }, fallback: '와(과)' }, { k: 'want', label: '행동' }, '.'];
+  }
+  // 처음 고를 차례 (문장 순서와 다를 수 있음)
+  var ORDER = { 1: ['where', 'what', 'how', 'act', 'who'], 2: ['spk', 'say', 'when2', 'said'], 3: ['feel', 'reason', 'much'], 4: ['part', 'mat', 'sl', 'move'], 5: ['next', 'who5', 'want'] };
+  function slotKeys(n) { return parts(n).filter(function (p) { return typeof p === 'object'; }).map(function (p) { return p.k; }); }
+  function firstEmpty(n) {
+    var keys = slotKeys(n);
+    var o = ORDER[n].filter(function (k) { return keys.indexOf(k) >= 0; });
+    for (var i = 0; i < o.length; i++) if (!strip(S[o[i]]) && !S.skip[o[i]]) return o[i];
+    return null;
+  }
+
+  /* ---------- 고르기 ---------- */
+  function set(k, v) {
+    S[k] = v;
+    delete S.over['s' + screen];
+    S.skip[k] = false;
+    if (k === 'want') S._wantTouched = true;
+    if (k === 'who' && !S.who5) S.who5 = v;
+    if (k === 'who' && !S.spk) S.spk = noJosaWho(v) ? '나' : v;
+    if (k === 'feel') delete S.over.emoBox;
+    if (k === 'mat' || k === 'sl' || k === 'move') delete S.over.matBox;
+    save();
+    active = firstEmpty(screen);
+    render();
+  }
+  function pickPlace(card) {
+    S.where = card.name; S.placeIdx = card.idx; browsePlace = null;
+    S.rowIdx = null; S.what = ''; S.act = ''; S.how = '';
+    if (!S._wantTouched) S.want = '';
+    delete S.over.s1; save();
+    active = firstEmpty(1); render();
+  }
+  function pickRowWord(pi, ri, w) {
+    var r = D.places[pi].rows[ri];
+    var rowChanged = S.placeIdx !== pi || S.rowIdx !== ri;
+    S.placeIdx = pi; S.rowIdx = ri; S.what = w; S.act = r.action.past;
+    if (rowChanged && S.how && r.how.indexOf(S.how) < 0) S.how = '';
+    if (!S._wantTouched) S.want = '또 ' + w + josa(w, '을', '를') + ' ' + r.action.want;
+    delete S.over.s1; save();
+    active = firstEmpty(1); render();
+  }
+  function pickEmotion(i) {
+    S.emo = i; S.feel = D.emotions[i].past;
+    // 감정이 바뀌면 몸 표현 재료도 새로
+    S.mat = ''; S.sl = ''; S.move = '';
+    delete S.over.s3; delete S.over.s4; delete S.over.emoBox; delete S.over.matBox;
+    save(); active = firstEmpty(2); render();
+  }
+
+  /* ---------- 그리기 도우미 ---------- */
+  function h(tag, attrs, kids) {
+    var el = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (a) {
+      if (a === 'on') Object.keys(attrs.on).forEach(function (ev) { el.addEventListener(ev, attrs.on[ev]); });
+      else if (a === 'class') el.className = attrs[a];
+      else if (a === 'html') el.innerHTML = attrs[a];
+      else if (a === 'style') el.setAttribute('style', attrs[a]);
+      else if (a in el && a !== 'list') el[a] = attrs[a];
+      else el.setAttribute(a, attrs[a]);
+    });
+    (kids || []).forEach(function (k) { if (k == null || k === false) return; el.appendChild(typeof k === 'string' ? document.createTextNode(k) : k); });
+    return el;
+  }
+  function chip(label, onClick, opt) {
+    opt = opt || {};
+    return h('button', { class: 'chip' + (opt.big ? ' big' : '') + (opt.on ? ' on' : ''), type: 'button', on: { click: onClick } }, [
+      opt.em ? h('span', { class: 'em' }, [opt.em]) : null,
+      h('span', null, [label]),
+      opt.small ? h('span', { class: 'small' }, [opt.small]) : null
+    ]);
+  }
+  function chipList(words, k, emMap) {
+    return h('div', { class: 'chips' }, words.map(function (w) {
+      return chip(w, function () { set(k, w); }, { on: S[k] === w, em: emMap && emMap[w] });
+    }));
+  }
+  function writeBox(k, label, placeholder) {
+    var inp = h('input', { type: 'text', value: S[k] || '', placeholder: placeholder || '여기에 써요' });
+    function go() { set(k, inp.value.trim()); }
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) go(); });
+    return h('div', { class: 'write' }, [
+      h('label', null, ['✏️ ' + (label || '직접 쓰기') + ' — 목록에 없는 말도 괜찮아요']),
+      inp,
+      h('button', { class: 'btn', type: 'button', on: { click: go } }, ['넣기']),
+      S[k] ? h('button', { class: 'btn gray', type: 'button', on: { click: function () { set(k, ''); } } }, ['지우기']) : null
+    ]);
+  }
+
+  function skipBtn(k, text) {
+    return h('div', { style: 'margin-top:12px' }, [h('button', { class: 'btn gray', type: 'button', on: { click: function () {
+      S[k] = ''; S.skip[k] = true; delete S.over['s' + screen]; save(); active = firstEmpty(screen); render();
+    } } }, [text])]);
+  }
+  // 했다 → 해서, 먹었다 → 먹어서 ...
+  function toSeo(past) {
+    past = strip(past).replace(/\.$/, '');
+    var rules = [[/했다$/, '해서'], [/였다$/, '여서'], [/었다$/, '어서'], [/았다$/, '아서'], [/렸다$/, '려서'], [/쳤다$/, '쳐서'], [/졌다$/, '져서'],
+      [/웠다$/, '워서'], [/랐다$/, '라서'], [/갔다$/, '가서'], [/왔다$/, '와서'], [/났다$/, '나서'], [/탔다$/, '타서'], [/샀다$/, '사서'], [/섰다$/, '서서'], [/봤다$/, '봐서']];
+    for (var i = 0; i < rules.length; i++) if (rules[i][0].test(past)) return past.replace(rules[i][0], rules[i][1]);
+    return '';
+  }
+  function reasonsFromScene() {
+    var out = [], v = toSeo(S.act), w = strip(S.what);
+    if (!v) return out;
+    var obj = w ? w + josa(w, '을', '를') + ' ' : '';
+    var full = [whoPart(S.who), wherePart(S.where), obj + v].filter(Boolean).join(' ');
+    // 1번과 겹치지 않게 짧은 말부터
+    if (S.who && !noJosaWho(S.who)) out.push('같이 ' + obj + v);
+    out.push(obj + v);
+    if (S.who && !noJosaWho(S.who)) out.push(whoPart(S.who) + ' 같이 놀아서');
+    out.push(full);
+    return out.filter(function (x, i) { return out.indexOf(x) === i; });
+  }
+  function wantsFromScene() {
+    var out = [], r = row(), w = strip(S.what);
+    if (r) {
+      out.push(r.action.want);
+      if (w) { out.push('또 ' + w + josa(w, '을', '를') + ' ' + r.action.want); out.push(w + josa(w, '을', '를') + ' 더 ' + r.action.want); }
+    }
+    if (strip(S.where)) out.push(strip(S.where) + '에 또 가고 싶다');
+    return out.filter(function (x, i) { return out.indexOf(x) === i; });
+  }
+
+  /* ---------- 화면: 시작 ---------- */
+  function renderStart(app) {
+    var st = h('div', { class: 'stage' });
+    st.appendChild(h('div', { class: 'stage-head' }, [h('div', { class: 'num' }, ['✎']), h('div', { class: 'stage-name' }, ['오늘의 일기 시작'])]));
+    var date = h('input', { type: 'date', value: S.date, on: { change: function () { S.date = date.value; save(); } } });
+    st.appendChild(h('div', { class: 'field' }, [h('label', null, ['📅 날짜']), date]));
+
+    var wf = h('div', { class: 'field' }, [h('label', null, ['🌤️ 날씨'])]);
+    wf.appendChild(h('div', { class: 'chips' }, WEATHER.map(function (w) {
+      return chip(w[1], function () { S.weather = w[1]; save(); render(); }, { em: w[0], on: S.weather === w[1] });
+    })));
+    var winp = h('input', { type: 'text', value: S.weather, placeholder: '직접 써도 돼요 (예: 바람이 시원함)', style: 'margin-top:10px' });
+    winp.addEventListener('input', function () { S.weather = winp.value; save(); });
+    wf.appendChild(winp);
+    st.appendChild(wf);
+
+    var t = h('input', { type: 'text', value: S.title, placeholder: '예: 보조 바퀴 없이 탄 날' });
+    t.addEventListener('input', function () { S.title = t.value; save(); });
+    st.appendChild(h('div', { class: 'field' }, [h('label', null, ['🏷️ 제목 (나중에 써도 돼요)']), t]));
+    app.appendChild(st);
+
+    var ex = h('div', { class: 'board' }, [
+      h('div', { class: 'board-title' }, ['📖 예시 일기 (' + D.example.emotion + ')']),
+      h('ol', { class: 'moments' }, D.example.sentences.map(function (s) { return h('li', null, [s]); }))
+    ]);
+    app.appendChild(ex);
+
+  }
+
+  /* ---------- 화면: 문장 ---------- */
+  var STEP_NAMES = ['시작', '장면', '대화', '감정·까닭', '몸 표현', '마무리', '완성'];
+  function renderSentence(app, n) {
+    var st = h('div', { class: 'stage' });
+    st.appendChild(h('div', { class: 'stage-head' }, [h('div', { class: 'num' }, [String(n)]), h('div', { class: 'stage-name' }, [STEP_NAMES[n]])]));
+    if (n === 4) {
+      st.appendChild(h('div', { class: 'choose' }, [
+        h('button', { type: 'button', class: S.kind === '가' ? 'on' : '', on: { click: function () { S.kind = '가'; delete S.over.s4; delete S.over.matBox; save(); active = firstEmpty(4); render(); } }, html: '<b>가</b> 마치 ○○처럼 (비유 재료)' }),
+        h('button', { type: 'button', class: S.kind === '나' ? 'on' : '', on: { click: function () { S.kind = '나'; delete S.over.s4; delete S.over.matBox; save(); active = firstEmpty(4); render(); } }, html: '<b>나</b> 소리 말·모습 말로' })
+      ]));
+    }
+    var sen = h('div', { class: 'sentence' });
+    parts(n).forEach(function (p, i) {
+      if (i > 0 && p !== '.') sen.appendChild(document.createTextNode(' '));
+      if (typeof p === 'string') { sen.appendChild(document.createTextNode(p)); return; }
+      var v = strip(S[p.k]);
+      if (p.before) sen.appendChild(h('span', { class: 'josa' }, [p.before]));
+      sen.appendChild(h('span', {
+        class: 'slot' + (v ? ' filled' : '') + (active === p.k ? ' active' : '') + (p.opt ? ' opt' : ''),
+        on: { click: function () { active = p.k; render(); } }
+      }, [(p.k === 'say' && v ? cleanSay(v) : v) || p.label]));
+      if (p.after) sen.appendChild(h('span', { class: 'josa' }, [v ? p.after(v) : p.fallback]));
+    });
+    st.appendChild(sen);
+    if (S.over['s' + n] != null) st.appendChild(h('div', { class: 'note' }, ['✏️ 완성 화면에서 문장을 직접 고쳤어요: "' + S.over['s' + n] + '"']));
+    app.appendChild(st);
+
+    if (!active) {
+      app.appendChild(h('div', { class: 'board' }, [
+        h('div', { class: 'board-title' }, ['🎉 이 문장을 다 채웠어요!']),
+        h('div', { class: 'board-hint' }, ['바꾸고 싶은 네모를 누르면 다시 고를 수 있어요. 아래 "다음"을 눌러요.'])
+      ]));
+      return;
+    }
+    app.appendChild(board(active));
+  }
+
+  function board(k) {
+    var b = h('div', { class: 'board' });
+    function title(t, hint) { b.appendChild(h('div', { class: 'board-title' }, [t])); if (hint) b.appendChild(h('div', { class: 'board-hint' }, [hint])); }
+    function label(t) { b.appendChild(h('div', { class: 'group-label' }, [t])); }
+    var e = emo(), r = row();
+
+    if (k === 'where') {
+      title('어디에서 있었던 일이에요?', '장소 카드를 고르면 무엇·어떻게·행동을 고르기 쉬워요.');
+      b.appendChild(h('div', { class: 'chips' }, PLACE_CARDS.map(function (c) {
+        return chip(c.name, function () { pickPlace(c); }, { big: true, em: EM_PLACE[c.name], on: S.where === c.name });
+      })));
+      b.appendChild(writeBox('where', '장소 직접 쓰기', '예: 이모네 집'));
+    }
+    else if (k === 'what') {
+      var pi = S.placeIdx != null ? S.placeIdx : browsePlace;
+      title('무엇을 했어요?', '한 줄에서 낱말을 하나 고르면 행동도 같이 들어가요.');
+      if (pi == null) {
+        b.appendChild(h('div', { class: 'board-hint' }, ['어느 장소 카드에서 찾아볼까요?']));
+        b.appendChild(h('div', { class: 'chips' }, PLACE_CARDS.map(function (c) {
+          return chip(c.name, function () { browsePlace = c.idx; render(); }, { em: EM_PLACE[c.name] });
+        })));
+      } else {
+        var P = D.places[pi];
+        if (S.placeIdx == null) b.appendChild(h('div', { class: 'board-hint' }, [P.place + ' 카드에서 보고 있어요. ', h('a', { href: '#', on: { click: function (ev) { ev.preventDefault(); browsePlace = null; render(); } } }, ['다른 장소 카드 보기'])]));
+        P.rows.forEach(function (rw, ri) {
+          var on = S.placeIdx === pi && S.rowIdx === ri;
+          var card = h('div', { class: 'row-card' + (on ? ' on' : '') }, [
+            h('div', { class: 'row-act', html: '…을(를) <b>' + rw.action.past + '</b>' })
+          ]);
+          card.appendChild(h('div', { class: 'chips' }, rw.what.map(function (w) {
+            return chip(w, function () { pickRowWord(pi, ri, w); }, { on: on && S.what === w });
+          })));
+          b.appendChild(card);
+        });
+      }
+      b.appendChild(writeBox('what', '무엇 직접 쓰기', '예: 딱지치기'));
+    }
+    else if (k === 'how') {
+      title('어떻게 했어요?', '안 골라도 돼요.');
+      if (r) { label('이 줄의 어떻게'); b.appendChild(chipList(r.how, 'how')); }
+      label('더 고르기');
+      b.appendChild(chipList(group(1, '어떻게'), 'how'));
+      b.appendChild(skipBtn('how', '어떻게는 빼기'));
+      b.appendChild(writeBox('how', '어떻게 직접 쓰기', '예: 씽씽'));
+    }
+    else if (k === 'act') {
+      title('행동 (지난 일)', r ? '고른 줄의 행동이 들어가 있어요. 바꿔도 돼요.' : '어떤 행동을 했어요?');
+      var acts = [];
+      D.places.forEach(function (p) { p.rows.forEach(function (x) { if (acts.indexOf(x.action.past) < 0) acts.push(x.action.past); }); });
+      b.appendChild(h('div', { class: 'chips' }, acts.map(function (a) {
+        return chip(a, function () {
+          S.act = a;
+          // 같은 행동의 '다음에' 말도 맞춰 준다
+          if (!S._wantTouched) D.places.forEach(function (p) { p.rows.forEach(function (x) { if (x.action.past === a) S.want = x.action.want; }); });
+          set('act', a);
+        }, { on: S.act === a });
+      })));
+      b.appendChild(writeBox('act', '행동 직접 쓰기', '예: 만들었다'));
+    }
+    else if (k === 'who' || k === 'who5') {
+      title(k === 'who' ? '누구와 함께했어요?' : '다음에는 누구와?', '"혼자서"를 고르면 "와(과)"가 빠져요.');
+      b.appendChild(h('div', { class: 'chips' }, WHO.map(function (w) {
+        return chip(w, function () { set(k, w); }, { big: true, em: EM_WHO[w], on: S[k] === w });
+      })));
+      b.appendChild(writeBox(k, '누구 직접 쓰기', '예: 사촌 동생'));
+    }
+    else if (k === 'when2') {
+      title('무엇을 하다가?', '맨 앞에 넣는 말이에요. 안 골라도 돼요.');
+      var dg = toDaga(S.act), ww = strip(S.what), op = [];
+      if (dg && ww) op.push(ww + josa(ww, '을', '를') + ' ' + dg);
+      if (op.length) { label('📍 1번에서 고른 일로'); b.appendChild(chipList(op, 'when2')); }
+      label('더 고르기'); b.appendChild(chipList(X.openers, 'when2'));
+      b.appendChild(skipBtn('when2', '빼기'));
+      b.appendChild(writeBox('when2', '직접 쓰기', '예: 밥을 먹다가'));
+    }
+    else if (k === 'spk') {
+      title('누가 말했어요?', '"나"를 고르면 "나는"이 돼요.');
+      var sp = ['나'].concat(WHO.filter(function (w) { return !noJosaWho(w); }));
+      if (strip(S.who) && !noJosaWho(S.who) && sp.indexOf(strip(S.who)) < 0) sp.splice(1, 0, strip(S.who));
+      b.appendChild(h('div', { class: 'chips' }, sp.map(function (w) {
+        return chip(w, function () { set('spk', w); }, { big: true, em: w === '나' ? '🙋' : EM_WHO[w], on: S.spk === w });
+      })));
+      b.appendChild(writeBox('spk', '누가 직접 쓰기', '예: 짝꿍'));
+    }
+    else if (k === 'say') {
+      title('뭐라고 말했어요?', '따옴표 안에 들어갈 말이에요.');
+      var sg = X.says.slice();
+      if (e) sg.sort(function (a, c) { return (a.part === e.part ? 0 : 1) - (c.part === e.part ? 0 : 1); });
+      sg.forEach(function (g) { label(g.label); b.appendChild(chipList(g.words, 'say')); });
+      b.appendChild(writeBox('say', '한 말 직접 쓰기', '예: 내 차례 언제야?'));
+    }
+    else if (k === 'said') {
+      title('어떻게 말했어요?');
+      b.appendChild(chipList(X.said, 'said'));
+      b.appendChild(writeBox('said', '직접 쓰기', '예: 크게 웃었다'));
+    }
+    else if (k === 'feel') {
+      title('그때 어떤 감정이었어요?', '감정 카드를 누르면 감정 말이 들어가요.');
+      b.appendChild(h('div', { class: 'tabs' }, D.emotion_groups.map(function (g) {
+        return h('button', { type: 'button', class: 'tab' + (emoTab === g.part ? ' on' : ''), style: emoTab === g.part ? 'background:' + GROUP_COLOR[g.part] + ';border-color:' + GROUP_COLOR[g.part] : 'color:' + GROUP_COLOR[g.part], on: { click: function () { emoTab = g.part; render(); } } }, [g.name]);
+      })));
+      var list = h('div', { class: 'chips' });
+      D.emotions.forEach(function (em, i) {
+        if (em.part !== emoTab) return;
+        list.appendChild(chip(em.name, function () { pickEmotion(i); }, { big: true, em: EM_EMO[i], small: em.past, on: S.emo === i }));
+      });
+      b.appendChild(list);
+      if (e) {
+        b.appendChild(h('div', { class: 'meaning' }, [EM_EMO[S.emo] + ' ' + e.name + ': ' + e.meaning]));
+        label('💬 ' + e.name + ' — 감정 말을 더 풍성하게');
+        var fm = [e.past];
+        (X.feel_more[e.name] || []).forEach(function (w) { if (fm.indexOf(w) < 0) fm.push(w); });
+        b.appendChild(chipList(fm, 'feel'));
+      }
+      b.appendChild(h('div', { style: 'margin-top:12px' }, [h('button', { class: 'btn ghost', type: 'button', on: { click: function () { showMoments = !showMoments; render(); } } }, [showMoments ? '힌트 닫기' : '🤔 감정이 안 떠올라요'])]));
+      if (showMoments) {
+        D.emotions.forEach(function (em, i) {
+          if (em.part !== emoTab) return;
+          b.appendChild(h('div', { class: 'group-label' }, [EM_EMO[i] + ' ' + em.name + ' — 이런 순간']));
+          b.appendChild(h('ul', { class: 'moments' }, em.moments.map(function (m) { return h('li', null, [m]); })));
+        });
+      }
+      b.appendChild(writeBox('feel', '감정 말 직접 쓰기', '예: 두근두근했다'));
+    }
+    else if (k === 'much') {
+      title('얼마나?', '안 골라도 돼요.');
+      b.appendChild(chipList(X.much, 'much'));
+      b.appendChild(skipBtn('much', '얼마나는 빼기'));
+      b.appendChild(writeBox('much', '얼마나 직접 쓰기', '예: 엄청'));
+    }
+    else if (k === 'reason') {
+      title('왜 그런 감정이 들었어요?', '"…해서", "…어서"로 끝나는 말이에요.');
+      var mine = reasonsFromScene();
+      if (mine.length) { label('📍 1번에서 고른 일로'); b.appendChild(chipList(mine, 'reason')); }
+      X.reasons.forEach(function (g) { label(g.label); b.appendChild(chipList(g.words, 'reason')); });
+      b.appendChild(writeBox('reason', '까닭 직접 쓰기', '예: 친구가 내 그림을 칭찬해 주어서'));
+    }
+    else if (k === 'part') {
+      title('몸 부위', '그때 몸의 어디가 어땠어요?');
+      b.appendChild(h('div', { class: 'chips' }, ['얼굴', '가슴', '손', '발', '온몸'].map(function (p) {
+        return chip(p, function () { if (S.part !== p && S.kind === '가') S.mat = ''; set('part', p); }, { big: true, em: EM_BODY[p], on: S.part === p });
+      })));
+      b.appendChild(writeBox('part', '몸 부위 직접 쓰기', '예: 볼'));
+    }
+    else if (k === 'mat') {
+      title('비유 재료', '"마치 ○○처럼"에 들어갈 말이에요.');
+      if (!e) b.appendChild(h('div', { class: 'board-hint' }, ['2번에서 감정 카드를 고르면 비유 재료가 나와요. 직접 써도 돼요.']));
+      else {
+        var bodies = e.body.filter(function (x) { return x.part === S.part; });
+        if (!bodies.length) bodies = e.body;
+        bodies.forEach(function (x) { label((EM_BODY[x.part] || '') + ' ' + x.part); b.appendChild(chipList(x.materials, 'mat')); });
+      }
+      b.appendChild(writeBox('mat', '비유 재료 직접 쓰기', '예: 터질 듯한 풍선'));
+    }
+    else if (k === 'sl') {
+      title('소리 말·모습 말');
+      if (e) {
+        label(EM_EMO[S.emo] + ' ' + e.name + ' — 소리 말'); b.appendChild(chipList(e.sound_words, 'sl'));
+        label(EM_EMO[S.emo] + ' ' + e.name + ' — 모습 말'); b.appendChild(chipList(e.look_words, 'sl'));
+      } else b.appendChild(h('div', { class: 'board-hint' }, ['2번에서 감정 카드를 고르면 그 감정의 소리 말·모습 말이 나와요.']));
+      label('더 고르기 — 소리 말'); b.appendChild(chipList(group(1, '소리 말'), 'sl'));
+      label('더 고르기 — 모습 말'); b.appendChild(chipList(group(1, '모습 말'), 'sl'));
+      b.appendChild(writeBox('sl', '소리 말·모습 말 직접 쓰기', '예: 콩닥콩닥'));
+    }
+    else if (k === 'move') {
+      title('움직임', '몸 부위가 어떻게 되었어요?');
+      if (e) b.appendChild(chipList(e.movements, 'move'));
+      else b.appendChild(h('div', { class: 'board-hint' }, ['2번에서 감정 카드를 고르면 움직임이 나와요.']));
+      b.appendChild(writeBox('move', '움직임 직접 쓰기', '예: 빨개졌다'));
+    }
+    else if (k === 'next') {
+      title('다음에도? 앞으로는?');
+      b.appendChild(chipList(['다음에도', '앞으로는'], 'next'));
+      b.appendChild(writeBox('next', '직접 쓰기', '예: 내일은'));
+    }
+    else if (k === 'want') {
+      title('하고 싶은 행동', r ? '1번에서 고른 줄의 "다음에" 말이 들어가 있어요. 바꿔도 돼요.' : '');
+      var mineW = wantsFromScene();
+      if (mineW.length) { label('📍 1번에서 고른 일로'); b.appendChild(chipList(mineW, 'want')); }
+      var wg = X.wants.slice();
+      if (e && e.part >= 4) wg.unshift(wg.pop()); // 속상한·불편한 감정이면 '앞으로는 이렇게'를 먼저
+      wg.forEach(function (g) { label(g.label); b.appendChild(chipList(g.words, 'want')); });
+      var other = [];
+      D.places.forEach(function (p) { p.rows.forEach(function (x) { if (other.indexOf(x.action.want) < 0 && mineW.indexOf(x.action.want) < 0) other.push(x.action.want); }); });
+      label('장소 카드의 다음에');
+      b.appendChild(chipList(other, 'want'));
+      b.appendChild(writeBox('want', '행동 직접 쓰기', '예: 더 멀리 타고 싶다'));
+    }
+    return b;
+  }
+
+  /* ---------- 화면: 완성 ---------- */
+  function renderDone(app) {
+    var st = h('div', { class: 'stage' });
+    st.appendChild(h('div', { class: 'stage-head' }, [h('div', { class: 'num' }, ['★']), h('div', { class: 'stage-name' }, ['완성! 마지막으로 고쳐요'])]));
+    st.appendChild(h('div', { class: 'board-hint' }, ['아래 칸은 모두 직접 고칠 수 있어요. 고친 내용이 그대로 인쇄돼요.']));
+    var list = h('div', { class: 'edit-list' });
+
+    function ed(lbl, value, onInput, onReset, multi) {
+      var inp = multi ? h('textarea', { rows: multi }) : h('input', { type: 'text' });
+      inp.value = value || '';
+      inp.addEventListener('input', function () { onInput(inp.value); save(); paintPreview(); });
+      return h('div', { class: 'ed' }, [
+        h('label', null, [lbl, onReset ? h('button', { class: 'reset', type: 'button', on: { click: function () { onReset(); save(); render(); } } }, ['고른 낱말로 되돌리기']) : null]),
+        inp
+      ]);
+    }
+    var top = h('div', { style: 'display:grid;grid-template-columns:1fr 1fr;gap:10px' }, [
+      ed('날짜', S.date, function (v) { S.date = v; }),
+      ed('날씨', S.weather, function (v) { S.weather = v; })
+    ]);
+    list.appendChild(top);
+    list.appendChild(ed('제목', S.title, function (v) { S.title = v; }));
+    list.appendChild(ed('오늘의 감정 · 감정 말', emoBox(), function (v) { S.over.emoBox = v; }, function () { delete S.over.emoBox; }, 2));
+    list.appendChild(ed('내가 고른 재료 (소리 말 · 모습 말 · 비유 재료)', matBox(), function (v) { S.over.matBox = v; }, function () { delete S.over.matBox; }, 2));
+    for (var n = 1; n <= LAST; n++) (function (n) {
+      list.appendChild(ed(n + '. ' + STEP_NAMES[n], finalSentence(n), function (v) { S.over['s' + n] = v; }, S.over['s' + n] != null ? function () { delete S.over['s' + n]; } : null, 2));
+    })(n);
+    st.appendChild(list);
+    app.appendChild(st);
+
+    var pb = h('div', { class: 'board' });
+    pb.appendChild(h('div', { class: 'board-title' }, ['🖨️ 인쇄하기 (오늘의 일기 쪽)']));
+    pb.appendChild(h('div', { class: 'board-hint' }, ['문장 글씨를 어떻게 넣을까요?']));
+    pb.appendChild(h('div', { class: 'modes' }, [['trace', '따라 쓰기 (연하게)'], ['solid', '완성본 (진하게)'], ['blank', '빈 칸 (문장 없이)']].map(function (m) {
+      return chip(m[1], function () { S.mode = m[0]; save(); render(); }, { on: S.mode === m[0] });
+    })));
+    pb.appendChild(h('button', { class: 'btn', type: 'button', style: 'width:100%;font-size:24px', on: { click: doPrint } }, ['🖨️ 인쇄 / PDF로 저장']));
+    pb.appendChild(h('div', { class: 'note' }, ['인쇄 창에서 "PDF로 저장"을 고르면 PDF 파일이 돼요. 휴대폰은 공유 → 인쇄에서 저장할 수 있어요. 여백은 "없음", 배경 그래픽은 "켜기"로 하면 원본과 똑같이 나와요.']));
+    var wrap = h('div', { class: 'preview-wrap', id: 'pvw' }, [h('div', { class: 'preview-scale', id: 'pvs' })]);
+    pb.appendChild(wrap);
+    app.appendChild(pb);
+    paintPreview();
+  }
+
+  /* ---------- 인쇄용 쪽 ---------- */
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function prettyDate(d) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d || '');
+    if (!m) return esc(d);
+    var dt = new Date(+m[1], +m[2] - 1, +m[3]);
+    return (+m[1]) + '년 ' + (+m[2]) + '월 ' + (+m[3]) + '일 ' + '일월화수목금토'[dt.getDay()] + '요일';
+  }
+  function B(t) { return '<span class="b">' + t + '</span>'; }
+  var FRAMES = [
+    '오늘 나는 ' + B('누구') + '와(과) ' + B('어디') + '에서 ' + B('무엇') + '을(를) ' + B('어떻게') + ' ' + B('행동') + '.',
+    B('하다가') + ' ' + B('누가') + '이(가) "' + B('한 말') + '" 하고 ' + B('말했다') + '.',
+    B('까닭 (~해서)') + ' ' + B('얼마나') + ' ' + B('감정 말') + '.',
+    '<span class="tag">가</span>그때 내 ' + B('몸 부위') + '은(는) 마치 ' + B('비유 재료') + '처럼 ' + B('움직임') + '. &nbsp;또는 &nbsp;<span class="tag">나</span>그때 내 ' + B('몸 부위') + '은(는) ' + B('소리 말·모습 말') + ' ' + B('움직임') + '.',
+    B('다음에도·앞으로는') + ' ' + B('누구') + '와(과) ' + B('행동') + '.'
+  ];
+  function sheetHTML() {
+    var s = '<div class="sheet ' + (S.mode || 'trace') + '">';
+    s += '<div class="sh-kicker">일기 쓰기 칸 · 필요한 만큼 인쇄해요</div><div class="sh-title">오늘의 일기</div>';
+    s += '<div class="sh-meta"><div class="f">날짜<div class="v" style="width:52mm">' + prettyDate(S.date) + '</div></div>' +
+      '<div class="f">날씨<div class="v" style="width:30mm">' + esc(S.weather) + '</div></div>' +
+      '<div class="f" style="flex:1">제목<div class="v" style="flex:1">' + esc(S.title) + '</div></div></div>';
+    s += '<div class="sh-boxes"><div class="sh-box"><div class="t">오늘의 감정 · 감정 말</div><div class="c">' + esc(emoBox()).replace(/\n/g, '<br>') + '</div></div>' +
+      '<div class="sh-box"><div class="t">내가 고른 재료 (소리 말 · 모습 말 · 비유 재료)</div><div class="c" style="font-size:11.5pt">' + esc(matBox()).replace(/\n/g, '<br>') + '</div></div></div>';
+    for (var n = 1; n <= LAST; n++) {
+      s += '<div class="sh-s"><div class="sh-n">' + n + '</div><div class="sh-body"><div class="sh-frame">' + FRAMES[n - 1] + '</div>' +
+        '<div class="sh-lines"><div class="sh-text">' + esc(finalSentence(n)) + '</div></div></div></div>';
+    }
+    s += '<div class="sh-foot"><span>일기 5문장으로 쓰기 · 감정 카드와 장소 카드의 낱말은 새로 쓴 것입니다</span><span>11</span></div>';
+    return s + '</div>';
+  }
+  function paintPreview() {
+    var pvs = document.getElementById('pvs'), pvw = document.getElementById('pvw');
+    if (!pvs) return;
+    pvs.innerHTML = sheetHTML();
+    var sh = pvs.firstChild;
+    var sc = pvw.clientWidth / sh.offsetWidth;
+    pvs.style.transform = 'scale(' + sc + ')';
+    pvw.style.height = (sh.offsetHeight * sc) + 'px';
+  }
+  function doPrint() {
+    save();
+    document.getElementById('printArea').innerHTML = sheetHTML();
+    var done = function () { window.print(); };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(done); else done();
+  }
+  window.addEventListener('resize', paintPreview);
+
+  /* ---------- 전체 그리기 ---------- */
+  function go(n) {
+    screen = Math.max(0, Math.min(DONE, n)); showMoments = false; browsePlace = null;
+    active = (screen >= 1 && screen <= LAST) ? firstEmpty(screen) : null;
+    render(); window.scrollTo(0, 0);
+  }
+  function stepDone(i) {
+    if (i === 0) return !!S.date;
+    if (i >= 1 && i <= LAST) {
+      if (S.over['s' + i] != null) return !!strip(S.over['s' + i]);
+      return parts(i).every(function (p) { return typeof p !== 'object' || p.opt || !!strip(S[p.k]); });
+    }
+    return false;
+  }
+  function render() {
+    var app = document.getElementById('app');
+    app.innerHTML = '';
+    app.appendChild(h('div', { class: 'top' }, [
+      h('a', { class: 'home', href: '../', title: '처음으로' }, ['🏠']),
+      h('div', { class: 'apptitle' }, ['일기 5문장으로 쓰기'])
+    ]));
+    app.appendChild(h('div', { class: 'steps' }, STEP_NAMES.map(function (nm, i) {
+      return h('button', { type: 'button', class: 'step' + (i === screen ? ' on' : stepDone(i) ? ' done' : ''), on: { click: function () { go(i); } } }, [(i >= 1 && i <= LAST ? i + ' ' : '') + nm]);
+    })));
+    if (screen === 0) renderStart(app);
+    else if (screen === DONE) renderDone(app);
+    else renderSentence(app, screen);
+
+    var nav = document.getElementById('nav');
+    nav.innerHTML = '';
+    if (screen > 0) nav.appendChild(h('button', { class: 'btn ghost', type: 'button', on: { click: function () { go(screen - 1); } } }, ['← 이전']));
+    if (screen < DONE) nav.appendChild(h('button', { class: 'btn', type: 'button', on: { click: function () { go(screen + 1); } } }, [screen === 0 ? '쓰기 시작 →' : screen === LAST ? '완성 보기 →' : '다음 →']));
+    else nav.appendChild(h('button', { class: 'btn', type: 'button', on: { click: doPrint } }, ['🖨️ 인쇄 / PDF']));
+  }
+
+  if (S.emo != null) emoTab = D.emotions[S.emo].part;
+  render();
+})();
+</script>
+</body>
+</html>
