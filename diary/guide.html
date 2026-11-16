@@ -212,8 +212,7 @@
     box(2, 2, '말 · 행동', FR[2],
       row('하다가', '<div class="chips"><div class="hint" style="width:100%;margin-bottom:1mm">장소 카드의 <b>무엇</b> + <b>하다가</b> 칸 → 그네를 타다가 · 책을 읽다가 · 급식을 먹다가 …</div>' + chips(X.openers).replace(/^<div class="chips">|<\/div>$/g, '') + '</div>') +
       row('누가', chips(['나 (→ 나는)'].concat(g(1, '누구').words.filter(function (w) { return w !== '혼자서'; })))) +
-      row('<span class="tag">말</span>한 말', '<div class="chips">' + say + '</div>') +
-      row('<span class="tag">말</span>말했다', chips(X.said)) +
+      row('<span class="tag">말</span>한 말 · 말했다', '<div class="chips">' + say + '<div class="grp" style="--c:var(--c5)"><span class="sub">말했다</span>' + X.said.map(function (w) { return '<span class="chip">' + esc(w) + '</span>'; }).join('') + '</div></div>') +
       row('<span class="tag">행동</span>무엇을 · 행동', '<div class="chips">' + X.acts.map(function (a) { return grp(a.label, a.pairs.map(function (p) { return (p[0] ? p[0] + ' ' : '') + p[1]; })); }).join('') + '</div>'))
   );
   var verbs = X.reason_parts.verb.map(function (r) { return grp(r.label, r.words); }).join('');
