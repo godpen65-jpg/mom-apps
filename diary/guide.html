@@ -168,7 +168,7 @@
   var FR = {
     1: '오늘 나는 ' + B('누구') + '와(과) ' + B('어디') + '에서 ' + B('무엇') + '을(를) ' + B('어떻게') + ' ' + B('행동') + '.',
     2: B('하다가') + ' ' + B('누가') + '이(가) "' + B('한 말') + '" 하고 ' + B('말했다') + '.',
-    3: B('까닭 (~해서)') + ' ' + B('얼마나') + ' ' + B('감정 말') + '.',
+    3: B('누가') + ' ' + B('무엇을') + ' ' + B('~해서') + ' ' + B('얼마나') + ' ' + B('감정 말') + '.',
     5: B('다음에도·앞으로는') + ' ' + B('누구') + '와(과) ' + B('행동') + '.'
   };
   var FR4a = '<span class="tag">가</span>그때 내 ' + B('몸 부위') + '은(는) 마치 ' + B('비유 재료') + '처럼 ' + B('움직임') + '.';
@@ -183,7 +183,7 @@
     '<table class="frame"><tr><th></th><th>단계</th><th>문장 틀 ' + B('네모') + ' 안만 바꿔 써요</th><th>예시 (뿌듯하다)</th></tr>' +
     '<tr><td class="n">1</td><td class="s">장면</td><td><div class="fr">' + FR[1] + '</div><div class="nt"><b>누구 · 어디</b>는 네모 메꾸기, <b>무엇 · 어떻게 · 행동(지난 일)</b>은 장소 카드에서 골라요. 어떻게는 빼도 돼요.</div></td><td class="ex">오늘 나는 아빠와 공원에서 자전거를 신나게 탔다.</td></tr>' +
     '<tr><td class="n">2</td><td class="s">대화</td><td><div class="fr">' + FR[2] + '</div><div class="nt"><b>하다가</b>는 장소 카드의 하다가 칸, <b>한 말</b>은 네모 메꾸기나 감정 사전 PART 맨 위에서 골라요. "나"가 말했으면 "나는"이 돼요. 하다가는 빼도 돼요.</div></td><td class="ex">자전거를 타다가 아빠가 "와, 혼자서도 잘 탄다!" 하고 말했다.</td></tr>' +
-    '<tr><td class="n">3</td><td class="s">감정 · 까닭</td><td><div class="fr">' + FR[3] + '</div><div class="nt"><b>까닭</b>은 장소 카드의 해서 칸이나 네모 메꾸기, <b>감정 말</b>은 감정 카드에서 골라요. 얼마나는 빼도 돼요.</div></td><td class="ex">보조 바퀴 없이 끝까지 해내서 정말 뿌듯했다.</td></tr>' +
+    '<tr><td class="n">3</td><td class="s">감정 · 까닭</td><td><div class="fr">' + FR[3] + '</div><div class="nt"><b>까닭</b>은 누가 · 무엇을 · ~해서 세 조각으로 골라 이어 붙여요 (장소 카드의 해서 칸, 네모 메꾸기, 부록의 순간). <b>감정 말</b>은 감정 카드에서 골라요. 누가 · 무엇을 · 얼마나는 빼도 돼요.</div></td><td class="ex">보조 바퀴 없이 끝까지 해내서 정말 뿌듯했다.</td></tr>' +
     '<tr><td class="n">4</td><td class="s">몸 표현</td><td><div class="fr">' + FR4a + '</div><div class="nt" style="margin:.6mm 0">또는</div><div class="fr">' + FR4b + '</div><div class="nt"><b>가, 나 중 하나만</b> 골라 써요. 가는 감정 카드의 <b>비유 재료</b>, 나는 <b>소리 말 · 모습 말</b>에서 골라요. <b>움직임</b>도 감정 카드에 있어요.</div></td><td class="ex"><span class="tag">가</span>그때 내 가슴은 마치 가득 찬 바구니처럼 꽉 찼다.<br><span class="tag">나</span>그때 내 가슴은 당당히 쫙 펴졌다.</td></tr>' +
     '<tr><td class="n">5</td><td class="s">마무리</td><td><div class="fr">' + FR[5] + '</div><div class="nt">장소 카드의 <b>다음에</b> 칸이나 네모 메꾸기에서 골라요.</div></td><td class="ex">다음에도 아빠와 더 멀리 타고 싶다.</td></tr></table>' +
     '<div class="rules"><b>받침에 맞게</b> 와/과 · 을/를 · 은/는 · 이/가를 골라요 (친구<b>와</b> / 동생<b>과</b>, 엄마<b>가</b> / 동생<b>이</b>). "혼자서"는 와(과)를 빼요.<br><b>모든 네모</b>에는 여기에 없는 말을 직접 써도 돼요.</div>' +
@@ -217,11 +217,14 @@
       row('한 말', '<div class="chips">' + say + '</div>') +
       row('말했다', chips(X.said)))
   );
-  var reasons = X.reasons.map(function (r) { return grp(r.label, r.words); }).join('');
+  var verbs = X.reason_parts.verb.map(function (r) { return grp(r.label, r.words); }).join('');
   var wants = X.wants.map(function (r) { return grp(r.label, r.words); }).join('');
   page('<div class="kicker">네모 메꾸기 · 5문장 틀에 넣을 재료 (이어서)</div><h1>네모 메꾸기</h1><p class="lead">감정이 안 떠오르면 13~14쪽 <b>부록</b>을 보세요.</p>' +
     box(3, 3, '감정 · 까닭', FR[3],
-      row('까닭 (~해서)', '<div class="chips"><div class="hint" style="width:100%">장소 카드의 <b>무엇</b> + <b>해서</b> 칸 → 그네를 타서 · 같이 소꿉놀이를 해서 · 친구와 같이 놀아서 …</div>' + reasons + '</div>') +
+      row('까닭 고르는 법', '<div class="hint">세 조각을 골라 이어 붙여요 → [아빠가] [집에 일찍] [와서] · [ ] [잃어버린 필통을] [찾아서] · [친구들과 같이] [소꿉놀이를] [해서]<br>장소 카드의 <b>해서</b> 칸, 13~14쪽 부록의 순간도 조각으로 써요.</div>') +
+      row('누가', chips(X.reason_parts.who)) +
+      row('무엇을 · 어디에', chips(X.reason_parts.obj)) +
+      row('~해서', '<div class="chips">' + verbs + '</div>') +
       row('얼마나', chips(X.much)) +
       row('감정 말', '<div class="hint">감정 카드(7~11쪽)에서 골라요 → 기뻤다 · 날아갈 것 같았다 · 마음이 따뜻해졌다 · 속상했다 · 화가 났다 …</div>')) +
     box(4, 4, '몸 표현', '감정 카드의 ' + B('비유 재료') + ' 또는 ' + B('소리 말·모습 말'),
