@@ -273,13 +273,14 @@
       kind: '가', part: '', mat: '', sl: '', move: '',
       next: '', who5: '', want: '',
       over: {}, // 완성 화면에서 고친 문장/칸
-      mode: 'trace'
+      mode: 'solid', modeV: 2
     };
   }
   function load(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   var S = Object.assign(blank(), load(KEY, {}));
   if (!S.skip) S.skip = {};
+  if (S.modeV !== 2) { S.mode = 'solid'; S.modeV = 2; } // 인쇄 기본값을 완성본으로
   var LAST = 5;      // 문장 수
   var DONE = LAST + 1;
   var screen = 0;   // 0 시작, 1~4 문장, 5 완성
@@ -766,7 +767,7 @@
     var pb = h('div', { class: 'board' });
     pb.appendChild(h('div', { class: 'board-title' }, ['🖨️ 인쇄하기 (오늘의 일기 쪽)']));
     pb.appendChild(h('div', { class: 'board-hint' }, ['문장 글씨를 어떻게 넣을까요?']));
-    pb.appendChild(h('div', { class: 'modes' }, [['trace', '따라 쓰기 (연하게)'], ['solid', '완성본 (진하게)'], ['blank', '빈 칸 (문장 없이)']].map(function (m) {
+    pb.appendChild(h('div', { class: 'modes' }, [['solid', '완성본 (진하게)'], ['trace', '따라 쓰기 (연하게)'], ['blank', '빈 칸 (문장 없이)']].map(function (m) {
       return chip(m[1], function () { S.mode = m[0]; save(); render(); }, { on: S.mode === m[0] });
     })));
     pb.appendChild(h('button', { class: 'btn', type: 'button', style: 'width:100%;font-size:24px', on: { click: doPrint } }, ['🖨️ 인쇄 / PDF로 저장']));
@@ -794,7 +795,7 @@
     B('다음에도·앞으로는') + ' ' + B('누구') + '와(과) ' + B('행동') + '.'
   ];
   function sheetHTML() {
-    var s = '<div class="sheet ' + (S.mode || 'trace') + '">';
+    var s = '<div class="sheet ' + (S.mode || 'solid') + '">';
     s += '<div class="sh-kicker">일기 쓰기 칸 · 필요한 만큼 인쇄해요</div><div class="sh-title">오늘의 일기</div>';
     s += '<div class="sh-meta"><div class="f">날짜<div class="v" style="width:52mm">' + prettyDate(S.date) + '</div></div>' +
       '<div class="f">날씨<div class="v" style="width:30mm">' + esc(S.weather) + '</div></div>' +
