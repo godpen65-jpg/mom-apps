@@ -308,7 +308,32 @@
   var DAGA = { '했다': '하다가', '먹었다': '먹다가', '그렸다': '그리다가', '보았다': '보다가', '들었다': '듣다가', '쌓았다': '쌓다가', '읽었다': '읽다가', '탔다': '타다가', '불었다': '불다가', '빌렸다': '빌리다가', '골랐다': '고르다가', '밀었다': '밀다가', '찍었다': '찍다가', '주웠다': '줍다가', '쳤다': '치다가' };
   function toDaga(past) { past = strip(past).replace(/\.$/, ''); if (DAGA[past]) return DAGA[past]; if (/했다$/.test(past)) return past.replace(/했다$/, '하다가'); return ''; }
   function whoPart(w) { w = strip(w); if (!w) return ''; return noJosaWho(w) ? w : w + josa(w, '과', '와'); }
-  function wherePart(w) { w = strip(w); if (!w) return ''; return /에서$/.test(w) ? w : w + '에서'; }
+  function wherePart(w) { w = strip(w); if (!w) return ''; return /에서$/.test(w) ? w : /에$/.test(w) ? w + '서' : w + '에서'; }
+  // 5번: 행동에 따라 와/과 · 에게 · 을/를
+  function who5Josa(v) {
+    v = strip(v); if (!v || noJosaWho(v)) return '';
+    var j = X.want_josa[strip(S.want)];
+    if (j === '에게') return '에게';
+    if (j === '를') return josa(v, '을', '를');
+    return josa(v, '과', '와');
+  }
+  function feelDefault(e) { return (X.feel_default && X.feel_default[e.name]) || e.past; }
+  function feelList(e) { var o = [feelDefault(e), e.past].concat(X.feel_more[e.name] || []); return o.filter(function (x, i) { return o.indexOf(x) === i; }); }
+  // 4번: 움직임이 몸 부위와 어울리는지 (어울리면 true, 모든 부위에 되는 말은 늘 true)
+  var MOVE_RULES = [
+    [/따뜻해|포근해|가벼워|무거워|뜨거워|힘이|굳|얼어붙|떨렸|스르르 풀렸|작아졌/, ['얼굴', '가슴', '손', '발', '온몸']],
+    [/손뼉|쥐었|잡았|붙잡|만지|쓰다듬|내밀|가리켰|손을|두 손|건드렸|맞잡|세었|번쩍 들었|높이 들었|흔들었|가렸|꼼지락|안았/, ['손', '온몸']],
+    [/뛰었|걸었|달려|굴렀|나섰|내디뎠|다가갔|섰다|버텼|돌아섰|뒷걸음|서성|주저앉|돌아앉|동동/, ['발', '온몸']],
+    [/환해|웃음|미소|빨개|발그레|눈|입|고개|일그러|화끈|휘둥그레|벌어졌|반짝였|말똥|또렷|찌푸|질렸|숙였|쳐다보|들여다보|내다보|먼 곳을 보|뒤돌아보|멍하니 보|한숨|말이 안|힐끔|빼꼼|갸웃|쫑긋|뾰로통|삐죽|두리번|울먹|뾰족|소리를|기울었|빛났|끄덕|다물/, ['얼굴']],
+    [/두근|콩닥|쿵쾅|쿵쿵 뛰|찼다|답답|뭉클|찡해|벅|부풀|서늘|허전|부글부글|말랑|간질|풀렸|고요해|숨|조마조마|쓸쓸|텅 비|꺼졌|느긋|잔잔|끓었|펴졌/, ['가슴', '온몸']],
+    [/들썩|늘어졌|처졌|움츠|웅크|춤|빙글|느려|기댔|안겼|곧게|당당|으쓱|펴졌|통통|깡충|펄쩍|머뭇|숨고|꾸벅|안 왔/, ['온몸']]
+  ];
+  function moveFits(m, part) {
+    if (['얼굴', '가슴', '손', '발', '온몸'].indexOf(part) < 0) return true;
+    var any = false, ok = false;
+    MOVE_RULES.forEach(function (r) { if (r[0].test(m)) { any = true; if (r[1].indexOf(part) >= 0) ok = true; } });
+    return !any || ok;
+  }
   function built(n) {
     var x = [];
     if (n === 1) {
@@ -328,7 +353,7 @@
       if (S.kind === '가') x = [p, S.mat ? '마치 ' + strip(S.mat) + '처럼' : '', strip(S.move)];
       else x = [p, strip(S.sl), strip(S.move)];
     } else if (n === 5) {
-      x = [strip(S.next), whoPart(S.who5), strip(S.want)];
+      x = [strip(S.next), strip(S.who5) ? strip(S.who5) + who5Josa(S.who5) : '', strip(S.want)];
     }
     var body = x.filter(Boolean);
     if (body.length <= (n === 1 ? 1 : 0)) return '';
@@ -338,7 +363,7 @@
   function emoBox() {
     if (S.over.emoBox != null) return S.over.emoBox;
     var e = emo();
-    var fm = e ? [e.past].concat(X.feel_more[e.name] || []) : [];
+    var fm = e ? feelList(e) : [];
     if (e && fm.indexOf(S.feel) >= 0) return EM_EMO[S.emo] + ' ' + e.name + ' → ' + S.feel;
     return strip(S.feel);
   }
@@ -356,7 +381,7 @@
   function parts(n) {
     if (n === 1) return [
       '오늘 나는', { k: 'who', label: '누구', after: function (v) { return noJosaWho(v) ? '' : josa(v, '과', '와'); }, fallback: '와(과)' },
-      { k: 'where', label: '어디', after: function (v) { return /에서$/.test(strip(v)) ? '' : '에서'; }, fallback: '에서' },
+      { k: 'where', label: '어디', after: function (v) { return /에서$/.test(strip(v)) ? '' : /에$/.test(strip(v)) ? '서' : '에서'; }, fallback: '에서' },
       { k: 'what', label: '무엇', after: function (v) { return josa(v, '을', '를'); }, fallback: '을(를)' },
       { k: 'how', label: '어떻게', opt: true },
       { k: 'act', label: '행동' }, '.'
@@ -370,7 +395,7 @@
     if (n === 4) return S.kind === '가'
       ? ['그때 내', { k: 'part', label: '몸 부위', after: function (v) { return josa(v, '은', '는'); }, fallback: '은(는)' }, '마치', { k: 'mat', label: '비유 재료', after: function () { return '처럼'; }, fallback: '처럼' }, { k: 'move', label: '움직임' }, '.']
       : ['그때 내', { k: 'part', label: '몸 부위', after: function (v) { return josa(v, '은', '는'); }, fallback: '은(는)' }, { k: 'sl', label: '소리 말·모습 말' }, { k: 'move', label: '움직임' }, '.'];
-    if (n === 5) return [{ k: 'next', label: '다음에도·앞으로는' }, { k: 'who5', label: '누구', after: function (v) { return noJosaWho(v) ? '' : josa(v, '과', '와'); }, fallback: '와(과)' }, { k: 'want', label: '행동' }, '.'];
+    if (n === 5) return [{ k: 'next', label: '다음에도·앞으로는' }, { k: 'who5', label: '누구', after: function (v) { return who5Josa(v); }, fallback: '와(과)' }, { k: 'want', label: '행동' }, '.'];
   }
   // 처음 고를 차례 (문장 순서와 다를 수 있음)
   var ORDER = { 1: ['where', 'what', 'how', 'act', 'who'], 2: ['spk', 'say', 'obj2', 'act2', 'when2', 'said'], 3: ['feel', 'r1', 'r2', 'r3', 'much'], 4: ['part', 'mat', 'sl', 'move'], 5: ['next', 'who5', 'want'] };
@@ -413,7 +438,7 @@
     active = firstEmpty(1); render();
   }
   function pickEmotion(i, rp) {
-    S.emo = i; S.feel = D.emotions[i].past;
+    S.emo = i; S.feel = feelDefault(D.emotions[i]);
     if (rp) { S.r1 = rp[0]; S.r2 = rp[1]; S.r3 = rp[2]; S.skip.r1 = !rp[0]; S.skip.r2 = !rp[1]; S.skip.r3 = false; }
     // 감정이 바뀌면 몸 표현 재료도 새로
     S.mat = ''; S.sl = ''; S.move = '';
@@ -667,9 +692,13 @@
       var sw = strip(S.what), sa = strip(S.act);
       var mineA = ia === 0 ? (sw ? [sw + josa(sw, '을', '를')] : []) : (sa ? ['같이 ' + sa] : []);
       if (mineA.length) { label('📍 1번에서 고른 일로'); b.appendChild(chipList(mineA, k)); }
+      // 말한 사람이 '나'면 "나는 내 손을 잡아 주었다" 같은 조각은 빼기
+      var meSpk = strip(S.spk) === '나';
+      var okPair = function (pr) { return !meSpk || !/(^|\s)(나를|나와|나에게|내 )|나를/.test(pr[0] + ' ' + pr[1]); };
       ag.forEach(function (g) {
         var ws = [];
-        g.pairs.forEach(function (pr) { if (pr[ia] && ws.indexOf(pr[ia]) < 0) ws.push(pr[ia]); });
+        g.pairs.forEach(function (pr) { if (okPair(pr) && pr[ia] && ws.indexOf(pr[ia]) < 0) ws.push(pr[ia]); });
+        if (!ws.length) return;
         label(g.label); b.appendChild(chipList(ws, k));
       });
       if (k === 'obj2') b.appendChild(skipBtn('obj2', '빼기'));
@@ -694,9 +723,7 @@
       if (e) {
         b.appendChild(h('div', { class: 'meaning' }, [EM_EMO[S.emo] + ' ' + e.name + ': ' + e.meaning]));
         label('💬 ' + e.name + ' — 감정 말을 더 풍성하게');
-        var fm = [e.past];
-        (X.feel_more[e.name] || []).forEach(function (w) { if (fm.indexOf(w) < 0) fm.push(w); });
-        b.appendChild(chipList(fm, 'feel'));
+        b.appendChild(chipList(feelList(e), 'feel'));
       }
       b.appendChild(h('div', { style: 'margin-top:12px' }, [h('button', { class: 'btn ghost', type: 'button', on: { click: function () { showMoments = !showMoments; render(); } } }, [showMoments ? '힌트 닫기' : '🤔 감정이 안 떠올라요'])]));
       if (showMoments) {
@@ -713,8 +740,10 @@
       b.appendChild(writeBox('feel', '감정 말 직접 쓰기', '예: 두근두근했다'));
     }
     else if (k === 'much') {
-      title('얼마나?', '안 골라도 돼요.');
-      b.appendChild(chipList(X.much, 'much'));
+      // 감정 말을 문장처럼 길게 골랐으면 짧은 것만 (예: "세상에서 제일 웃음이 났다" 막기)
+      var longFeel = /\s/.test(strip(S.feel));
+      title('얼마나?', longFeel ? '감정 말이 길어서 어울리는 것만 보여요. 안 골라도 돼요.' : '안 골라도 돼요.');
+      b.appendChild(chipList(longFeel ? X.much_short : X.much, 'much'));
       b.appendChild(skipBtn('much', '얼마나는 빼기'));
       b.appendChild(writeBox('much', '얼마나 직접 쓰기', '예: 엄청'));
     }
@@ -728,6 +757,18 @@
         (X.moment_parts[em.name] || []).forEach(function (t) { if (t[ix] && o.indexOf(t[ix]) < 0) o.push(t[ix]); });
         return o;
       };
+      // 앞 조각과 같은 순간에서 나온 다음 조각을 먼저 (예: [아빠가] → [집에 일찍] → [와서])
+      if (ix > 0) {
+        var prev = [strip(S.r1), strip(S.r2)];
+        var nxt = [];
+        D.emotions.forEach(function (em) {
+          (X.moment_parts[em.name] || []).forEach(function (t) {
+            var hit = ix === 1 ? (prev[0] && t[0] === prev[0]) : ((prev[1] && t[1] === prev[1]) || (!prev[1] && prev[0] && t[0] === prev[0]));
+            if (hit && t[ix] && nxt.indexOf(t[ix]) < 0) nxt.push(t[ix]);
+          });
+        });
+        if (nxt.length) { label('👉 앞 조각과 이어지는 말'); b.appendChild(chipList(nxt, k)); }
+      }
       if (e) { label('💡 ' + EM_EMO[S.emo] + ' ' + e.name + ' — 이런 순간에서'); b.appendChild(chipList(pieces(e), k)); }
       var mine = sceneParts(ix);
       if (mine.length) { label('📍 1번에서 고른 일로'); b.appendChild(chipList(mine, k)); }
@@ -752,7 +793,7 @@
     }
     else if (k === 'mat') {
       title('비유 재료', '"마치 ○○처럼"에 들어갈 말이에요.');
-      if (!e) b.appendChild(h('div', { class: 'board-hint' }, ['2번에서 감정 카드를 고르면 비유 재료가 나와요. 직접 써도 돼요.']));
+      if (!e) b.appendChild(h('div', { class: 'board-hint' }, ['3번에서 감정 카드를 고르면 비유 재료가 나와요. 직접 써도 돼요.']));
       else {
         var bodies = e.body.filter(function (x) { return x.part === S.part; });
         if (!bodies.length) bodies = e.body;
@@ -761,19 +802,31 @@
       b.appendChild(writeBox('mat', '비유 재료 직접 쓰기', '예: 터질 듯한 풍선'));
     }
     else if (k === 'sl') {
-      title('소리 말·모습 말');
+      title('소리 말·모습 말', '움직임 앞에 붙는 말이에요. 예: 콩닥콩닥 뛰었다');
       if (e) {
-        label(EM_EMO[S.emo] + ' ' + e.name + ' — 소리 말'); b.appendChild(chipList(e.sound_words, 'sl'));
         label(EM_EMO[S.emo] + ' ' + e.name + ' — 모습 말'); b.appendChild(chipList(e.look_words, 'sl'));
-      } else b.appendChild(h('div', { class: 'board-hint' }, ['2번에서 감정 카드를 고르면 그 감정의 소리 말·모습 말이 나와요.']));
-      label('더 고르기 — 소리 말'); b.appendChild(chipList(group(1, '소리 말'), 'sl'));
+        var sa = e.sound_words.filter(function (w) { return X.sound_adverbs.indexOf(w) >= 0; });
+        if (sa.length) { label(EM_EMO[S.emo] + ' ' + e.name + ' — 소리 말'); b.appendChild(chipList(sa, 'sl')); }
+      } else b.appendChild(h('div', { class: 'board-hint' }, ['3번에서 감정 카드를 고르면 그 감정의 소리 말·모습 말이 나와요.']));
+      label('더 고르기 — 소리 말'); b.appendChild(chipList(group(1, '소리 말').filter(function (w) { return X.sound_adverbs.indexOf(w) >= 0; }), 'sl'));
       label('더 고르기 — 모습 말'); b.appendChild(chipList(group(1, '모습 말'), 'sl'));
       b.appendChild(writeBox('sl', '소리 말·모습 말 직접 쓰기', '예: 콩닥콩닥'));
     }
     else if (k === 'move') {
-      title('움직임', '몸 부위가 어떻게 되었어요?');
-      if (e) b.appendChild(chipList(e.movements, 'move'));
-      else b.appendChild(h('div', { class: 'board-hint' }, ['2번에서 감정 카드를 고르면 움직임이 나와요.']));
+      title('움직임', strip(S.part) ? '내 ' + strip(S.part) + josa(S.part, '이', '가') + ' 어떻게 되었어요?' : '몸 부위가 어떻게 되었어요?');
+      if (e) {
+        var fit = e.movements.filter(function (m) { return moveFits(m, strip(S.part)); });
+        var rest = e.movements.filter(function (m) { return fit.indexOf(m) < 0; });
+        // 이 감정에 어울리는 게 적으면 다른 감정의 같은 부위 움직임도 보태기
+        if (fit.length < 3) D.emotions.forEach(function (em) { if (em.part === e.part) em.movements.forEach(function (m) { if (fit.length < 6 && fit.indexOf(m) < 0 && moveFits(m, strip(S.part)) && MOVE_RULES.some(function (r) { return r[0].test(m); })) fit.push(m); }); });
+        if (strip(S.part) && rest.length) label(EM_EMO[S.emo] + ' ' + e.name + ' — ' + strip(S.part) + '에 어울리는 움직임');
+        b.appendChild(chipList(fit, 'move'));
+        if (rest.length) {
+          b.appendChild(h('div', { style: 'margin-top:12px' }, [h('button', { class: 'btn ghost', type: 'button', on: { click: function () { showAllMoments = !showAllMoments; render(); } } }, [showAllMoments ? '닫기' : '다른 움직임도 보기'])]));
+          if (showAllMoments) { label('다른 몸 부위에 더 어울리는 말'); b.appendChild(chipList(rest, 'move')); }
+        }
+      }
+      else b.appendChild(h('div', { class: 'board-hint' }, ['3번에서 감정 카드를 고르면 움직임이 나와요.']));
       b.appendChild(writeBox('move', '움직임 직접 쓰기', '예: 빨개졌다'));
     }
     else if (k === 'next') {
