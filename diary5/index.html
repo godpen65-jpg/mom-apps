@@ -182,20 +182,20 @@
   .sh-box { flex: 1; border: 1.3px dashed var(--pink); border-radius: 3mm; height: 26mm; padding: 2.5mm 3.5mm; overflow: hidden; }
   .sh-box .t { color: var(--pink); font-weight: 700; font-size: 9pt; margin-bottom: 1.5mm; }
   .sh-box .c { font-size: 13pt; line-height: 1.45; }
-  .sh-s { display: flex; gap: 4mm; margin-bottom: 4mm; }
+  .sh-s { display: flex; gap: 4mm; margin-bottom: 3mm; }
   .sh-n { width: 9.5mm; height: 9.5mm; border-radius: 50%; background: var(--pink); color: #fff; font-weight: 700; font-size: 13pt; display: grid; place-items: center; flex: none; margin-top: -1mm; }
   .sh-body { flex: 1; min-width: 0; }
   .sh-frame { font-size: 9pt; color: #444; height: 5.5mm; white-space: nowrap; }
   .sh-frame .b { display: inline-block; border: 1px solid #999; border-radius: 1.6mm; padding: 0 1.4mm; margin: 0 .6mm; line-height: 1.35; font-size: 8.5pt; }
   .sh-frame .tag { display: inline-block; background: var(--pink); color: #fff; border-radius: 1mm; padding: 0 1.2mm; font-weight: 700; font-size: 8pt; margin-right: 1mm; }
   .sh-lines {
-    height: 42mm; position: relative;
-    background-image: linear-gradient(to bottom, transparent calc(14mm - 1px), #9a9a9a calc(14mm - 1px), #9a9a9a 14mm);
-    background-size: 100% 14mm;
+    height: 30mm; position: relative;
+    background-image: linear-gradient(to bottom, transparent calc(15mm - 1px), #9a9a9a calc(15mm - 1px), #9a9a9a 15mm);
+    background-size: 100% 15mm;
   }
   .sh-text {
     position: absolute; left: 0; right: 0; top: 0;
-    font-size: 16.5pt; line-height: 14mm; padding-top: 2.4mm; word-break: keep-all; overflow-wrap: anywhere;
+    font-size: 16.5pt; line-height: 15mm; padding-top: 2.6mm; word-break: keep-all; overflow-wrap: anywhere;
   }
   .sheet.trace .sh-text { color: #b9b9b9; font-weight: 400; }
   .sheet.solid .sh-text { color: #222; font-weight: 500; }
@@ -256,7 +256,7 @@
   function endDot(s) { s = strip(s); return /[.!?~]$/.test(s) ? s : s + '.'; }
 
   /* ---------- 상태 ---------- */
-  var KEY = 'diary5.v2.current';
+  var KEY = 'diary5.v3.current';
   function blank() {
     var t = new Date();
     return {
@@ -264,6 +264,7 @@
       date: t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'),
       weather: '', title: '',
       who: '', where: '', placeIdx: null, rowIdx: null, what: '', how: '', act: '',
+      when2: '', spk: '', say: '', said: '말했다',
       much: '', emo: null, feel: '', reason: '',
       skip: {},
       kind: '가', part: '', mat: '', sl: '', move: '',
@@ -276,7 +277,7 @@
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   var S = Object.assign(blank(), load(KEY, {}));
   if (!S.skip) S.skip = {};
-  var LAST = 4;      // 문장 수
+  var LAST = 5;      // 문장 수
   var DONE = LAST + 1;
   var screen = 0;   // 0 시작, 1~4 문장, 5 완성
   var active = null; // 지금 고르는 네모
@@ -286,6 +287,11 @@
   function row() { return (S.placeIdx == null || S.rowIdx == null) ? null : D.places[S.placeIdx].rows[S.rowIdx]; }
 
   /* ---------- 문장 만들기 ---------- */
+  function spkPart(w) { w = strip(w); if (!w) return ''; if (w === '나') return '나는'; return /께서$/.test(w) ? w : w + josa(w, '이', '가'); }
+  function cleanSay(t) { return strip(t).replace(/^["“”']+|["“”']+$/g, ''); }
+  // 했다 → 하다가, 먹었다 → 먹다가 ...
+  var DAGA = { '했다': '하다가', '먹었다': '먹다가', '그렸다': '그리다가', '보았다': '보다가', '들었다': '듣다가', '쌓았다': '쌓다가', '읽었다': '읽다가', '탔다': '타다가', '불었다': '불다가', '빌렸다': '빌리다가', '골랐다': '고르다가', '밀었다': '밀다가', '찍었다': '찍다가', '주웠다': '줍다가', '쳤다': '치다가' };
+  function toDaga(past) { past = strip(past).replace(/\.$/, ''); if (DAGA[past]) return DAGA[past]; if (/했다$/.test(past)) return past.replace(/했다$/, '하다가'); return ''; }
   function whoPart(w) { w = strip(w); if (!w) return ''; return noJosaWho(w) ? w : w + josa(w, '과', '와'); }
   function wherePart(w) { w = strip(w); if (!w) return ''; return /에서$/.test(w) ? w : w + '에서'; }
   function built(n) {
@@ -293,12 +299,15 @@
     if (n === 1) {
       x = ['오늘 나는', whoPart(S.who), wherePart(S.where), S.what ? strip(S.what) + josa(S.what, '을', '를') : '', strip(S.how), strip(S.act)];
     } else if (n === 2) {
-      x = [strip(S.reason), strip(S.much), strip(S.feel)];
+      if (!strip(S.say)) return '';
+      x = [strip(S.when2), spkPart(S.spk), '"' + cleanSay(S.say) + '" 하고', strip(S.said) || '말했다'];
     } else if (n === 3) {
+      x = [strip(S.reason), strip(S.much), strip(S.feel)];
+    } else if (n === 4) {
       var p = strip(S.part) ? '그때 내 ' + strip(S.part) + josa(S.part, '은', '는') : '';
       if (S.kind === '가') x = [p, S.mat ? '마치 ' + strip(S.mat) + '처럼' : '', strip(S.move)];
       else x = [p, strip(S.sl), strip(S.move)];
-    } else if (n === 4) {
+    } else if (n === 5) {
       x = [strip(S.next), whoPart(S.who5), strip(S.want)];
     }
     var body = x.filter(Boolean);
@@ -332,14 +341,18 @@
       { k: 'how', label: '어떻게', opt: true },
       { k: 'act', label: '행동' }, '.'
     ];
-    if (n === 2) return [{ k: 'reason', label: '까닭 (~해서)' }, { k: 'much', label: '얼마나', opt: true }, { k: 'feel', label: '감정 말' }, '.'];
-    if (n === 3) return S.kind === '가'
+    if (n === 2) return [{ k: 'when2', label: '하다가', opt: true },
+      { k: 'spk', label: '누가', after: function (v) { var x = spkPart(v); return x.slice(strip(v).length); }, fallback: '이(가)' },
+      { k: 'say', label: '한 말', before: '"', after: function () { return '" 하고'; }, fallback: '" 하고' },
+      { k: 'said', label: '말했다' }, '.'];
+    if (n === 3) return [{ k: 'reason', label: '까닭 (~해서)' }, { k: 'much', label: '얼마나', opt: true }, { k: 'feel', label: '감정 말' }, '.'];
+    if (n === 4) return S.kind === '가'
       ? ['그때 내', { k: 'part', label: '몸 부위', after: function (v) { return josa(v, '은', '는'); }, fallback: '은(는)' }, '마치', { k: 'mat', label: '비유 재료', after: function () { return '처럼'; }, fallback: '처럼' }, { k: 'move', label: '움직임' }, '.']
       : ['그때 내', { k: 'part', label: '몸 부위', after: function (v) { return josa(v, '은', '는'); }, fallback: '은(는)' }, { k: 'sl', label: '소리 말·모습 말' }, { k: 'move', label: '움직임' }, '.'];
-    if (n === 4) return [{ k: 'next', label: '다음에도·앞으로는' }, { k: 'who5', label: '누구', after: function (v) { return noJosaWho(v) ? '' : josa(v, '과', '와'); }, fallback: '와(과)' }, { k: 'want', label: '행동' }, '.'];
+    if (n === 5) return [{ k: 'next', label: '다음에도·앞으로는' }, { k: 'who5', label: '누구', after: function (v) { return noJosaWho(v) ? '' : josa(v, '과', '와'); }, fallback: '와(과)' }, { k: 'want', label: '행동' }, '.'];
   }
   // 처음 고를 차례 (문장 순서와 다를 수 있음)
-  var ORDER = { 1: ['where', 'what', 'how', 'act', 'who'], 2: ['feel', 'reason', 'much'], 3: ['part', 'mat', 'sl', 'move'], 4: ['next', 'who5', 'want'] };
+  var ORDER = { 1: ['where', 'what', 'how', 'act', 'who'], 2: ['spk', 'say', 'when2', 'said'], 3: ['feel', 'reason', 'much'], 4: ['part', 'mat', 'sl', 'move'], 5: ['next', 'who5', 'want'] };
   function slotKeys(n) { return parts(n).filter(function (p) { return typeof p === 'object'; }).map(function (p) { return p.k; }); }
   function firstEmpty(n) {
     var keys = slotKeys(n);
@@ -355,6 +368,7 @@
     S.skip[k] = false;
     if (k === 'want') S._wantTouched = true;
     if (k === 'who' && !S.who5) S.who5 = v;
+    if (k === 'who' && !S.spk) S.spk = noJosaWho(v) ? '나' : v;
     if (k === 'feel') delete S.over.emoBox;
     if (k === 'mat' || k === 'sl' || k === 'move') delete S.over.matBox;
     save();
@@ -381,7 +395,7 @@
     S.emo = i; S.feel = D.emotions[i].past;
     // 감정이 바뀌면 몸 표현 재료도 새로
     S.mat = ''; S.sl = ''; S.move = '';
-    delete S.over.s2; delete S.over.s3; delete S.over.emoBox; delete S.over.matBox;
+    delete S.over.s3; delete S.over.s4; delete S.over.emoBox; delete S.over.matBox;
     save(); active = firstEmpty(2); render();
   }
 
@@ -442,10 +456,11 @@
     if (!v) return out;
     var obj = w ? w + josa(w, '을', '를') + ' ' : '';
     var full = [whoPart(S.who), wherePart(S.where), obj + v].filter(Boolean).join(' ');
-    out.push(full);
+    // 1번과 겹치지 않게 짧은 말부터
     if (S.who && !noJosaWho(S.who)) out.push('같이 ' + obj + v);
     out.push(obj + v);
     if (S.who && !noJosaWho(S.who)) out.push(whoPart(S.who) + ' 같이 놀아서');
+    out.push(full);
     return out.filter(function (x, i) { return out.indexOf(x) === i; });
   }
   function wantsFromScene() {
@@ -488,14 +503,14 @@
   }
 
   /* ---------- 화면: 문장 ---------- */
-  var STEP_NAMES = ['시작', '장면', '감정·까닭', '몸 표현', '마무리', '완성'];
+  var STEP_NAMES = ['시작', '장면', '대화', '감정·까닭', '몸 표현', '마무리', '완성'];
   function renderSentence(app, n) {
     var st = h('div', { class: 'stage' });
     st.appendChild(h('div', { class: 'stage-head' }, [h('div', { class: 'num' }, [String(n)]), h('div', { class: 'stage-name' }, [STEP_NAMES[n]])]));
-    if (n === 3) {
+    if (n === 4) {
       st.appendChild(h('div', { class: 'choose' }, [
-        h('button', { type: 'button', class: S.kind === '가' ? 'on' : '', on: { click: function () { S.kind = '가'; delete S.over.s4; delete S.over.matBox; save(); active = firstEmpty(3); render(); } }, html: '<b>가</b> 마치 ○○처럼 (비유 재료)' }),
-        h('button', { type: 'button', class: S.kind === '나' ? 'on' : '', on: { click: function () { S.kind = '나'; delete S.over.s4; delete S.over.matBox; save(); active = firstEmpty(3); render(); } }, html: '<b>나</b> 소리 말·모습 말로' })
+        h('button', { type: 'button', class: S.kind === '가' ? 'on' : '', on: { click: function () { S.kind = '가'; delete S.over.s4; delete S.over.matBox; save(); active = firstEmpty(4); render(); } }, html: '<b>가</b> 마치 ○○처럼 (비유 재료)' }),
+        h('button', { type: 'button', class: S.kind === '나' ? 'on' : '', on: { click: function () { S.kind = '나'; delete S.over.s4; delete S.over.matBox; save(); active = firstEmpty(4); render(); } }, html: '<b>나</b> 소리 말·모습 말로' })
       ]));
     }
     var sen = h('div', { class: 'sentence' });
@@ -503,10 +518,11 @@
       if (i > 0 && p !== '.') sen.appendChild(document.createTextNode(' '));
       if (typeof p === 'string') { sen.appendChild(document.createTextNode(p)); return; }
       var v = strip(S[p.k]);
+      if (p.before) sen.appendChild(h('span', { class: 'josa' }, [p.before]));
       sen.appendChild(h('span', {
         class: 'slot' + (v ? ' filled' : '') + (active === p.k ? ' active' : '') + (p.opt ? ' opt' : ''),
         on: { click: function () { active = p.k; render(); } }
-      }, [v || p.label]));
+      }, [(p.k === 'say' && v ? cleanSay(v) : v) || p.label]));
       if (p.after) sen.appendChild(h('span', { class: 'josa' }, [v ? p.after(v) : p.fallback]));
     });
     st.appendChild(sen);
@@ -588,6 +604,36 @@
         return chip(w, function () { set(k, w); }, { big: true, em: EM_WHO[w], on: S[k] === w });
       })));
       b.appendChild(writeBox(k, '누구 직접 쓰기', '예: 사촌 동생'));
+    }
+    else if (k === 'when2') {
+      title('무엇을 하다가?', '맨 앞에 넣는 말이에요. 안 골라도 돼요.');
+      var dg = toDaga(S.act), ww = strip(S.what), op = [];
+      if (dg && ww) op.push(ww + josa(ww, '을', '를') + ' ' + dg);
+      if (op.length) { label('📍 1번에서 고른 일로'); b.appendChild(chipList(op, 'when2')); }
+      label('더 고르기'); b.appendChild(chipList(X.openers, 'when2'));
+      b.appendChild(skipBtn('when2', '빼기'));
+      b.appendChild(writeBox('when2', '직접 쓰기', '예: 밥을 먹다가'));
+    }
+    else if (k === 'spk') {
+      title('누가 말했어요?', '"나"를 고르면 "나는"이 돼요.');
+      var sp = ['나'].concat(WHO.filter(function (w) { return !noJosaWho(w); }));
+      if (strip(S.who) && !noJosaWho(S.who) && sp.indexOf(strip(S.who)) < 0) sp.splice(1, 0, strip(S.who));
+      b.appendChild(h('div', { class: 'chips' }, sp.map(function (w) {
+        return chip(w, function () { set('spk', w); }, { big: true, em: w === '나' ? '🙋' : EM_WHO[w], on: S.spk === w });
+      })));
+      b.appendChild(writeBox('spk', '누가 직접 쓰기', '예: 짝꿍'));
+    }
+    else if (k === 'say') {
+      title('뭐라고 말했어요?', '따옴표 안에 들어갈 말이에요.');
+      var sg = X.says.slice();
+      if (e) sg.sort(function (a, c) { return (a.part === e.part ? 0 : 1) - (c.part === e.part ? 0 : 1); });
+      sg.forEach(function (g) { label(g.label); b.appendChild(chipList(g.words, 'say')); });
+      b.appendChild(writeBox('say', '한 말 직접 쓰기', '예: 내 차례 언제야?'));
+    }
+    else if (k === 'said') {
+      title('어떻게 말했어요?');
+      b.appendChild(chipList(X.said, 'said'));
+      b.appendChild(writeBox('said', '직접 쓰기', '예: 크게 웃었다'));
     }
     else if (k === 'feel') {
       title('그때 어떤 감정이었어요?', '감정 카드를 누르면 감정 말이 들어가요.');
@@ -739,6 +785,7 @@
   function B(t) { return '<span class="b">' + t + '</span>'; }
   var FRAMES = [
     '오늘 나는 ' + B('누구') + '와(과) ' + B('어디') + '에서 ' + B('무엇') + '을(를) ' + B('어떻게') + ' ' + B('행동') + '.',
+    B('하다가') + ' ' + B('누가') + '이(가) "' + B('한 말') + '" 하고 ' + B('말했다') + '.',
     B('까닭 (~해서)') + ' ' + B('얼마나') + ' ' + B('감정 말') + '.',
     '<span class="tag">가</span>그때 내 ' + B('몸 부위') + '은(는) 마치 ' + B('비유 재료') + '처럼 ' + B('움직임') + '. &nbsp;또는 &nbsp;<span class="tag">나</span>그때 내 ' + B('몸 부위') + '은(는) ' + B('소리 말·모습 말') + ' ' + B('움직임') + '.',
     B('다음에도·앞으로는') + ' ' + B('누구') + '와(과) ' + B('행동') + '.'
