@@ -228,13 +228,32 @@
   html[data-theme="green"]  { --pink: #2a8a5c; --pink-soft: #e2f5ea; --bg: #f4fbf6; --line: #d4e8db; --edge: #d3eedd; --mid: #9fd3b4; }
   html[data-theme="purple"] { --pink: #7445c2; --pink-soft: #eee6fb; --bg: #f8f5fe; --line: #e1d8f0; --edge: #e6dcf8; --mid: #c6b2ea; }
   html[data-theme="orange"] { --pink: #d0650f; --pink-soft: #fdebdc; --bg: #fff8f2; --line: #f0dfcf; --edge: #fbe0c8; --mid: #f2bd8f; }
-  html[data-theme="night"]  { --pink: #ff8fb8; --pink-soft: #3a2f45; --bg: #1f1b26; --line: #4a4057; --edge: #3d3448; --mid: #6b5a7d; --ink: #f1ebf5; --sub: #c4b8cf; }
+  /* 밤: 검정 바탕에 하얀 글씨 */
+  html[data-theme="night"]  { --pink: #ffffff; --pink-soft: #2a2a2a; --bg: #000000; --line: #555555; --edge: #333333; --mid: #888888; --ink: #ffffff; --sub: #cccccc; }
+  html[data-theme="night"] body { color: #fff; }
   html[data-theme="night"] .stage, html[data-theme="night"] .board, html[data-theme="night"] .chip, html[data-theme="night"] .step,
   html[data-theme="night"] .row-card, html[data-theme="night"] .choose button, html[data-theme="night"] .tab,
-  html[data-theme="night"] input, html[data-theme="night"] textarea { background: #2a2433; color: var(--ink); }
-  html[data-theme="night"] .chip.on, html[data-theme="night"] .slot.filled { background: var(--pink-soft); color: var(--ink); }
-  html[data-theme="night"] .nav { background: rgba(31,27,38,.96); }
-  html[data-theme="night"] .meaning { background: #3a3324; }
+  html[data-theme="night"] input, html[data-theme="night"] textarea, html[data-theme="night"] .slot,
+  html[data-theme="night"] .history button, html[data-theme="night"] .themes button { background: #000; color: #fff; border-color: #555; }
+  html[data-theme="night"] .chip.on, html[data-theme="night"] .slot.filled, html[data-theme="night"] .choose button.on { background: #2a2a2a; color: #fff; border-color: #fff; }
+  html[data-theme="night"] .slot { color: #aaa; }
+  html[data-theme="night"] .slot.filled { color: #fff; }
+  html[data-theme="night"] .step.on, html[data-theme="night"] .tab.on, html[data-theme="night"] .num { background: #fff !important; color: #000 !important; border-color: #fff !important; }
+  html[data-theme="night"] .btn { background: #fff; color: #000; }
+  html[data-theme="night"] .btn.ghost, html[data-theme="night"] .btn.gray { background: #000; color: #fff; border: 3px solid #fff; }
+  html[data-theme="night"] .choose b, html[data-theme="night"] .tag { background: #fff; color: #000; }
+  html[data-theme="night"] .nav { background: #000; border-top-color: #333; }
+  html[data-theme="night"] .meaning { background: #1a1a1a; color: #fff; }
+  html[data-theme="night"] input::placeholder { color: #999; }
+  html[data-theme="night"] .themebtn { background: #000; border-color: #fff; }
+  html[data-theme="night"] .sheet { --pink: #000; color: #222; } /* 인쇄 쪽은 하얀 종이라 검정으로 */
+  html[data-theme="night"] .field input[type=date], html[data-theme="night"] .field input[type=text], html[data-theme="night"] .write input,
+  html[data-theme="night"] .edit-list textarea, html[data-theme="night"] .edit-list input { background: #000; color: #fff; border-color: #777; color-scheme: dark; }
+  html[data-theme="night"] .slot.active { border-color: #fff; box-shadow: 0 0 0 4px rgba(255,255,255,.25); }
+  html[data-theme="night"] .sheet .tag { background: #000; color: #fff; }
+  /* 홈 화면 추가 안내도 검정에 하얀 글씨 */
+  html[data-theme="night"] #hs-add .hs-go span { background: #000 !important; color: #fff !important; border: 1px solid #555; }
+  html[data-theme="night"] #hs-add .hs-x { background: #000 !important; color: #fff !important; border: 1px solid #555 !important; }
   .themebtn { margin-right: auto; border: 2px solid var(--line); background: var(--pink-soft); border-radius: 999px; font-size: 22px; width: 44px; height: 44px; cursor: pointer; flex: none; }
   .themes { max-width: 760px; margin: 8px auto 0; display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; }
   .themes[hidden] { display: none; }
@@ -256,9 +275,9 @@
 <div class="print-only" id="printArea"></div>
 
 <!-- 버전을 올리면 ?v= 도 같이 바꿔요 (예전 파일이 남지 않게) -->
-<script src="version.js?v=2.0"></script>
-<script src="data.js?v=2.0"></script>
-<script src="extra.js?v=2.0"></script>
+<script src="version.js?v=2.1"></script>
+<script src="data.js?v=2.1"></script>
+<script src="extra.js?v=2.1"></script>
 <script>
 (function () {
   'use strict';
@@ -884,13 +903,13 @@
   }
 
   /* ---------- 화면 색 (기기마다 기억) ---------- */
-  var THEMES = [['pink', '분홍', '#c8195e'], ['sky', '하늘', '#1f6fbf'], ['green', '초록', '#2a8a5c'], ['purple', '보라', '#7445c2'], ['orange', '주황', '#d0650f'], ['night', '밤', '#1f1b26']];
+  var THEMES = [['pink', '분홍', '#c8195e'], ['sky', '하늘', '#1f6fbf'], ['green', '초록', '#2a8a5c'], ['purple', '보라', '#7445c2'], ['orange', '주황', '#d0650f'], ['night', '검정', '#000000']];
   function setTheme(t) {
     if (t && t !== 'pink') document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme');
     try { localStorage.setItem('diary.theme', t); } catch (e) {}
     var meta = document.querySelector('meta[name="theme-color"]');
     var c = THEMES.filter(function (x) { return x[0] === t; })[0];
-    if (meta && c) meta.setAttribute('content', t === 'night' ? '#1f1b26' : getComputedStyle(document.documentElement).getPropertyValue('--pink-soft').trim() || '#fde2ef');
+    if (meta && c) meta.setAttribute('content', t === 'night' ? '#000000' : getComputedStyle(document.documentElement).getPropertyValue('--pink-soft').trim() || '#fde2ef');
     Array.prototype.forEach.call(document.querySelectorAll('#themes button'), function (bt) { bt.classList.toggle('on', bt.dataset.t === t); });
     paintPreview();
   }
