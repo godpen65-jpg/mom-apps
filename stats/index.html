@@ -42,6 +42,9 @@
   .url{font-family:'Gaegu',sans-serif;font-size:12px;color:#bbb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .cnt{font-size:24px;color:#ff6faa;flex:0 0 auto;min-width:58px;text-align:right;}
   .cnt small{font-size:12px;color:#cbb;}
+  .cnt .ppl{display:block;font-size:15px;color:#8a7bd6;margin-top:2px;}
+  .total .two{display:flex;justify-content:center;gap:26px;}
+  .total .ppl{color:#8a7bd6;}
   .foot{text-align:center;font-family:'Gaegu',sans-serif;font-size:13px;color:#bbb;margin-top:22px;line-height:1.7;}
   .refresh{
     display:block;margin:20px auto 0;background:#ffb3d1;color:#fff;border:none;
@@ -57,8 +60,10 @@
   <div class="sub">엄마가 만든 사이트들, 얼마나 왔나 보기</div>
 
   <div class="total">
-    <div class="n" id="total">…</div>
-    <div class="lbl">전체 방문 합계</div>
+    <div class="two">
+      <div><div class="n" id="total">…</div><div class="lbl">전체 방문 횟수</div></div>
+      <div><div class="n ppl" id="totalP">…</div><div class="lbl">처음 온 기기 수 합계</div></div>
+    </div>
   </div>
 
   <div class="sec">🌸 공유용 앱</div>
@@ -70,6 +75,8 @@
   <button class="refresh" onclick="loadAll()">🔄 새로고침</button>
   <div class="foot">
     숫자는 이 현황판을 열어도 올라가지 않아요(읽기 전용).<br>
+    <b style="color:#8a7bd6">기기 수</b>는 기기마다 처음 한 번만 세요 (2026-11-19부터, 티니핑은 그전부터).<br>
+    우리 집 기기 수보다 많으면 다른 사람도 쓰고 있다는 뜻이에요.<br>
     현황판 자체는 검색에 안 뜨는 나만 보는 페이지예요.<br>
     <span id="updated"></span>
   </div>
@@ -86,6 +93,10 @@ var SITES=[
   {g:"share",  e:"🍦", nm:"아이스크림 가게", key:"icecream",    url:"https://godpen65-jpg.github.io/icecream-shop/"},
   {g:"share",  e:"💖", nm:"티니핑 도감",    key:"teenieping",  url:"https://godpen65-jpg.github.io/mom-apps/teenieping/"},
   {g:"share",  e:"🧺", nm:"품사 놀이터",    key:"posplay",     url:"https://godpen65-jpg.github.io/mom-apps/parts-of-speech/"},
+  {g:"share",  e:"📔", nm:"일기 5문장",     key:"diary",       url:"https://godpen65-jpg.github.io/mom-apps/diary/"},
+  {g:"share",  e:"🍕", nm:"영문법 만화",    key:"grammar",     url:"https://godpen65-jpg.github.io/mom-apps/grammar/"},
+  {g:"share",  e:"🌱", nm:"교육청 자료",    key:"edulinks",    url:"https://godpen65-jpg.github.io/mom-apps/edu-links/"},
+  {g:"share",  e:"✂️", nm:"PDF 나누기",     key:"pdfsplit",    url:"https://godpen65-jpg.github.io/pdf-page-splitter/"},
   {g:"hub",    e:"🏠", nm:"엄마표앱 모음",  key:"momapps",     url:"https://godpen65-jpg.github.io/mom-apps/home/"}
 ];
 
@@ -103,30 +114,28 @@ function render(){
   });
 }
 
+function getN(key){
+  return fetch("https://abacus.jasoncameron.dev/get/"+NS+"/"+key)
+    .then(function(r){ if(!r.ok) return 0; return r.json(); })
+    .then(function(d){ return (d&&typeof d.value!=="undefined")?Number(d.value):0; })
+    .catch(function(){ return null; });
+}
 function loadAll(){
   render();
-  var total=0, done=0;
+  var total=0, totalP=0, done=0;
   SITES.forEach(function(s){
-    fetch("https://abacus.jasoncameron.dev/get/"+NS+"/"+s.key)
-      .then(function(r){return r.json();})
-      .then(function(d){
-        var v=(d&&typeof d.value!=="undefined")?Number(d.value):0;
-        var el=document.getElementById("c-"+s.key);
-        if(el) el.innerHTML=v.toLocaleString()+' <small>회</small>';
-        total+=v;
-      })
-      .catch(function(){
-        var el=document.getElementById("c-"+s.key);
-        if(el) el.innerHTML='<small>-</small>';
-      })
-      .finally(function(){
-        done++;
-        if(done===SITES.length){
-          document.getElementById("total").textContent=total.toLocaleString();
-          var now=new Date();
-          document.getElementById("updated").textContent="업데이트: "+now.toLocaleString('ko-KR');
-        }
-      });
+    Promise.all([getN(s.key), getN(s.key+"-people")]).then(function(v){
+      var el=document.getElementById("c-"+s.key);
+      if(el) el.innerHTML=(v[0]==null?'-':v[0].toLocaleString())+' <small>회</small>'+
+        '<span class="ppl">'+(v[1]==null?'-':v[1].toLocaleString())+' <small>대</small></span>';
+      total+=v[0]||0; totalP+=v[1]||0;
+      done++;
+      if(done===SITES.length){
+        document.getElementById("total").textContent=total.toLocaleString();
+        document.getElementById("totalP").textContent=totalP.toLocaleString();
+        document.getElementById("updated").textContent="업데이트: "+new Date().toLocaleString('ko-KR');
+      }
+    });
   });
 }
 loadAll();
