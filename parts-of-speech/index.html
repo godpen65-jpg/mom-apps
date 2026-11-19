@@ -695,5 +695,16 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape') hlpClose()
 // 방문자 현황판용: 들어올 때마다 1씩 센다
 fetch('https://abacus.jasoncameron.dev/hit/godpen65-sites/posplay').catch(function(){});
 </script>
+<script>
+/* 방문자 현황판용 (숫자만 보냄, 기기 정보는 안 보냄)
+   - 처음 온 기기 수: 기기마다 처음 한 번만 posplay-people
+   - 테스트(내 컴퓨터)에서 연 것은 안 셈 */
+(function () {
+  if (location.hostname !== 'godpen65-jpg.github.io') return;
+  var U = 'https://abacus.jasoncameron.dev/hit/godpen65-sites/', K = 'posplay';
+  try { if (localStorage.getItem('people-counted:' + K)) return; } catch (e) { return; }
+  fetch(U + K + '-people').then(function (r) { if (r.ok) try { localStorage.setItem('people-counted:' + K, '1'); } catch (e) {} }).catch(function () {});
+})();
+</script>
 </body>
 </html>

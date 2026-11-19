@@ -329,5 +329,18 @@
       좋은 자료 더 찾으면 계속 추가할게요!
     </footer>
   </div>
+<script>
+/* 방문자 현황판용 (숫자만 보냄, 기기 정보는 안 보냄)
+   - 들어올 때마다 1씩: edulinks
+   - 처음 온 기기 수: 기기마다 처음 한 번만 edulinks-people
+   - 테스트(내 컴퓨터)에서 연 것은 안 셈 */
+(function () {
+  if (location.hostname !== 'godpen65-jpg.github.io') return;
+  var U = 'https://abacus.jasoncameron.dev/hit/godpen65-sites/', K = 'edulinks';
+  fetch(U + K).catch(function () {});
+  try { if (localStorage.getItem('people-counted:' + K)) return; } catch (e) { return; }
+  fetch(U + K + '-people').then(function (r) { if (r.ok) try { localStorage.setItem('people-counted:' + K, '1'); } catch (e) {} }).catch(function () {});
+})();
+</script>
 </body>
 </html>
